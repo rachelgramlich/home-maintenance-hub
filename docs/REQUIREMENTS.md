@@ -324,4 +324,4 @@ Answer these to freeze the spec for implementation.
 
 | Date | Change |
 |------|--------|
-| 2026-03-23 | Initial draft from planning session + deprecated Notion schema review |
+| 2026-11-17 | Initial draft from planning session + deprecated Notion schema review |

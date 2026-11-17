@@ -203,4 +203,4 @@ Python `>=3.12,<3.13` to match grocery-wizard.
 
 | Date | Change |
 |------|--------|
-| 2026-03-23 | Initial technical draft |
+| 2026-11-17 | Initial technical draft |
