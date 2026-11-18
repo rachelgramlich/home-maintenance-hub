@@ -56,7 +56,7 @@ def _render_hero(month_label: str, store_label: str) -> None:
     st.markdown(
         f'<div class="mw-hero">'
         f"<h1>B &amp; R Home Maintenance</h1>"
-        f"<p>{month_label} · monthly checklist</p>"
+        f'<p class="mw-hero-month">{month_label}</p>'
         f"</div>",
         unsafe_allow_html=True,
     )
