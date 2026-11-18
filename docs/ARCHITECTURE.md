@@ -13,29 +13,44 @@ See [FEATURES.md](./FEATURES.md) for v1/v2 scope.
 You want **lookup**, not a buried audit log:
 
 - On each task (monthly view or detail): **Last completed:** date, optional **notes**, optional **vendor/cost** later.
-- Implemented by:
-  - **`instances` sheet:** one row per task per period; when status → Done, set `completed_on` and `notes`.
-  - **`last_done` in UI:** query latest instance per `task_id` where `status = Done` (or `Won't do` if you want that visible — default: Done only).
-
-No separate “query vs save” choice — **saving each completion with notes automatically enables “last time”** in the app.
+- Implemented by **`completions` tab:** append a row only when you tap Done or Won’t do (`period`, `notes`, `completed_on`).
+- **Last done** in UI: latest completion per `task_id` where `status = done`.
 
 ---
 
-## Data model (Google Sheet — three tabs)
+## Data model (Google Sheet — two tabs)
+
+The sheet does **not** recur anything. **Recurrence lives in app code** (which templates apply to which month).
 
 | Tab | Role |
 |-----|------|
-| **templates** | Stable task definitions + `gcal_series_id` |
-| **instances** | Per-month state (`pending` / `done` / `wont_do`); month-end rolls unmarked `pending` forward as **carried_over** |
-| **history** (optional) | Append-only copy on action for extra safety; can skip if instances are never hard-deleted |
+| **templates** | **One row per task, forever** — name, cadence, due month/day, area, active, … |
+| **completions** | **Sparse** — one row only when you act: Done or Won’t do for a given `period` (`YYYY-MM`) |
+
+**Pending / overdue are computed**, not stored as monthly instance rows.
 
 **templates columns (minimum):** `task_id`, `name`, `cadence`, `due_month`, `due_day`, `area`, `active` (+ `gcal_series_id` in **v2**)
 
-**instances columns (minimum):** `instance_id`, `task_id`, `period_key` (`YYYY-MM`), `status`, `due_date`, `carried_over`, `completed_on`, `notes` (+ `gcal_instance_id` in **v2**)
+**completions columns (minimum):** `completion_id`, `task_id`, `period` (`YYYY-MM`), `status` (`done` / `wont_do`), `completed_on`, `notes` (+ `gcal_instance_id` in **v2**)
+
+### How v1 builds the monthly list
+
+For selected month *M*:
+
+1. Select applicable **templates** (monthly always; annual when `due_month` matches *M*).
+2. Load **completions** for period *M* (and earlier periods if needed for carry-over).
+3. For each task:
+   - **Done / Won’t do in *M*** → hidden or muted.
+   - **No terminal completion for *M*** → **pending** for this month.
+   - **No terminal completion for a prior required period** while viewing *M* → **overdue** (red).
 
 ### Month rollover (v1)
 
-When the calendar month ends, any instance still `pending` for month *M* is closed as implicit defer: create or activate `pending` + `carried_over=true` for month *M+1* (or run this on first open of the new month).
+No defer rows are created at month end. When *M+1* opens, tasks that still lack Done/Won’t do for the period(s) they owed work in show as **overdue** until you act in the new month (implicit carry).
+
+### Recurrence elsewhere
+
+**v2 Google Calendar** owns native RRULE + phone reminders. The sheet stays templates + completions.
 
 ---
 
@@ -74,3 +89,4 @@ Not applicable if we **start** with Streamlit + Sheet. The earlier Apps Script p
 |------|--------|
 | 2026-11-17 | Lock Streamlit + Sheet + GCal; per-task last-done + notes; Cursor-first |
 | 2026-11-17 | v1 monthly only; done/won’t do; auto month rollover; GCal → v2 |
+| 2026-11-17 | Data model: templates + sparse completions; pending computed in app |

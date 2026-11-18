@@ -7,7 +7,7 @@
 - **Done** or **Won’t do** only (optional notes on done).
 - **Unmarked** at month end → **auto carries to next month** as overdue (no Defer button).
 - **Urgency:** overdue (red), due soon (orange), normal.
-- **Last done** date + notes per task (from past instances).
+- **Last done** date + notes per task (from **completions** log, not one row per month).
 - Filter by **area** (and metadata on templates).
 - **Hidden Google Sheet** backend + one-time import from your sheet / deprecated Notion.
 - Streamlit app; develop in Cursor.
@@ -26,3 +26,4 @@
 | Date | Change |
 |------|--------|
 | 2026-11-17 | v1 month view, done/won’t do, implicit month rollover; GCal → v2 |
+| 2026-11-17 | Sheet: templates + completions; pending/overdue computed in app |
