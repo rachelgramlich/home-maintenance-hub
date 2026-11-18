@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
 import streamlit as st
@@ -11,17 +11,22 @@ from maintenance_wizard.config import get_settings
 from maintenance_wizard.domain.board import build_month_board
 from maintenance_wizard.models import Urgency
 from maintenance_wizard.store.factory import get_store
-from maintenance_wizard.ui.styles import BADGE_CSS
-
-st.set_page_config(page_title="Maintenance Wizard", page_icon="🏠", layout="wide")
-st.markdown(BADGE_CSS, unsafe_allow_html=True)
+from maintenance_wizard.ui.styles import inject_app_styles
 
 
 def today_in_tz() -> date:
     tz = ZoneInfo(get_settings().timezone)
-    from datetime import datetime
-
     return datetime.now(tz).date()
+
+
+def urgency_class(urgency: Urgency) -> str:
+    return {
+        Urgency.OVERDUE: "mw-task mw-overdue",
+        Urgency.DUE_SOON: "mw-task mw-soon",
+        Urgency.NORMAL: "mw-task",
+        Urgency.DONE: "mw-task mw-done",
+        Urgency.WONT_DO: "mw-task mw-wont",
+    }[urgency]
 
 
 def urgency_badge(urgency: Urgency) -> str:
@@ -30,16 +35,6 @@ def urgency_badge(urgency: Urgency) -> str:
     if urgency == Urgency.DUE_SOON:
         return '<span class="mw-badge mw-badge-soon">Due soon</span>'
     return ""
-
-
-def card_class(urgency: Urgency) -> str:
-    return {
-        Urgency.OVERDUE: "mw-card mw-overdue",
-        Urgency.DUE_SOON: "mw-card mw-soon",
-        Urgency.NORMAL: "mw-card mw-normal",
-        Urgency.DONE: "mw-card mw-done",
-        Urgency.WONT_DO: "mw-card mw-wont",
-    }[urgency]
 
 
 @st.cache_data(ttl=30)
@@ -57,12 +52,27 @@ def load_board(year: int, month: int, show_closed: bool) -> list:
     return board
 
 
+def _render_hero(month_label: str, store_label: str) -> None:
+    st.markdown(
+        f'<div class="mw-hero">'
+        f"<h1>Maintenance Wizard</h1>"
+        f"<p>{month_label} · home maintenance checklist</p>"
+        f"</div>",
+        unsafe_allow_html=True,
+    )
+    st.caption(f"Data source: {store_label}")
+
+
 def main() -> None:
+    st.set_page_config(
+        page_title="Maintenance Wizard",
+        page_icon="🏠",
+        layout="centered",
+    )
+    inject_app_styles()
+
     settings = get_settings()
     today = today_in_tz()
-
-    st.title("Maintenance Wizard")
-    st.caption("This month's home maintenance · data: " + settings.store)
 
     with st.sidebar:
         st.header("Month")
@@ -74,18 +84,14 @@ def main() -> None:
             index=today.month - 1,
         )
         show_closed = st.toggle("Show done & won't do", value=False)
-        area_filter = st.multiselect(
-            "Area",
-            options=sorted(
-                {
-                    t.area
-                    for t in get_store().list_templates()
-                }
-            ),
-        )
-        if st.button("Refresh"):
+        areas = sorted({t.area for t in get_store().list_templates()})
+        area_filter = st.multiselect("Area", options=areas)
+        if st.button("Refresh", use_container_width=True):
             load_board.clear()
             st.rerun()
+
+    month_label = date(year, month, 1).strftime("%B %Y")
+    _render_hero(month_label, settings.store)
 
     try:
         board = load_board(year, month, show_closed)
@@ -99,62 +105,77 @@ def main() -> None:
 
     overdue_n = sum(1 for r in board if r.urgency == Urgency.OVERDUE)
     soon_n = sum(1 for r in board if r.urgency == Urgency.DUE_SOON)
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Overdue", overdue_n)
-    col2.metric("Due soon", soon_n)
-    col3.metric("Open", len(board) - overdue_n - soon_n)
+    open_n = len(board) - overdue_n - soon_n
+
+    m1, m2, m3 = st.columns(3)
+    m1.metric("Overdue", overdue_n)
+    m2.metric("Due soon", soon_n)
+    m3.metric("Open", max(open_n, 0))
 
     if not board:
         st.success("Nothing open for this month — or all tasks are complete.")
         return
 
     store = get_store()
+
     for row in board:
         t = row.template
         badge = urgency_badge(row.urgency)
-        last = ""
+        last_html = ""
         if row.last_done_on:
-            last = f"Last done {row.last_done_on.isoformat()}"
+            last_html = f'<p class="mw-last">Last done {row.last_done_on.isoformat()}'
             if row.last_done_notes:
-                last += f" — {row.last_done_notes}"
+                last_html += f" — {row.last_done_notes}"
+            last_html += "</p>"
 
-        st.markdown(
-            f'<div class="{card_class(row.urgency)}">'
-            f"{badge}<strong>{t.name}</strong>"
-            f'<div class="mw-meta">{t.area} · {t.cadence} · period {row.period}</div>'
-            f'<div class="mw-meta">{last}</div></div>',
-            unsafe_allow_html=True,
+        card_html = (
+            f"{badge}"
+            f'<p class="mw-task-title">{t.name}</p>'
+            f'<p class="mw-meta">{t.area} · {t.cadence} · {row.period}</p>'
+            f"{last_html}"
         )
 
         if row.urgency in (Urgency.DONE, Urgency.WONT_DO):
+            st.markdown(
+                f'<div class="{urgency_class(row.urgency)}">{card_html}</div>',
+                unsafe_allow_html=True,
+            )
             continue
 
-        c1, c2, c3 = st.columns([1, 1, 3])
-        notes_key = f"notes_{t.task_id}_{row.period}"
-        with c3:
-            notes = st.text_input("Notes (optional)", key=notes_key, label_visibility="collapsed")
-        with c1:
-            if st.button("Done", key=f"done_{t.task_id}_{row.period}", type="primary"):
-                try:
-                    store.add_completion(
-                        t.task_id, row.period, "done", today, notes or ""
-                    )
-                    load_board.clear()
-                    st.rerun()
-                except ValueError as err:
-                    st.warning(str(err))
-        with c2:
-            if st.button("Won't do", key=f"wont_{t.task_id}_{row.period}"):
-                try:
-                    store.add_completion(
-                        t.task_id, row.period, "wont_do", today, notes or ""
-                    )
-                    load_board.clear()
-                    st.rerun()
-                except ValueError as err:
-                    st.warning(str(err))
-
-        st.divider()
+        with st.container(border=True):
+            st.markdown(
+                f'<div class="{urgency_class(row.urgency)} mw-task--open">{card_html}</div>',
+                unsafe_allow_html=True,
+            )
+            notes_key = f"notes_{t.task_id}_{row.period}"
+            note_col, done_col, wont_col = st.columns([5, 1.2, 1.4])
+            with note_col:
+                notes = st.text_input(
+                    "Notes",
+                    key=notes_key,
+                    placeholder="Optional notes",
+                    label_visibility="collapsed",
+                )
+            with done_col:
+                if st.button("Done", key=f"done_{t.task_id}_{row.period}", type="primary"):
+                    try:
+                        store.add_completion(
+                            t.task_id, row.period, "done", today, notes or ""
+                        )
+                        load_board.clear()
+                        st.rerun()
+                    except ValueError as err:
+                        st.warning(str(err))
+            with wont_col:
+                if st.button("Skip", key=f"wont_{t.task_id}_{row.period}"):
+                    try:
+                        store.add_completion(
+                            t.task_id, row.period, "wont_do", today, notes or ""
+                        )
+                        load_board.clear()
+                        st.rerun()
+                    except ValueError as err:
+                        st.warning(str(err))
 
 
 if __name__ == "__main__":

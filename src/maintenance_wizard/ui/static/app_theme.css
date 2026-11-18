@@ -1,0 +1,221 @@
+/* Maintenance Wizard — lavender theme (extends MW_THEME tokens). */
+
+:root {
+    --mw-bg: #e6e0f2;
+    --mw-text: #3a2849;
+    --mw-text-muted: #5a4868;
+    --mw-input-bg: #f8f6fc;
+    --mw-accent: #6341a5;
+    --mw-blue: #c8d8f0;
+    --mw-blue-strong: #7ba3d4;
+    --mw-blue-text: #1e3d5c;
+    --mw-card-bg: #ffffff;
+    --mw-border: #a894c8;
+    --mw-overdue: #b71c3a;
+    --mw-overdue-bg: #fce8ec;
+    --mw-soon: #9c4d00;
+    --mw-soon-bg: #fff4e8;
+}
+
+html {
+    color-scheme: light;
+}
+
+.stApp {
+    background-color: var(--mw-bg);
+    color: var(--mw-text);
+}
+
+[data-testid="stSidebar"] {
+    background-color: var(--mw-input-bg);
+    border-right: 1px solid var(--mw-border);
+}
+
+.stApp h1, .stApp h2, .stApp h3, .stApp label,
+.stApp [data-testid="stMarkdownContainer"] p,
+.stApp [data-testid="stWidgetLabel"] p {
+    color: var(--mw-text);
+}
+
+.stApp [data-testid="stCaptionContainer"],
+.stApp .stCaption {
+    color: var(--mw-text-muted);
+}
+
+[data-testid="stMetric"] {
+    background: var(--mw-card-bg);
+    border: 1px solid var(--mw-border);
+    border-radius: 12px;
+    padding: 0.65rem 0.9rem;
+    box-shadow: 0 1px 3px rgba(58, 40, 73, 0.08);
+}
+
+[data-testid="stMetricLabel"] {
+    color: var(--mw-text-muted) !important;
+    font-size: 0.8rem !important;
+}
+
+[data-testid="stMetricValue"] {
+    color: var(--mw-text) !important;
+    font-weight: 700 !important;
+}
+
+[data-testid="stTextInputRootElement"],
+[data-testid="stNumberInputContainer"],
+[data-testid="stMultiSelect"] div:has([data-testid="stMultiSelectTagsContainer"]),
+[data-testid="stSelectbox"] div:has(button[aria-label="Open"]) {
+    background-color: var(--mw-input-bg) !important;
+    border-color: var(--mw-border) !important;
+    border-radius: 8px !important;
+}
+
+.stTextInput input::placeholder {
+    color: var(--mw-text-muted) !important;
+    opacity: 0.75 !important;
+}
+
+.stButton button[kind="primary"],
+.stButton button[data-testid^="stBaseButton-primary"] {
+    background-color: var(--mw-accent) !important;
+    border-color: var(--mw-accent) !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    border-radius: 8px !important;
+}
+
+.stButton button[kind="secondary"],
+.stButton button[data-testid^="stBaseButton-secondary"] {
+    background-color: var(--mw-input-bg) !important;
+    border: 1px solid var(--mw-border) !important;
+    color: var(--mw-text) !important;
+    border-radius: 8px !important;
+}
+
+.block-container {
+    max-width: 44rem;
+    padding-top: 1.5rem;
+    padding-bottom: 3rem;
+}
+
+.mw-hero {
+    margin-bottom: 1.25rem;
+}
+
+.mw-hero h1 {
+    font-size: 1.85rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.25rem 0;
+    color: var(--mw-text);
+}
+
+.mw-hero p {
+    margin: 0;
+    color: var(--mw-text-muted);
+    font-size: 0.95rem;
+}
+
+.mw-task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.mw-task {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0 0 0.15rem;
+    box-shadow: none;
+}
+
+.mw-task.mw-task--open {
+    padding-bottom: 0.35rem;
+}
+
+[data-testid="stVerticalBlockBorderWrapper"] {
+    background: var(--mw-card-bg) !important;
+    border-color: var(--mw-border) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 1px 3px rgba(58, 40, 73, 0.07);
+    margin-bottom: 0.85rem;
+}
+
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-overdue) {
+    border-color: var(--mw-overdue) !important;
+    border-left-width: 4px !important;
+    background: linear-gradient(90deg, var(--mw-overdue-bg) 0%, var(--mw-card-bg) 45%) !important;
+}
+
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-soon) {
+    border-color: var(--mw-soon) !important;
+    border-left-width: 4px !important;
+    background: linear-gradient(90deg, var(--mw-soon-bg) 0%, var(--mw-card-bg) 40%) !important;
+}
+
+.mw-task.mw-overdue {
+    border-color: var(--mw-overdue);
+    border-left-width: 4px;
+    background: linear-gradient(90deg, var(--mw-overdue-bg) 0%, var(--mw-card-bg) 42%);
+}
+
+.mw-task.mw-soon {
+    border-color: var(--mw-soon);
+    border-left-width: 4px;
+    background: linear-gradient(90deg, var(--mw-soon-bg) 0%, var(--mw-card-bg) 38%);
+}
+
+.mw-task.mw-done,
+.mw-task.mw-wont {
+    opacity: 0.82;
+}
+
+.mw-task-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--mw-text);
+    margin: 0.35rem 0 0.2rem;
+}
+
+.mw-meta {
+    color: var(--mw-text-muted);
+    font-size: 0.82rem;
+    line-height: 1.35;
+    margin: 0;
+}
+
+.mw-last {
+    margin-top: 0.35rem;
+    font-size: 0.8rem;
+    color: var(--mw-text-muted);
+    font-style: italic;
+}
+
+.mw-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 3px 9px;
+    border-radius: 6px;
+}
+
+.mw-badge-overdue {
+    background: var(--mw-overdue);
+    color: #ffffff;
+}
+
+.mw-badge-soon {
+    background: var(--mw-soon);
+    color: #ffffff;
+}
+
+.mw-actions-row {
+    margin-top: 0.65rem !important;
+}
+
+#MainMenu, footer, [data-testid="stToolbar"] {
+    visibility: hidden;
+    height: 0;
+}
