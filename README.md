@@ -1,6 +1,8 @@
-# Household recurring tasks
+# Maintenance Wizard
 
-Streamlit app (in planning) for monthly and annual home maintenance tasks, with **Notion** as source of truth — similar ops and UX patterns to [grocery-wizard](https://github.com/rachelgramlich/grocery-wizard).
+Streamlit app for monthly and annual home maintenance — **This month** checklist, Google Sheet backend (`templates` + `completions`). Ops patterns similar to [grocery-wizard](https://github.com/rachelgramlich/grocery-wizard).
+
+**Repo name:** `maintenance-wizard` · **Python package:** `maintenance_wizard`
 
 ## Documentation
 

@@ -1,4 +1,6 @@
-# Architecture decision (current)
+# Maintenance Wizard — architecture
+
+**Repo:** `maintenance-wizard` · **Package:** `maintenance_wizard`
 
 **Chosen direction:** Small **Python / Streamlit** repo developed in **Cursor**, **hidden Google Sheet** as data store. **v1:** monthly checklist only. **v2:** Google Calendar sync + reminders. **Notion not required.**
 
