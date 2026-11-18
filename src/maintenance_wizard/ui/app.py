@@ -137,27 +137,32 @@ def main() -> None:
 
         if row.urgency in (Urgency.DONE, Urgency.WONT_DO):
             st.markdown(
-                f'<div class="{urgency_class(row.urgency)}">{card_html}</div>',
+                f'<div class="mw-task-card {urgency_class(row.urgency)}">{card_html}</div>',
                 unsafe_allow_html=True,
             )
             continue
 
         with st.container(border=True):
+            st.markdown('<span class="mw-task-shell" aria-hidden="true"></span>', unsafe_allow_html=True)
             st.markdown(
                 f'<div class="{urgency_class(row.urgency)} mw-task--open">{card_html}</div>',
                 unsafe_allow_html=True,
             )
             notes_key = f"notes_{t.task_id}_{row.period}"
-            note_col, done_col, wont_col = st.columns([5, 1.2, 1.4])
-            with note_col:
-                notes = st.text_input(
-                    "Notes",
-                    key=notes_key,
-                    placeholder="Optional notes",
-                    label_visibility="collapsed",
-                )
+            notes = st.text_input(
+                "Notes",
+                key=notes_key,
+                placeholder="Optional notes",
+                label_visibility="collapsed",
+            )
+            done_col, skip_col = st.columns(2)
             with done_col:
-                if st.button("Done", key=f"done_{t.task_id}_{row.period}", type="primary"):
+                if st.button(
+                    "Done",
+                    key=f"done_{t.task_id}_{row.period}",
+                    type="primary",
+                    use_container_width=True,
+                ):
                     try:
                         store.add_completion(
                             t.task_id, row.period, "done", today, notes or ""
@@ -166,8 +171,13 @@ def main() -> None:
                         st.rerun()
                     except ValueError as err:
                         st.warning(str(err))
-            with wont_col:
-                if st.button("Skip", key=f"wont_{t.task_id}_{row.period}"):
+            with skip_col:
+                if st.button(
+                    "Won't do",
+                    key=f"wont_{t.task_id}_{row.period}",
+                    type="secondary",
+                    use_container_width=True,
+                ):
                     try:
                         store.add_completion(
                             t.task_id, row.period, "wont_do", today, notes or ""

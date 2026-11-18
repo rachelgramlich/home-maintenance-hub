@@ -1,4 +1,4 @@
-/* Maintenance Wizard — lavender theme (extends MW_THEME tokens). */
+/* Maintenance Wizard — lavender theme (Grocery Wizard contrast pattern). */
 
 :root {
     --mw-bg: #e6e0f2;
@@ -69,26 +69,68 @@ html {
     border-radius: 8px !important;
 }
 
+[data-testid="stTextInputField"],
+.stTextInput input {
+    background-color: transparent !important;
+    color: var(--mw-text) !important;
+    -webkit-text-fill-color: var(--mw-text) !important;
+}
+
 .stTextInput input::placeholder {
     color: var(--mw-text-muted) !important;
     opacity: 0.75 !important;
 }
 
+/* Buttons — mirror grocery-wizard label/fill rules (Streamlit 1.6x). */
 .stButton button[kind="primary"],
-.stButton button[data-testid^="stBaseButton-primary"] {
+.stButton button[kind^="primary"],
+.stButton button[data-testid^="stBaseButton-primary"],
+.stButton button[data-testid^="baseButton-primary"] {
     background-color: var(--mw-accent) !important;
     border-color: var(--mw-accent) !important;
     color: #ffffff !important;
-    font-weight: 600;
+    font-weight: 600 !important;
     border-radius: 8px !important;
+    min-height: 2.5rem !important;
+}
+
+.stButton button[kind="primary"] *,
+.stButton button[kind^="primary"] *,
+.stButton button[data-testid^="stBaseButton-primary"] *,
+.stButton button[data-testid^="baseButton-primary"] *,
+.stButton button[kind="primary"] p,
+.stButton button[kind^="primary"] p,
+.stButton button[data-testid^="stBaseButton-primary"] p {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    font-weight: 600 !important;
 }
 
 .stButton button[kind="secondary"],
-.stButton button[data-testid^="stBaseButton-secondary"] {
+.stButton button[kind^="secondary"],
+.stButton button[data-testid^="stBaseButton-secondary"],
+.stButton button[data-testid^="baseButton-secondary"] {
     background-color: var(--mw-input-bg) !important;
     border: 1px solid var(--mw-border) !important;
     color: var(--mw-text) !important;
+    font-weight: 600 !important;
     border-radius: 8px !important;
+    min-height: 2.5rem !important;
+}
+
+.stButton button[kind="secondary"] *,
+.stButton button[kind^="secondary"] *,
+.stButton button[data-testid^="stBaseButton-secondary"] *,
+.stButton button[data-testid^="baseButton-secondary"] *,
+.stButton button[kind="secondary"] p,
+.stButton button[kind^="secondary"] p {
+    color: var(--mw-text) !important;
+    -webkit-text-fill-color: var(--mw-text) !important;
+    font-weight: 600 !important;
+}
+
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell) .stButton {
+    margin-top: 0.15rem;
 }
 
 .block-container {
@@ -115,59 +157,62 @@ html {
     font-size: 0.95rem;
 }
 
-.mw-task-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.85rem;
+.mw-task-shell {
+    display: none;
 }
 
-.mw-task {
-    background: transparent;
-    border: none;
-    border-radius: 0;
-    padding: 0 0 0.15rem;
-    box-shadow: none;
-}
-
-.mw-task.mw-task--open {
-    padding-bottom: 0.35rem;
-}
-
-[data-testid="stVerticalBlockBorderWrapper"] {
+/* Open task cards only — scoped via .mw-task-shell */
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell) {
     background: var(--mw-card-bg) !important;
     border-color: var(--mw-border) !important;
     border-radius: 14px !important;
     box-shadow: 0 1px 3px rgba(58, 40, 73, 0.07);
     margin-bottom: 0.85rem;
+    padding: 0.35rem 0.5rem 0.75rem;
 }
 
-[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-overdue) {
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-overdue.mw-task--open) {
     border-color: var(--mw-overdue) !important;
     border-left-width: 4px !important;
-    background: linear-gradient(90deg, var(--mw-overdue-bg) 0%, var(--mw-card-bg) 45%) !important;
+    background: linear-gradient(90deg, var(--mw-overdue-bg) 0%, var(--mw-card-bg) 48%) !important;
 }
 
-[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-soon) {
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-soon.mw-task--open) {
     border-color: var(--mw-soon) !important;
     border-left-width: 4px !important;
-    background: linear-gradient(90deg, var(--mw-soon-bg) 0%, var(--mw-card-bg) 40%) !important;
+    background: linear-gradient(90deg, var(--mw-soon-bg) 0%, var(--mw-card-bg) 42%) !important;
 }
 
-.mw-task.mw-overdue {
+.mw-task-card {
+    background: var(--mw-card-bg);
+    border: 1px solid var(--mw-border);
+    border-radius: 14px;
+    padding: 1rem 1.1rem;
+    margin-bottom: 0.85rem;
+    box-shadow: 0 1px 3px rgba(58, 40, 73, 0.07);
+}
+
+.mw-task-card.mw-overdue {
     border-color: var(--mw-overdue);
     border-left-width: 4px;
-    background: linear-gradient(90deg, var(--mw-overdue-bg) 0%, var(--mw-card-bg) 42%);
+    background: linear-gradient(90deg, var(--mw-overdue-bg) 0%, var(--mw-card-bg) 48%);
 }
 
-.mw-task.mw-soon {
+.mw-task-card.mw-soon {
     border-color: var(--mw-soon);
     border-left-width: 4px;
-    background: linear-gradient(90deg, var(--mw-soon-bg) 0%, var(--mw-card-bg) 38%);
+    background: linear-gradient(90deg, var(--mw-soon-bg) 0%, var(--mw-card-bg) 42%);
+}
+
+.mw-task {
+    background: transparent;
+    border: none;
+    padding: 0.25rem 0.5rem 0;
 }
 
 .mw-task.mw-done,
 .mw-task.mw-wont {
-    opacity: 0.82;
+    opacity: 0.88;
 }
 
 .mw-task-title {
@@ -209,10 +254,6 @@ html {
 .mw-badge-soon {
     background: var(--mw-soon);
     color: #ffffff;
-}
-
-.mw-actions-row {
-    margin-top: 0.65rem !important;
 }
 
 #MainMenu, footer, [data-testid="stToolbar"] {
