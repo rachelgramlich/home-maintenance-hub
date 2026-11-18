@@ -1,0 +1,12 @@
+.venv/
+.env
+secrets.toml
+.local/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+*.egg-info/

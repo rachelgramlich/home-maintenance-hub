@@ -1,16 +1,45 @@
 # Maintenance Wizard
 
-Streamlit app for monthly and annual home maintenance — **This month** checklist, Google Sheet backend (`templates` + `completions`). Ops patterns similar to [grocery-wizard](https://github.com/rachelgramlich/grocery-wizard).
+Monthly home maintenance checklist: **Done** / **Won’t do**, overdue carry-over, last-done notes.
 
-**Repo name:** `maintenance-wizard` · **Python package:** `maintenance_wizard`
+- **v1:** Streamlit + hidden **Google Sheet** (or **local JSON** for dev)
+- **v2:** Google Calendar reminders (not implemented yet)
 
-## Documentation
+Docs: [docs/FEATURES.md](docs/FEATURES.md) · [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 
-| Doc | Purpose |
-|-----|---------|
-| [docs/FEATURES.md](docs/FEATURES.md) | **v1 / v2 scope** (source of truth for what we build) |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Sheet backend, data model, Cursor-first |
-| [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) | Earlier draft (some items superseded by FEATURES) |
-| [docs/SPEC.md](docs/SPEC.md) | Technical draft (to align with FEATURES before build) |
+## Quick start (local)
 
-Implementation not started.
+```bash
+brew install just uv   # if needed
+just setup
+just init-local-data
+just ui
+```
+
+Open http://127.0.0.1:8765
+
+## Configuration
+
+Copy `.env.example` → `.env` or `secrets.toml.example` → `secrets.toml`.
+
+| Variable | Default | Meaning |
+|----------|---------|---------|
+| `MAINTENANCE_WIZARD_STORE` | `local` | `local` or `google_sheets` |
+| `MAINTENANCE_WIZARD_SHEET_ID` | — | Google spreadsheet ID |
+| `MAINTENANCE_WIZARD_TIMEZONE` | `America/New_York` | Month/due boundaries |
+| `MAINTENANCE_WIZARD_DUE_SOON_DAYS` | `7` | Orange “due soon” window |
+
+Local data file: `.local/maintenance_wizard/data.json` (gitignored).
+
+## Google Sheets (production)
+
+1. Create a spreadsheet with tabs **`templates`** and **`completions`** (headers match [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)).
+2. OAuth token at `.local/maintenance_wizard/token.json` (setup script coming in a follow-up).
+3. Set `MAINTENANCE_WIZARD_STORE=google_sheets` and `MAINTENANCE_WIZARD_SHEET_ID`.
+
+## Development
+
+```bash
+just check    # ruff + pytest
+just format
+```
