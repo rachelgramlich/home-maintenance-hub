@@ -55,8 +55,8 @@ def load_board(year: int, month: int, show_closed: bool) -> list:
 def _render_hero(month_label: str, store_label: str) -> None:
     st.markdown(
         f'<div class="mw-hero">'
-        f"<h1>Maintenance Wizard</h1>"
-        f"<p>{month_label} · home maintenance checklist</p>"
+        f"<h1>B &amp; R Home Maintenance</h1>"
+        f"<p>{month_label} · monthly checklist</p>"
         f"</div>",
         unsafe_allow_html=True,
     )
@@ -65,7 +65,7 @@ def _render_hero(month_label: str, store_label: str) -> None:
 
 def main() -> None:
     st.set_page_config(
-        page_title="Maintenance Wizard",
+        page_title="B & R Home Maintenance",
         page_icon="🏠",
         layout="centered",
     )
