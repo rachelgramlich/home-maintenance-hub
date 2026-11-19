@@ -34,7 +34,9 @@ The sheet does **not** recur anything. **Recurrence lives in app code** (which t
 
 **templates columns (minimum):** `task_id`, `name`, `month` (or `due_month` for annual), `area`, `type`, `effort`, `priority`, `active`, optional `instructions` (text), `links` (JSON or pipe-delimited label\|url rows), `contractor_id` (+ `gcal_series_id` in **v2**)
 
-**completions columns (minimum):** `completion_id`, `task_id`, `period` (`YYYY-MM`), `status` (`done` / `wont_do`), `completed_on`, `notes` (+ `gcal_instance_id` in **v2**)
+**completions columns (minimum):** `completion_id`, `task_id`, `period` (`YYYY-MM`), `status` (`in_progress` | `done` | `wont_do`), `completed_on`, `notes` (+ `gcal_instance_id` in **v2**)
+
+`in_progress` is written when you tap **In progress** on the monthly board (optional `started_on`). It is **not terminal** — task stays on the board with an **In progress** badge until **Done** or **Won’t do**. Stats can show a separate **in progress** count. At most one open status row per `task_id` + `period` (update in place).
 
 **contractors columns (minimum):** `contractor_id`, `name`, `trade` (e.g. Plumber, HVAC, Duct cleaning), `phone`, `email`, `website`, `notes`, `active`
 
@@ -48,7 +50,7 @@ The sheet does **not** recur anything. **Recurrence lives in app code** (which t
 
 - **View:** instructions, links (open in new tab), contractor block (tap-to-call / mailto), read-only template summary.
 - **Edit** (in-drawer): same fields as template row — name, area, type, effort, priority, instructions, add/remove links, **contractor** dropdown. Link **Manage contractors** opens the contractors admin page (new tab or in-app route); picker refreshes when you return.
-- **Manage contractors page:** CRUD on **contractors** tab (filter by trade, see how many templates link each row). Not a calendar — month navigation stays the monthly checklist only for v1.
+- **Manage contractors page:** CRUD on **contractors** tab (search, filter by trade, table only — **no calendar**). **Edit contractor** modal shows **Used by N tasks** with links to those templates. **Manage contractors** link from the drawer contractor picker.
 - Completion **notes** and **last done** are never edited here; they come from **completions** only.
 
 ### How v1 builds the monthly list
