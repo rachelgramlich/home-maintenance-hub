@@ -156,3 +156,82 @@ class LocalTaskStore(TaskStore):
         if active_only:
             rows = [c for c in rows if c.active]
         return rows
+
+    def upsert_contractor(self, contractor: Contractor) -> Contractor:
+        data = self._load()
+        raw = data.get("contractors", [])
+        row = {
+            "contractor_id": contractor.contractor_id or uuid.uuid4().hex[:12],
+            "name": contractor.name,
+            "trade": contractor.trade,
+            "phone": contractor.phone,
+            "email": contractor.email,
+            "website": contractor.website,
+            "notes": contractor.notes,
+            "active": contractor.active,
+        }
+        if contractor.contractor_id:
+            replaced = False
+            for i, existing in enumerate(raw):
+                if str(existing.get("contractor_id")) == contractor.contractor_id:
+                    raw[i] = row
+                    replaced = True
+                    break
+            if not replaced:
+                raw.append(row)
+        else:
+            raw.append(row)
+        data["contractors"] = raw
+        self._save(data)
+        return Contractor(
+            contractor_id=str(row["contractor_id"]),
+            name=row["name"],
+            trade=row["trade"],
+            phone=row["phone"],
+            email=row["email"],
+            website=row["website"],
+            notes=row["notes"],
+            active=row["active"],
+        )
+
+    def update_task(self, template: Template) -> Template:
+        data = self._load()
+        templates = _parse_templates(data.get("templates", []))
+        updated = template
+        out_raw: list[dict] = []
+        for t in templates:
+            if t.task_id == template.task_id:
+                updated = template
+            rec = {
+                "task_id": t.task_id,
+                "name": t.name,
+                "due_month": t.due_month,
+                "area": t.area,
+                "cadence": t.cadence,
+                "active": t.active,
+                "month_name": t.month_name,
+                "task_type": t.task_type,
+                "effort": t.effort,
+                "priority": t.priority,
+                "season": t.season,
+                "instructions": t.instructions,
+                "links_json": "",
+                "contractor_id": t.contractor_id,
+                "stable_key": t.stable_key,
+            }
+            if t.task_id == template.task_id:
+                rec = {
+                    **rec,
+                    "name": template.name,
+                    "area": template.area,
+                    "priority": template.priority,
+                    "instructions": template.instructions,
+                    "contractor_id": template.contractor_id,
+                    "task_type": template.task_type,
+                    "effort": template.effort,
+                    "season": template.season,
+                }
+            out_raw.append(rec)
+        data["templates"] = out_raw
+        self._save(data)
+        return updated

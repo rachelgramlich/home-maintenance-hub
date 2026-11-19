@@ -294,7 +294,7 @@ class MaintenanceStore(Protocol):
 | `local` | `.local/.../data.json` — default CI and fast UI dev |
 | `notion` | Production |
 
-Remove or deprecate `google_sheets` when Notion store lands.
+Google Sheets backend removed (v1 uses **local JSON** or **Notion** only).
 
 **Notion client:** Follow **Notion API 2025 data source** pattern (same approach as grocery-wizard): resolve data source ID, paginate queries, map select enums strictly, surface API errors in Streamlit (NFR1).
 

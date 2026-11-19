@@ -101,10 +101,17 @@ def main() -> None:
             )
             show_closed = st.toggle("Show done & won't do", value=False)
             try:
-                areas = sorted({t.area for t in get_store().list_templates()})
+                templates = get_store().list_templates()
+                areas = sorted({t.area for t in templates})
+                types = sorted({t.task_type for t in templates if t.task_type})
+                seasons = sorted({t.season for t in templates if t.season})
             except Exception:
                 areas = []
+                types = []
+                seasons = []
             area_filter = st.multiselect("Area", options=areas)
+            type_filter = st.multiselect("Type", options=types)
+            season_filter = st.multiselect("Season", options=seasons)
             if st.button("Refresh", use_container_width=True):
                 load_board.clear()
                 st.session_state.drawer_task = None
@@ -114,6 +121,8 @@ def main() -> None:
             month = today.month
             show_closed = False
             area_filter = []
+            type_filter = []
+            season_filter = []
 
     if st.session_state.page == "contractors":
         render_contractors_admin(get_store())
@@ -134,6 +143,10 @@ def main() -> None:
 
         if area_filter:
             board = [r for r in board if r.template.area in area_filter]
+        if type_filter:
+            board = [r for r in board if r.template.task_type in type_filter]
+        if season_filter:
+            board = [r for r in board if r.template.season in season_filter]
 
         overdue_n = sum(1 for r in board if r.urgency == Urgency.OVERDUE)
         inprog_n = sum(1 for r in board if r.urgency == Urgency.IN_PROGRESS)
@@ -143,6 +156,7 @@ def main() -> None:
         s1.metric("Overdue", overdue_n)
         s2.metric("In progress", inprog_n)
         s3.metric("Open", open_n)
+        st.caption("Sorted by urgency, then priority (High → Low), area, and name.")
 
         if not board:
             st.success("Nothing open for this month — or all tasks are complete.")

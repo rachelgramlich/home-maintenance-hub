@@ -229,6 +229,16 @@ def run_import(*, dry_run: bool, year: int, purge_legacy: bool) -> dict[str, int
 
     lines.append("---")
     lines.append(str(stats))
+    if not dry_run and stats.get("errors", 0) == 0:
+        try:
+            from maintenance_wizard.scripts.notion_row_audit import audit_row_counts, format_audit
+
+            after = format_audit(audit_row_counts())
+            lines.append("--- after audit ---")
+            lines.append(after)
+            print(after)
+        except Exception as exc:
+            lines.append(f"after audit skipped: {exc}")
     LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
     LOG_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print("\n".join(lines))

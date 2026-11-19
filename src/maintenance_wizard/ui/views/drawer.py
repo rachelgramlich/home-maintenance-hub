@@ -29,6 +29,11 @@ def render_drawer(row: BoardTask, store: TaskStore, *, editing: bool) -> None:
             st.write(f"{contractor.name} · {contractor.trade}")
             if contractor.phone:
                 st.markdown(f"[Call](tel:{contractor.phone})")
+            if contractor.email:
+                st.markdown(f"[Email](mailto:{contractor.email})")
+        if st.button("Manage contractors", key=f"mwc_{t.task_id}"):
+            st.session_state.page = "contractors"
+            st.rerun()
         if row.last_done_on:
             st.markdown(
                 f"**Last done** {row.last_done_on.isoformat()}"
@@ -39,13 +44,34 @@ def render_drawer(row: BoardTask, store: TaskStore, *, editing: bool) -> None:
 
 def _edit_form(template: Template, store: TaskStore) -> None:
     name = st.text_input("Task name", value=template.name)
-    area = st.text_input("Area", value=template.area)
+    areas = [
+        "HVAC",
+        "Plumbing",
+        "Exterior",
+        "Laundry",
+        "Appliances",
+        "Safety",
+        "Pest",
+        "Electrical",
+        "Other",
+    ]
+    area_idx = areas.index(template.area) if template.area in areas else len(areas) - 1
+    area = st.selectbox("Area", areas, index=area_idx)
     prios = ["High", "Medium", "Low"]
     priority = st.selectbox(
         "Priority",
         prios,
         index=prios.index(template.priority),
     )
+    types = ["Replace", "Service", "Clean", "Inspect/Test", ""]
+    type_idx = types.index(template.task_type) if template.task_type in types else len(types) - 1
+    task_type = st.selectbox("Type", types, index=type_idx)
+    efforts = ["XS", "S", "M", ""]
+    effort_idx = efforts.index(template.effort) if template.effort in efforts else len(efforts) - 1
+    effort = st.selectbox("Effort", efforts, index=effort_idx)
+    seasons = ["", "Winter", "Spring", "Summer", "Fall"]
+    season_idx = seasons.index(template.season) if template.season in seasons else 0
+    season = st.selectbox("Season", seasons, index=season_idx)
     instructions = st.text_area("Instructions", value=template.instructions, height=120)
     contractors = store.list_contractors()
     ctr_names = ["— none —"] + [c.name for c in contractors]
@@ -64,10 +90,10 @@ def _edit_form(template: Template, store: TaskStore) -> None:
             area=area,
             active=template.active,
             month_name=template.month_name,
-            task_type=template.task_type,
-            effort=template.effort,
+            task_type=task_type,
+            effort=effort,
             priority=priority,  # type: ignore[arg-type]
-            season=template.season,
+            season=season,
             instructions=instructions,
             links=template.links,
             contractor_id=ctr_id,

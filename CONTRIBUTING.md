@@ -332,7 +332,7 @@ text = "line one\nline two\nline three"
 
 ```
 src/maintenance_wizard/
-├── config.py     # Settings (local / google_sheets store)
+├── config.py     # Settings (local / notion store)
 ├── domain/       # Schedule logic + month board assembly
 ├── models.py     # Template, Completion, BoardTask
 ├── scripts/      # Local data seeding
