@@ -76,7 +76,6 @@ def theme_contrast_pairs(tokens: ThemeTokens = MW_THEME) -> list[tuple[str, str,
         ("primary button", tokens.on_accent, tokens.accent),
         ("secondary button", tokens.text, tokens.input_bg),
         ("overdue badge", "#ffffff", "#b71c3a"),
-        ("due soon badge", "#ffffff", "#9c4d00"),
     ]
 
 

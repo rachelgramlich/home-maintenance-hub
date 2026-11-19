@@ -22,7 +22,6 @@ def build_month_board(
     year: int,
     month: int,
     today: date,
-    due_soon_days: int,
 ) -> list[BoardTask]:
     rows: list[BoardTask] = []
     for template in templates:
@@ -36,8 +35,6 @@ def build_month_board(
             urgency = Urgency.DONE if row.status == "done" else Urgency.WONT_DO
         elif schedule.is_overdue(template, year, month, today, completions):
             urgency = Urgency.OVERDUE
-        elif schedule.is_due_soon(template, year, month, today, due_soon_days):
-            urgency = Urgency.DUE_SOON
         else:
             urgency = Urgency.NORMAL
         last_on, last_notes = last_done(completions, template.task_id)
@@ -53,10 +50,9 @@ def build_month_board(
 
     order = {
         Urgency.OVERDUE: 0,
-        Urgency.DUE_SOON: 1,
-        Urgency.NORMAL: 2,
-        Urgency.DONE: 3,
-        Urgency.WONT_DO: 4,
+        Urgency.NORMAL: 1,
+        Urgency.DONE: 2,
+        Urgency.WONT_DO: 3,
     }
     rows.sort(key=lambda r: (order[r.urgency], r.template.area, r.template.name))
     return rows

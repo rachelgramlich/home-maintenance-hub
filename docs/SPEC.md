@@ -40,14 +40,14 @@ flowchart LR
 
 ```
 src/household_tasks/
-  config/__init__.py          # pydantic-settings: Notion IDs, due_soon_days, tz
+  config/__init__.py          # pydantic-settings: Notion IDs, tz
   integrations/notion/
     client.py                 # shared Notion client + data source resolution
     catalog.py                # template CRUD + query active
     periods.py                # period row CRUD + query by month
   domain/
     schedule.py               # period_key, due_date_for(template, period)
-    urgency.py                # overdue | due_soon | normal
+    urgency.py                # overdue | normal
     carryover.py              # ensure rows for month; carry unresolved forward
     actions.py                # done, wont_do, defer transitions
   ui/
@@ -87,12 +87,10 @@ All comparisons use timezone `TZ` (default `America/New_York`).
 # Pseudocode
 if status in (Done, WontDo):
     display = hidden  # unless show_completed
-elif status == Pending and (carried_over or period_key < current_period or today > due_date):
-    display = overdue      # red — exact rule ties to requirement decision
-elif status == Pending and today >= due_date - due_soon_days:
-    display = due_soon     # orange
+elif status == Pending and (carried_over or period_key < current_period):
+    display = overdue      # red — earlier month still open
 else:
-    display = normal
+    display = normal       # open for the whole view month; no due-soon window
 ```
 
 ### 3.4 Month open workflow (`ensure_month_periods`)
@@ -129,7 +127,7 @@ For selected `(year, month)`:
 | Element | Behavior |
 |---------|----------|
 | `st.session_state.selected_month` | `(year, month)` tuple |
-| Summary metrics | Count overdue, due soon, done this month |
+| Summary metrics | Count overdue and open this month |
 | Task card | Columns: badge, title, meta, actions |
 | CSS | `.ht-overdue { border-left: 4px solid #dc3545; }` etc. |
 

@@ -199,14 +199,15 @@ erDiagram
 | **Done / Won’t do** | Terminal completion for **view month** period |
 | **In progress** | Completion `in_progress` for view month period |
 | **Overdue** | Task owed for an **earlier** period in the same year (or prior policy month) with no terminal completion |
-| **Due soon** | Optional: last `due_soon_days` of the **calendar month** when viewing that month (no per-task due date) |
-| **Open** | Otherwise |
+| **Open** | Active task for the view month with no completion row |
+
+There is **no “due soon” state** and no `due_soon_days` window. Tasks are scheduled by **month**, not by a day inside the month, so urgency does not change as the calendar month runs out.
 
 Month boundaries use `MAINTENANCE_WIZARD_TIMEZONE` (default `America/New_York`).
 
 ### 4.4 Sort order
 
-1. Urgency bucket: **overdue** → **in progress** → **open** (incl. due soon) → completed (if shown)
+1. Urgency bucket: **overdue** → **in progress** → **open** → completed (if shown)
 2. **Priority:** High → Medium → Low
 3. **Area**, then **Task** title
 
@@ -247,7 +248,7 @@ Pure Python — **no Notion imports**.
 src/maintenance_wizard/
   models.py          # Template, Contractor, Completion, BoardTask, Urgency, …
   domain/
-    schedule.py      # month matching, period keys, overdue / due-soon
+    schedule.py      # month matching, period keys, overdue
     board.py         # build_month_board, sort, last_done
   store/
     base.py          # Protocol: TaskStore
@@ -346,7 +347,6 @@ Remove or deprecate `google_sheets` when Notion store lands.
 | `MAINTENANCE_WIZARD_NOTION_CONTRACTORS_DS_ID` | Contractors data source ID |
 | `MAINTENANCE_WIZARD_NOTION_COMPLETIONS_DS_ID` | Completions data source ID |
 | `MAINTENANCE_WIZARD_TIMEZONE` | Default `America/New_York` |
-| `MAINTENANCE_WIZARD_DUE_SOON_DAYS` | End-of-month window (default 7) |
 
 Never commit secrets or xlsx with credentials (`Account Info` tab). NFR5.
 
@@ -400,6 +400,7 @@ Notion is **not** the recurrence engine for phone reminders in v2; **GCal** is. 
 - Apps Script–first, Zapier/Make as core sync
 - Dual live sync Sheet ↔ Notion
 - Per-task due dates in UI (month-only scheduling)
+- **Due soon** / `due_soon_days` (no day-level window inside a month)
 - Calendar view (any variant)
 - Defer as a first-class button
 - Storing completion notes on task templates
@@ -414,3 +415,4 @@ Notion is **not** the recurrence engine for phone reminders in v2; **GCal** is. 
 | 2026-11-17 | Sparse completions; pending computed in app |
 | 2026-11-19 | Mockup C: drawer, contractors, in progress, no due dates |
 | 2026-11-19 | **Pivot to Notion** — full architecture; Sheet superseded |
+| 2026-11-19 | Drop **due soon** / `due_soon_days`; urgency is month-only (overdue, in progress, open, terminal) |

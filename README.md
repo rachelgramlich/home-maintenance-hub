@@ -29,8 +29,7 @@ Copy `.env.example` → `.env` or `secrets.toml.example` → `secrets.toml`.
 | `MAINTENANCE_WIZARD_STORE` | `local` | `local` or `notion` |
 | `NOTION_API_KEY` | — | Notion integration token |
 | `MAINTENANCE_WIZARD_NOTION_*_DS_ID` | — | Data source IDs (tasks, contractors, completions) |
-| `MAINTENANCE_WIZARD_TIMEZONE` | `America/New_York` | Month/due boundaries |
-| `MAINTENANCE_WIZARD_DUE_SOON_DAYS` | `7` | Orange “due soon” window |
+| `MAINTENANCE_WIZARD_TIMEZONE` | `America/New_York` | Month boundaries |
 
 Local data file: `.local/maintenance_wizard/data.json` (gitignored).
 

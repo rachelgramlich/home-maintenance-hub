@@ -13,8 +13,6 @@
     --mw-border: #a894c8;
     --mw-overdue: #b71c3a;
     --mw-overdue-bg: #fce8ec;
-    --mw-soon: #9c4d00;
-    --mw-soon-bg: #fff4e8;
 }
 
 html {
@@ -180,12 +178,6 @@ html {
     background: linear-gradient(90deg, var(--mw-overdue-bg) 0%, var(--mw-card-bg) 48%) !important;
 }
 
-[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-soon.mw-task--open) {
-    border-color: var(--mw-soon) !important;
-    border-left-width: 4px !important;
-    background: linear-gradient(90deg, var(--mw-soon-bg) 0%, var(--mw-card-bg) 42%) !important;
-}
-
 .mw-task-card {
     background: var(--mw-card-bg);
     border: 1px solid var(--mw-border);
@@ -199,12 +191,6 @@ html {
     border-color: var(--mw-overdue);
     border-left-width: 4px;
     background: linear-gradient(90deg, var(--mw-overdue-bg) 0%, var(--mw-card-bg) 48%);
-}
-
-.mw-task-card.mw-soon {
-    border-color: var(--mw-soon);
-    border-left-width: 4px;
-    background: linear-gradient(90deg, var(--mw-soon-bg) 0%, var(--mw-card-bg) 42%);
 }
 
 .mw-task {
@@ -251,11 +237,6 @@ html {
 
 .mw-badge-overdue {
     background: var(--mw-overdue);
-    color: #ffffff;
-}
-
-.mw-badge-soon {
-    background: var(--mw-soon);
     color: #ffffff;
 }
 
