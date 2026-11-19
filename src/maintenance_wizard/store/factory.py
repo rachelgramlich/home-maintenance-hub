@@ -7,14 +7,8 @@ from maintenance_wizard.store.local import LocalTaskStore
 
 def get_store() -> TaskStore:
     settings = get_settings()
-    if settings.store == "google_sheets":
-        if not settings.sheet_id:
-            msg = "Set MAINTENANCE_WIZARD_SHEET_ID for google_sheets store"
-            raise RuntimeError(msg)
-        from maintenance_wizard.store.google_sheets import GoogleSheetsTaskStore
+    if settings.store == "notion":
+        from maintenance_wizard.store.notion import NotionTaskStore
 
-        return GoogleSheetsTaskStore(
-            sheet_id=settings.sheet_id,
-            token_path=str(settings.google_token_path),
-        )
+        return NotionTaskStore(settings)
     return LocalTaskStore(settings.local_data_path)

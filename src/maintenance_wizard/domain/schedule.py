@@ -19,6 +19,8 @@ MONTH_NAMES = {
     "december": 12,
 }
 
+MONTH_LABELS = {v: k.capitalize() for k, v in MONTH_NAMES.items()}
+
 
 def period_key(year: int, month: int) -> str:
     return f"{year:04d}-{month:02d}"
@@ -33,18 +35,13 @@ def completion_for_period(
     return None
 
 
+def is_terminal_status(status: str) -> bool:
+    return status in ("done", "wont_do")
+
+
 def terminal_completion_exists(completions: list[Completion], task_id: str, period: str) -> bool:
     row = completion_for_period(completions, task_id, period)
-    return row is not None
-
-
-def monthly_task_period(template: Template, year: int, month: int) -> str:
-    """Monthly tasks use the viewing month as the period key."""
-    return period_key(year, month)
-
-
-def annual_task_period(template: Template, year: int) -> str:
-    return f"{year:04d}-{template.due_month:02d}"
+    return row is not None and is_terminal_status(row.status)
 
 
 def task_applies_to_board(
@@ -55,42 +52,27 @@ def task_applies_to_board(
 ) -> bool:
     if not template.active:
         return False
-    if template.cadence == "monthly":
+    if template.due_month == month:
         return True
-    # annual
-    if month == template.due_month:
-        return True
-    if month > template.due_month:
-        p = annual_task_period(template, year)
+    if template.due_month < month:
+        p = template.period_key(year)
         return not terminal_completion_exists(completions, template.task_id, p)
     return False
 
 
-def board_period_for_task(template: Template, year: int, month: int) -> str:
-    if template.cadence == "monthly":
-        return monthly_task_period(template, year, month)
-    return annual_task_period(template, year)
+def board_period_for_task(template: Template, year: int, _month: int) -> str:
+    return template.period_key(year)
 
 
 def is_overdue(
     template: Template,
     year: int,
     month: int,
-    today: date,
+    _today: date,
     completions: list[Completion],
 ) -> bool:
-    current_period = board_period_for_task(template, year, month)
-    if terminal_completion_exists(completions, template.task_id, current_period):
+    period = template.period_key(year)
+    row = completion_for_period(completions, template.task_id, period)
+    if row and is_terminal_status(row.status):
         return False
-
-    if template.cadence == "monthly":
-        if (today.year, today.month) > (year, month):
-            return True
-        prev_month, prev_year = (month - 1, year) if month > 1 else (12, year - 1)
-        prior = period_key(prev_year, prev_month)
-        return prior < current_period and not terminal_completion_exists(
-            completions, template.task_id, prior
-        )
-
-    # annual: overdue only after the due month, until completed
-    return (year, month) > (year, template.due_month)
+    return month > template.due_month

@@ -1,3 +1,5 @@
+"""Deprecated Google Sheets store (superseded by Notion in v1)."""
+
 from __future__ import annotations
 
 import uuid

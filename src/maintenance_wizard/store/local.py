@@ -5,7 +5,13 @@ import uuid
 from datetime import date
 from pathlib import Path
 
-from maintenance_wizard.models import Completion, CompletionStatus, Template
+from maintenance_wizard.models import (
+    Completion,
+    CompletionStatus,
+    Contractor,
+    Template,
+    parse_links_json,
+)
 from maintenance_wizard.store.base import TaskStore
 
 
@@ -14,11 +20,18 @@ def _parse_templates(raw: list[dict]) -> list[Template]:
         Template(
             task_id=str(row["task_id"]),
             name=str(row["name"]),
-            cadence=row["cadence"],
             due_month=int(row.get("due_month", 1)),
-            due_day=int(row.get("due_day", 1)),
             area=str(row.get("area", "Other")),
             active=bool(row.get("active", True)),
+            month_name=str(row.get("month_name", "")),
+            task_type=str(row.get("task_type", "")),
+            effort=str(row.get("effort", "")),
+            priority=row.get("priority", "Medium"),  # type: ignore[arg-type]
+            season=str(row.get("season", "")),
+            instructions=str(row.get("instructions", "")),
+            links=parse_links_json(str(row.get("links_json", ""))),
+            contractor_id=row.get("contractor_id"),
+            stable_key=str(row.get("stable_key", "")),
         )
         for row in raw
     ]
@@ -27,16 +40,20 @@ def _parse_templates(raw: list[dict]) -> list[Template]:
 def _parse_completions(raw: list[dict]) -> list[Completion]:
     out: list[Completion] = []
     for row in raw:
-        completed = row["completed_on"]
-        if isinstance(completed, str):
-            completed = date.fromisoformat(completed[:10])
+        completed = row.get("completed_on")
+        completed_on = None
+        if completed:
+            if isinstance(completed, str):
+                completed_on = date.fromisoformat(completed[:10])
+            elif isinstance(completed, date):
+                completed_on = completed
         out.append(
             Completion(
                 completion_id=str(row.get("completion_id", uuid.uuid4().hex[:12])),
                 task_id=str(row["task_id"]),
                 period=str(row["period"]),
                 status=row["status"],
-                completed_on=completed,
+                completed_on=completed_on,
                 notes=str(row.get("notes", "")),
             )
         )
@@ -49,7 +66,7 @@ class LocalTaskStore(TaskStore):
 
     def _load(self) -> dict:
         if not self._path.exists():
-            return {"templates": [], "completions": []}
+            return {"templates": [], "completions": [], "contractors": []}
         return json.loads(self._path.read_text(encoding="utf-8"))
 
     def _save(self, data: dict) -> None:
@@ -62,20 +79,41 @@ class LocalTaskStore(TaskStore):
     def list_completions(self) -> list[Completion]:
         return _parse_completions(self._load().get("completions", []))
 
-    def add_completion(
+    def upsert_completion(
         self,
         task_id: str,
         period: str,
         status: CompletionStatus,
-        completed_on: date,
+        completed_on: date | None,
         notes: str,
     ) -> Completion:
         data = self._load()
         completions = _parse_completions(data.get("completions", []))
-        for existing in completions:
+        for i, existing in enumerate(completions):
             if existing.task_id == task_id and existing.period == period:
-                msg = f"Completion already exists for {task_id} in {period}."
-                raise ValueError(msg)
+                updated = Completion(
+                    completion_id=existing.completion_id,
+                    task_id=task_id,
+                    period=period,
+                    status=status,
+                    completed_on=completed_on,
+                    notes=notes,
+                )
+                completions[i] = updated
+                data["completions"] = [
+                    {
+                        "completion_id": c.completion_id,
+                        "task_id": c.task_id,
+                        "period": c.period,
+                        "status": c.status,
+                        "completed_on": c.completed_on.isoformat() if c.completed_on else None,
+                        "notes": c.notes,
+                    }
+                    for c in completions
+                ]
+                self._save(data)
+                return updated
+
         row = Completion(
             completion_id=uuid.uuid4().hex[:12],
             task_id=task_id,
@@ -91,10 +129,29 @@ class LocalTaskStore(TaskStore):
                 "task_id": c.task_id,
                 "period": c.period,
                 "status": c.status,
-                "completed_on": c.completed_on.isoformat(),
+                "completed_on": c.completed_on.isoformat() if c.completed_on else None,
                 "notes": c.notes,
             }
             for c in completions
         ]
         self._save(data)
         return row
+
+    def list_contractors(self, *, active_only: bool = True) -> list[Contractor]:
+        data = self._load()
+        rows = [
+            Contractor(
+                contractor_id=str(r["contractor_id"]),
+                name=str(r["name"]),
+                trade=str(r.get("trade", "")),
+                phone=str(r.get("phone", "")),
+                email=str(r.get("email", "")),
+                website=str(r.get("website", "")),
+                notes=str(r.get("notes", "")),
+                active=bool(r.get("active", True)),
+            )
+            for r in data.get("contractors", [])
+        ]
+        if active_only:
+            rows = [c for c in rows if c.active]
+        return rows

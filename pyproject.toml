@@ -5,12 +5,11 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "maintenance-wizard"
 version = "0.1.0"
-description = "Monthly home maintenance checklist (local JSON or Google Sheets)"
+description = "Monthly home maintenance checklist (Notion-backed)"
 requires-python = ">=3.12,<3.13"
 dependencies = [
-    "google-auth>=2.29.0",
-    "google-auth-oauthlib>=1.2.0",
-    "gspread>=6.0.0",
+    "notion-client>=3.1.0",
+    "openpyxl>=3.1.5",
     "pydantic>=2.7.0",
     "pydantic-settings>=2.7.0",
     "python-dotenv>=1.0.1",
