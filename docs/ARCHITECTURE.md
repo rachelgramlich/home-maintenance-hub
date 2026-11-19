@@ -47,7 +47,8 @@ The sheet does **not** recur anything. **Recurrence lives in app code** (which t
 ### Details drawer (view vs edit)
 
 - **View:** instructions, links (open in new tab), contractor block (tap-to-call / mailto), read-only template summary.
-- **Edit** (in-drawer): same fields as template row — name, area, type, effort, priority, instructions, add/remove links, **contractor** dropdown (+ shortcut **Manage contractors**). Save writes **templates** (and **contractors** only when creating/updating a contractor from the directory UI, not by copying contact onto each task).
+- **Edit** (in-drawer): same fields as template row — name, area, type, effort, priority, instructions, add/remove links, **contractor** dropdown. Link **Manage contractors** opens the contractors admin page (new tab or in-app route); picker refreshes when you return.
+- **Manage contractors page:** CRUD on **contractors** tab (filter by trade, see how many templates link each row). Not a calendar — month navigation stays the monthly checklist only for v1.
 - Completion **notes** and **last done** are never edited here; they come from **completions** only.
 
 ### How v1 builds the monthly list
