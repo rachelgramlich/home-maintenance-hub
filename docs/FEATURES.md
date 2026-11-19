@@ -8,8 +8,8 @@
 - Tasks for selected month from **`[MW] Tasks`** (xlsx-style: one row per task per month).
 - **Done**, **Won’t do**, and **In progress**; completion **notes** on act only (stored in **`[MW] Completions`**).
 - **Unmarked** work **carries** as **overdue** into later months (implicit; no Defer button).
-- **Urgency:** overdue (red), optional due-soon (end of month window), open, in-progress badge.
-- **Sort:** urgency bucket, then **priority** (High → Low), area, name.
+- **Urgency:** overdue (red), open, in-progress badge. No due-soon window — scheduling is by month only.
+- **Sort:** urgency bucket (overdue → in progress → open), then **priority** (High → Low), area, name.
 - **Last done** + last completion note from completions log.
 - Filter by **area** (and optional type / season).
 - **Details drawer:** instructions, links, contractor (relation); view + **edit** template fields.
@@ -37,3 +37,4 @@
 | 2026-11-17 | v1 month view, done/won’t do, implicit rollover |
 | 2026-11-19 | In progress, contractors, drawer, Notion pivot |
 | 2026-11-19 | Sheet backend removed from v1 scope |
+| 2026-11-19 | Drop due-soon; urgency is month-only |
