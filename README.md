@@ -34,6 +34,10 @@ Copy `.env.example` → `.env` or `secrets.toml.example` → `secrets.toml`.
 
 Local data file: `.local/maintenance_wizard/data.json` (gitignored).
 
+## Deploy (Streamlit Cloud)
+
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
 ## Notion (production)
 
 Notion databases — [docs/NOTION_SETUP.md](docs/NOTION_SETUP.md). Connect **your** integration to the hub page, set `NOTION_API_KEY` + data source IDs in `.env`, then:

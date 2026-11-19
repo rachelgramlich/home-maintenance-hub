@@ -83,6 +83,12 @@ migrate-xlsx *ARGS:
 import-completions *ARGS:
     uv run python -m maintenance_wizard.scripts.import_completions {{ARGS}}
 
+notion-audit *ARGS:
+    uv run python -m maintenance_wizard.scripts.notion_row_audit {{ARGS}}
+
+purge-inactive-duplicates *ARGS:
+    uv run python -m maintenance_wizard.scripts.purge_inactive_duplicates {{ARGS}}
+
 info:
     @echo "Python version:"
     @uv run python --version
