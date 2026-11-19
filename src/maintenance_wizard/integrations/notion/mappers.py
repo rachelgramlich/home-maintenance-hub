@@ -17,11 +17,18 @@ def page_to_template(page: dict[str, Any]) -> Template:
         month_num = float(MONTH_NAMES.get(month_name.lower(), 1))
     links_raw = nc.plain_text(props.get("Links JSON"))
     rel = nc.relation_ids(props.get("Contractor"))
+    stable = nc.plain_text(props.get("Stable key"))
+    cadence_raw = (nc.select_name(props.get("Cadence")) or "Annual").lower()
+    if stable.endswith("|monthly"):
+        cadence = "monthly"
+    else:
+        cadence = "monthly" if cadence_raw.startswith("month") else "annual"
     return Template(
         task_id=page_id,
         name=nc.plain_text(props.get("Task")),
         due_month=int(month_num),
         area=nc.select_name(props.get("Area")) or "Other",
+        cadence=cadence,  # type: ignore[arg-type]
         active=nc.checkbox_value(props.get("Active")) if "Active" in props else True,
         month_name=nc.select_name(props.get("Month")),
         task_type=nc.select_name(props.get("Type")),

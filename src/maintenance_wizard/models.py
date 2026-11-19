@@ -6,6 +6,7 @@ from enum import StrEnum
 from typing import Any, Literal
 
 CompletionStatus = Literal["in_progress", "done", "wont_do"]
+Cadence = Literal["monthly", "annual"]
 Priority = Literal["High", "Medium", "Low"]
 
 
@@ -25,12 +26,13 @@ class TaskLink:
 
 @dataclass(frozen=True)
 class Template:
-    """One scheduled task appearance (single month per year)."""
+    """Task template: annual (one board month per year) or monthly (every month)."""
 
     task_id: str
     name: str
-    due_month: int  # 1-12 assigned month
+    due_month: int  # annual: assigned month; monthly: anchor month (1) for sorting
     area: str
+    cadence: Cadence = "annual"
     active: bool = True
     month_name: str = ""
     task_type: str = ""
@@ -43,8 +45,12 @@ class Template:
     stable_key: str = ""
     notion_url: str = ""
 
-    def period_key(self, year: int) -> str:
-        return f"{year:04d}-{self.due_month:02d}"
+    def period_key(self, year: int, *, board_month: int | None = None) -> str:
+        if self.cadence == "monthly" and board_month is not None:
+            month = board_month
+        else:
+            month = self.due_month
+        return f"{year:04d}-{month:02d}"
 
 
 @dataclass(frozen=True)
