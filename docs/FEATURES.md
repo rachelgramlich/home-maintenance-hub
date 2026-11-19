@@ -1,29 +1,39 @@
 # Maintenance Wizard — feature scope
 
-## v1 — Monthly checklist
+**Product:** B & R Home Maintenance · **UI:** mockup C (monthly board + details drawer + Manage contractors)
 
-- **This month** view (month picker for other months).
-- Tasks that apply to the selected month (monthly + annual due that month).
-- **Done** or **Won’t do** only (optional notes on done).
-- **Unmarked** at month end → **auto carries to next month** as overdue (no Defer button).
-- **Urgency:** overdue (red), due soon (orange), normal.
-- **Last done** date + notes per task (from **completions** log, not one row per month).
-- Filter by **area** (and metadata on templates).
-- **Hidden Google Sheet** backend + one-time import from your sheet / deprecated Notion.
+## v1 — Monthly checklist (Notion-backed)
+
+- **This month** view and month picker in sidebar (no calendar grid).
+- Tasks for selected month from **`[MW] Tasks`** (xlsx-style: one row per task per month).
+- **Done**, **Won’t do**, and **In progress**; completion **notes** on act only (stored in **`[MW] Completions`**).
+- **Unmarked** work **carries** as **overdue** into later months (implicit; no Defer button).
+- **Urgency:** overdue (red), optional due-soon (end of month window), open, in-progress badge.
+- **Sort:** urgency bucket, then **priority** (High → Low), area, name.
+- **Last done** + last completion note from completions log.
+- Filter by **area** (and optional type / season).
+- **Details drawer:** instructions, links, contractor (relation); view + **edit** template fields.
+- **Manage contractors:** CRUD + “used by N tasks”; link from drawer.
+- **Source of truth:** **Notion** (three databases). **Local JSON** for dev/CI only.
+- One-time **migration** from Ocala xlsx `Home Maintenance` tab.
 - Streamlit app; develop in Cursor.
 
-**v1 does not include:** Google Calendar sync, proactive phone reminders, partner-facing UI (partner unaffected until v2 calendar).
+**v1 does not include:** Google Calendar, proactive phone reminders, Google Sheet as live backend, calendar UI.
 
 ## v2 — Google Calendar
 
-- Dedicated **Home maintenance** calendar.
-- Recurring events from templates; sync on status changes.
-- Partner can subscribe for reminders.
-- OAuth/calendar setup added at v2.
+- Dedicated **Home maintenance** calendar; series from tasks.
+- Sync on status changes; partner subscribes for reminders.
+- OAuth/calendar setup at v2.
+
+## v1.1 (optional)
+
+- Weekly email digest (GitHub Action + Notion query).
 
 ## Revision log
 
 | Date | Change |
 |------|--------|
-| 2026-11-17 | v1 month view, done/won’t do, implicit month rollover; GCal → v2 |
-| 2026-11-17 | Sheet: templates + completions; pending/overdue computed in app |
+| 2026-11-17 | v1 month view, done/won’t do, implicit rollover |
+| 2026-11-19 | In progress, contractors, drawer, Notion pivot |
+| 2026-11-19 | Sheet backend removed from v1 scope |

@@ -1,113 +1,414 @@
 # Maintenance Wizard — architecture
 
+**Product:** **B & R Home Maintenance**  
 **Repo:** `maintenance-wizard` · **Package:** `maintenance_wizard`
 
-**Chosen direction:** Small **Python / Streamlit** repo developed in **Cursor**, **hidden Google Sheet** as data store. **v1:** monthly checklist only. **v2:** Google Calendar sync + reminders. **Notion not required.**
+**Stack (locked):** **Python 3.12** · **Streamlit** (monthly board UX) · **Notion** (source of truth) · develop in **Cursor** with `just` / `uv` / `pytest`.
 
-**Rejected for v1:** Apps Script–first, paid apps, Zapier/Make, GCal, explicit Defer action (month-end rollover instead).
+**v1:** Monthly checklist (mockup C): Done / Won’t do / **In progress**, details drawer, **Manage contractors**, urgency styling, priority sort. **No calendar view.** **No per-task due dates** — scheduling is **by month** only.
 
-See [FEATURES.md](./FEATURES.md) for v1/v2 scope.
+**v2:** Google Calendar sync + phone reminders (Notion remains catalog + completions).
 
----
+**Superseded:** Hidden Google Sheet as production store (replaced by Notion 2026-11-19). Local JSON store remains for **offline dev/tests** only.
 
-## What “last time I did X” means (product)
-
-You want **lookup**, not a buried audit log:
-
-- On each task (monthly view or detail): **Last completed:** date, optional **notes**, optional **vendor/cost** later.
-- Implemented by **`completions` tab:** append a row only when you tap Done or Won’t do (`period`, `notes`, `completed_on`).
-- **Last done** in UI: latest completion per `task_id` where `status = done`.
+See [FEATURES.md](./FEATURES.md) for scope. UI reference: mockup **`mockup-c-v4-in-progress-detail-pane-inside-card`**.
 
 ---
 
-## Data model (Google Sheet — three tabs)
+## 1. System context
 
-The sheet does **not** recur anything. **Recurrence lives in app code** (which templates apply to which month).
+```mermaid
+flowchart TB
+  User[Household user browser]
+  ST[Streamlit app]
+  Notion[Notion API]
+  DB1[(Tasks)]
+  DB2[(Contractors)]
+  DB3[(Completions)]
 
-| Tab | Role |
-|-----|------|
-| **templates** | **One row per task** (per your import: often one row per task × month) — name, area, type, effort, priority, month, instructions, links, `contractor_id`, active, … |
-| **completions** | **Sparse** — one row only when you act: Done or Won’t do for a given `period` (`YYYY-MM`); **`notes` live here only** (not on template). |
-| **contractors** | **Source of truth** for vendors — one row per company/contact; tasks **link** via `contractor_id`, not duplicated phone/email on every task. |
+  User --> ST
+  ST --> Notion
+  Notion --> DB1
+  Notion --> DB2
+  Notion --> DB3
+  DB1 -->|relation| DB2
+  DB3 -->|relation| DB1
+```
 
-**Pending / overdue are computed**, not stored as monthly instance rows.
+| Layer | Responsibility |
+|-------|----------------|
+| **Streamlit** | Monthly board, filters, actions, details drawer (view/edit), Manage contractors page, lavender theme |
+| **Domain (`board`, `schedule`)** | Which tasks appear for month *M*, overdue/carry-over, urgency, priority sort, last-done |
+| **Store (`notion` / `local`)** | CRUD templates, contractors, completions; pagination; map Notion properties ↔ dataclasses |
+| **Notion** | Durable data, relations, rich instructions, optional “open in Notion” for power edits |
 
-**templates columns (minimum):** `task_id`, `name`, `month` (or `due_month` for annual), `area`, `type`, `effort`, `priority`, `active`, optional `instructions` (text), `links` (JSON or pipe-delimited label\|url rows), `contractor_id` (+ `gcal_series_id` in **v2**)
-
-**completions columns (minimum):** `completion_id`, `task_id`, `period` (`YYYY-MM`), `status` (`in_progress` | `done` | `wont_do`), `completed_on`, `notes` (+ `gcal_instance_id` in **v2**)
-
-`in_progress` is written when you tap **In progress** on the monthly board (optional `started_on`). It is **not terminal** — task stays on the board with an **In progress** badge until **Done** or **Won’t do**. Stats can show a separate **in progress** count. At most one open status row per `task_id` + `period` (update in place).
-
-**contractors columns (minimum):** `contractor_id`, `name`, `trade` (e.g. Plumber, HVAC, Duct cleaning), `phone`, `email`, `website`, `notes`, `active`
-
-### Linking plumbers (and others) to tasks
-
-- Edit a contractor once in **contractors**; every template with that `contractor_id` shows the same phone/email in the details drawer.
-- Picker in the drawer is filtered by **trade** when the task’s area/type implies it (e.g. Plumbing → Plumber), but you can pick any active contractor or **unlink**.
-- Optional later: bulk “assign default Plumber to all templates with `trade=Plumber`” — still one foreign key per template row.
-
-### Details drawer (view vs edit)
-
-- **View:** instructions, links (open in new tab), contractor block (tap-to-call / mailto), read-only template summary.
-- **Edit** (in-drawer): same fields as template row — name, area, type, effort, priority, instructions, add/remove links, **contractor** dropdown. Link **Manage contractors** opens the contractors admin page (new tab or in-app route); picker refreshes when you return.
-- **Manage contractors page:** CRUD on **contractors** tab (search, filter by trade, table only — **no calendar**). **Edit contractor** modal shows **Used by N tasks** with links to those templates. **Manage contractors** link from the drawer contractor picker.
-- Completion **notes** and **last done** are never edited here; they come from **completions** only.
-
-### How v1 builds the monthly list
-
-For selected month *M*:
-
-1. Select applicable **templates** (monthly always; annual when `due_month` matches *M*).
-2. Load **completions** for period *M* (and earlier periods if needed for carry-over).
-3. For each task:
-   - **Done / Won’t do in *M*** → hidden or muted.
-   - **No terminal completion for *M*** → **pending** for this month.
-   - **No terminal completion for a prior required period** while viewing *M* → **overdue** (red).
-
-### Month rollover (v1)
-
-No defer rows are created at month end. When *M+1* opens, tasks that still lack Done/Won’t do for the period(s) they owed work in show as **overdue** until you act in the new month (implicit carry).
-
-### Recurrence elsewhere
-
-**v2 Google Calendar** owns native RRULE + phone reminders. The sheet stays templates + completions.
+Streamlit does **not** run background jobs. Reminders are **v2 (GCal)** or optional **v1.1** digest (GitHub Action) — see §10.
 
 ---
 
-## Why Streamlit repo, not Apps Script (Cursor + “you do it”)
+## 2. Notion pivot — plan
 
-| Concern | Apps Script web app | Streamlit repo (this project) |
-|---------|---------------------|-------------------------------|
-| Build & test in Cursor / cloud agent | Weak — deploy/authorize in Google UIs, awkward local run | **Strong** — same as grocery-wizard |
-| Iteration with AI | Edit in browser or `clasp` sync | **Edit in repo, `just ui`, pytest** |
-| Your manual config | Many Google Cloud / deploy steps | **One-time secrets** (below), then agent maintains code |
-| Partner | GCal subscribe | Same — **GCal only** |
+### 2.1 Decision
 
-Apps Script is fine for solo tinkering; it is a poor fit for **“the agent implements everything in this workspace.”**
+| Before | After |
+|--------|--------|
+| Google Sheet: `templates`, `completions`, `contractors` tabs | **Three Notion databases** with the same logical roles |
+| Sheet OAuth + `just init-sheet` | **Notion integration** + database IDs in env |
+| Import from xlsx → Sheet | One-time **`just migrate-xlsx` → Notion** (idempotent) |
+
+**Why pivot now:** Approved UI needs **relations** (contractors), **rich instructions/links**, editable metadata, and optional editing in the Notion app — poor fit for flat sheet columns.
+
+**Single write path:** Streamlit (and migration scripts) write **Notion** only. The Ocala xlsx / Google Sheet become **import sources**, not live sync targets.
+
+### 2.2 Phases
+
+| Phase | Deliverable | Outcome |
+|-------|-------------|---------|
+| **P0 — Docs & schema** | This document + Notion DB templates (manual create or `init-notion` script) | Property names and select options frozen |
+| **P1 — Store** | `store/notion.py`, config, mocked tests | Read/write three DBs via API 2025 data sources |
+| **P2 — Migration** | `scripts/migrate_xlsx.py` | 61 `Home Maintenance` rows + empty contractors; dry-run |
+| **P3 — Domain** | Extend models: `in_progress`, priority, type, effort, links, contractor | Board matches mockup rules |
+| **P4 — UI** | Mockup C: drawer, contractors admin, in progress | Parity with approved mockups |
+| **P5 — Cutover** | Point prod env at Notion; archive xlsx as backup | Sheet optional export only |
+
+**Out of scope for pivot:** Rewriting REQUIREMENTS.md wholesale, GCal (v2), Streamlit Cloud deploy (can follow P4).
+
+### 2.3 One-time manual setup (owner)
+
+1. Create a Notion **teamspace page** (e.g. “B & R Home Maintenance”).
+2. Create three databases (§3); note each **database ID** and **data source ID** (API).
+3. Create an **internal integration**; share all three databases with it.
+4. Set env vars (§9): `NOTION_API_KEY`, three data source IDs (or database IDs per grocery-wizard pattern).
+5. Run migration dry-run, then apply.
+6. Smoke-test: `just ui` with `MAINTENANCE_WIZARD_STORE=notion`.
+
+Deprecated catalog (`Maintenance Tasks` 61 rows) may be **merged or replaced** by migration; do not maintain two live task catalogs.
 
 ---
 
-## One-time manual setup
+## 3. Notion data model
 
-**v1:** Google Cloud + **Sheets API** only; OAuth once; `just init-sheet` creates the workbook.
+Three databases. Naming convention: **`[MW] Tasks`**, **`[MW] Contractors`**, **`[MW] Completions`** (prefix avoids clashing with legacy DBs).
 
-**v2 adds:** Calendar API, dedicated calendar ID, sync job.
+### 3.1 `[MW] Tasks` (templates)
 
-Optional later: Streamlit Community Cloud secrets (same TOML as grocery-wizard).
+One row per **scheduled appearance** (matches your xlsx: e.g. “Replace HVAC filter — January”). Notion holds **what** the task is; the app decides **how it behaves** on the monthly board.
+
+| Property | Type | Required | Notes |
+|----------|------|----------|--------|
+| **Task** | title | yes | Display name |
+| **Month** | select | yes | `January` … `December` (import from xlsx `Month`) |
+| **Month #** | number | no | Sort helper (1–12); synced from xlsx |
+| **Area** | select | yes | HVAC, Plumbing, Exterior, … |
+| **Type** | select | yes | Replace, Service, Clean, Inspect/Test, … |
+| **Effort** | select | yes | XS, S, M, … |
+| **Priority** | select | yes | High, Medium, Low |
+| **Season** | select | no | Winter, Spring, … (filter only; not on card) |
+| **Active** | checkbox | yes | default true |
+| **Instructions** | rich text | no | Standing steps; editable in drawer or Notion |
+| **Links** | rich text or multi URL | no | Label + URL pairs; v1: rich text lines or JSON in a text property `Links JSON` if needed |
+| **Contractor** | relation → Contractors | no | Single relation |
+| **Stable key** | rich text | no | `normalize(task)\|normalize(area)\|month` for idempotent migration |
+| **gcal_series_id** | rich text | no | **v2** only |
+
+**Not stored on Tasks:** completion notes, last done date, in-progress state (live on **Completions**).
+
+**Links encoding (v1 implementation):** Prefer a single **`Links`** text property storing JSON array `[{"label":"...","url":"..."}]` for reliable round-trip from Streamlit; optional later migration to Notion URL properties.
+
+### 3.2 `[MW] Contractors`
+
+| Property | Type | Required | Notes |
+|----------|------|----------|--------|
+| **Name** | title | yes | Company or contact |
+| **Trade** | select | yes | Plumber, HVAC, Duct cleaning, … |
+| **Phone** | phone or text | no | `tel:` in UI |
+| **Email** | email | no | `mailto:` in UI |
+| **Website** | url | no | |
+| **Notes** | rich text | no | |
+| **Active** | checkbox | yes | |
+| **Tasks** | relation → Tasks | auto | Back-link; roll up “used by N tasks” |
+
+### 3.3 `[MW] Completions` (sparse log)
+
+One row per **task + period** while status is open or when terminalized. **Notes only here** (completion notes).
+
+| Property | Type | Required | Notes |
+|----------|------|----------|--------|
+| **Name** | title | formula or manual | e.g. `{Task} · {Period}` |
+| **Task** | relation → Tasks | yes | |
+| **Period** | rich text | yes | `YYYY-MM` for the month the action applies to |
+| **Status** | select | yes | `in_progress`, `done`, `wont_do` |
+| **Completed on** | date | no | Set on terminal states; optional `started_on` for in_progress |
+| **Notes** | rich text | no | **Completion** note only |
+| **gcal_instance_id** | rich text | no | **v2** |
+
+**Rules:**
+
+- At most **one** completion row per `(Task, Period)` — updates are **in-place** (Notion page update), not append-only duplicates.
+- **In progress** is non-terminal: task stays on board with badge until **Done** or **Won’t do**.
+- **Last done** on card: latest `done` row for that Task (any period), by `Completed on`.
+
+```mermaid
+erDiagram
+  Tasks ||--o| Contractors : contractor
+  Tasks ||--o{ Completions : task
+  Tasks {
+    string Task
+    string Month
+    string Area
+    string Type
+    string Effort
+    string Priority
+    string Instructions
+  }
+  Contractors {
+    string Name
+    string Trade
+    string Phone
+    string Email
+  }
+  Completions {
+    string Period
+    string Status
+    date Completed_on
+    string Notes
+  }
+```
 
 ---
 
-## Migration A → B
+## 4. Product behavior (monthly board)
 
-Not applicable if we **start** with Streamlit + Sheet. The earlier Apps Script path was an optional phase-1; we skip it to match Cursor-first delivery.
+### 4.1 Navigation (no calendar)
+
+- Sidebar: **month picker** (`YYYY` + month), **area** filters, **Manage contractors**, **Settings**.
+- No “full calendar”, no contractor calendar, no week grid in v1.
+
+### 4.2 Which tasks appear for month *M*
+
+1. Query **Tasks** where `Active` and `Month` matches *M* (by name or `Month #`).
+2. Load **Completions** for relevant periods (view month and prior months for carry-over).
+3. Build **BoardTask** list in domain layer.
+
+### 4.3 Urgency (visual)
+
+| State | Condition |
+|-------|-----------|
+| **Done / Won’t do** | Terminal completion for **view month** period |
+| **In progress** | Completion `in_progress` for view month period |
+| **Overdue** | Task owed for an **earlier** period in the same year (or prior policy month) with no terminal completion |
+| **Due soon** | Optional: last `due_soon_days` of the **calendar month** when viewing that month (no per-task due date) |
+| **Open** | Otherwise |
+
+Month boundaries use `MAINTENANCE_WIZARD_TIMEZONE` (default `America/New_York`).
+
+### 4.4 Sort order
+
+1. Urgency bucket: **overdue** → **in progress** → **open** (incl. due soon) → completed (if shown)
+2. **Priority:** High → Medium → Low
+3. **Area**, then **Task** title
+
+### 4.5 Actions (main card)
+
+| Action | Effect |
+|--------|--------|
+| **In progress** | Upsert completion: `in_progress` for `period = YYYY-MM` of view |
+| **Done** | Terminal `done` + optional note from in-card field |
+| **Won’t do** | Terminal `wont_do` |
+| Note field | Saved **only** on Done/Won’t do (not on template) |
+
+### 4.6 Details drawer
+
+| Mode | Content |
+|------|---------|
+| **View** | Instructions, links (new tab), contractor block (from relation), **Open in Notion** link |
+| **Edit** | Task name, area, type, effort, priority, instructions, links, contractor picker; **Manage contractors** link |
+
+### 4.7 Manage contractors
+
+- Table: trade, name, phone, email, website, **# linked tasks**, edit.
+- **Edit contractor** modal: **Used by N tasks** (relation rollup + links to tasks).
+- CRUD writes **Contractors** DB only (contact fields not copied onto each task).
+
+### 4.8 Last done
+
+- Display: latest **`done`** completion for task (any period): date + notes snippet.
+- Not editable in drawer (history integrity).
 
 ---
 
-## Revision log
+## 5. Domain layer (repo)
+
+Pure Python — **no Notion imports**.
+
+```
+src/maintenance_wizard/
+  models.py          # Template, Contractor, Completion, BoardTask, Urgency, …
+  domain/
+    schedule.py      # month matching, period keys, overdue / due-soon
+    board.py         # build_month_board, sort, last_done
+  store/
+    base.py          # Protocol: TaskStore
+    local.py         # JSON fixture store (tests / offline)
+    notion.py        # production Notion client
+    factory.py
+  integrations/notion/
+    client.py        # shared client, data source resolution
+    tasks.py
+    contractors.py
+    completions.py
+  ui/
+    app.py           # entry
+    views/           # board, drawer, contractors (target split)
+    theme.py
+    static/app_theme.css
+  scripts/
+    migrate_xlsx.py
+    seed_local_data.py
+  config.py
+```
+
+**Cadence note:** Imported xlsx uses **one row per month appearance** instead of a `cadence` column. Domain may set `cadence=monthly` implicitly with `due_month` from **Month #**. Annual tasks are rows that appear only in one month per year (same as today’s sheet).
+
+---
+
+## 6. Store abstraction
+
+```python
+# Conceptual protocol — see store/base.py
+class MaintenanceStore(Protocol):
+    def list_tasks_for_month(self, year: int, month: int) -> list[Template]: ...
+    def list_completions(self, *, task_ids: list[str] | None = None) -> list[Completion]: ...
+    def upsert_completion(self, completion: Completion) -> None: ...
+    def update_task(self, task: Template) -> None: ...
+    def list_contractors(self, *, active_only: bool = True) -> list[Contractor]: ...
+    def upsert_contractor(self, contractor: Contractor) -> None: ...
+```
+
+| `MAINTENANCE_WIZARD_STORE` | Use |
+|----------------------------|-----|
+| `local` | `.local/.../data.json` — default CI and fast UI dev |
+| `notion` | Production |
+
+Remove or deprecate `google_sheets` when Notion store lands.
+
+**Notion client:** Follow **Notion API 2025 data source** pattern (same approach as grocery-wizard): resolve data source ID, paginate queries, map select enums strictly, surface API errors in Streamlit (NFR1).
+
+---
+
+## 7. Migration
+
+### 7.1 Sources
+
+| Source | Use |
+|--------|-----|
+| **Ocala xlsx — `Home Maintenance`** | Primary: 61 tasks → `[MW] Tasks` |
+| **Ocala xlsx — `House Projects` Vendor column** | Optional seed hints; not auto-imported to contractors without review |
+| **Deprecated Notion catalog** | Optional merge if IDs stable; otherwise xlsx wins |
+| **Google Sheet URL** | Retired after cutover |
+
+### 7.2 Column mapping (Home Maintenance → Tasks)
+
+| xlsx | Notion |
+|------|--------|
+| Task | Task (title) |
+| Month | Month (select) |
+| Month # (sort) | Month # |
+| Area | Area |
+| Type | Type |
+| Priority | Priority |
+| Effort | Effort |
+| Notes | Instructions (standing text only) |
+| Season | Season |
+| Done? | **Ignore** — use Completions after go-live |
+| Assignees | Skip until used |
+
+### 7.3 Idempotency
+
+- **Stable key** = normalized `task|area|month`.
+- Migration: `--dry-run` prints create / update / skip; safe to re-run (NFR2).
+
+### 7.4 Contractors
+
+- Start empty or manual CSV; link relations in Notion or via drawer after cutover.
+
+---
+
+## 8. Configuration & secrets
+
+| Variable | Meaning |
+|----------|---------|
+| `MAINTENANCE_WIZARD_STORE` | `local` \| `notion` |
+| `NOTION_API_KEY` | Integration secret |
+| `MAINTENANCE_WIZARD_NOTION_TASKS_DS_ID` | Tasks data source ID |
+| `MAINTENANCE_WIZARD_NOTION_CONTRACTORS_DS_ID` | Contractors data source ID |
+| `MAINTENANCE_WIZARD_NOTION_COMPLETIONS_DS_ID` | Completions data source ID |
+| `MAINTENANCE_WIZARD_TIMEZONE` | Default `America/New_York` |
+| `MAINTENANCE_WIZARD_DUE_SOON_DAYS` | End-of-month window (default 7) |
+
+Never commit secrets or xlsx with credentials (`Account Info` tab). NFR5.
+
+Optional Streamlit Cloud: `secrets.toml` mirroring grocery-wizard.
+
+---
+
+## 9. UI / UX alignment
+
+Approved layout: **mockup C v4** — wide layout, sidebar month + area filters, inline stats (`overdue · in progress · open`), cards with status icon, **note inside card**, **Details** → right drawer, **Manage contractors** in sidebar.
+
+**Theme:** Lavender palette (`#e6e0f2` background, `#3a2849` text, `#6341a5` accent) — see `ui/theme.py`.
+
+**Deferred UI:** Explicit Defer button (month-end implicit carry only), calendar views, due date fields.
+
+---
+
+## 10. Reminders & v2 calendar
+
+| Version | Mechanism |
+|---------|-----------|
+| **v1** | In-app urgency only |
+| **v1.1 (optional)** | Weekly email digest via GitHub Action querying Notion |
+| **v2** | One-way **Tasks → Google Calendar** series; completions patch instances; partner subscribes to calendar |
+
+Notion is **not** the recurrence engine for phone reminders in v2; **GCal** is. Notion keeps task metadata + completion audit.
+
+---
+
+## 11. Testing & quality
+
+| Concern | Approach |
+|---------|----------|
+| Board / overdue / priority sort | **Unit tests** with fixture JSON (`local` store) — no live Notion in CI |
+| Notion mapping | Contract tests with recorded JSON fixtures |
+| Store integration | Optional manual / labeled integration test with `NOTION_CI` DB copies |
+| Lint | `ruff` + `pytest` via `just check` |
+
+---
+
+## 12. Deployment (target)
+
+- **Local:** `just setup` → `just ui` (port **8765**).
+- **Hosted (optional):** Streamlit Community Cloud + Google OAuth allowlist (same ops pattern as grocery-wizard).
+- **Notion:** Integration must have access to all three databases in prod and optional `[MW CI]` clones.
+
+---
+
+## 13. Rejected / out of scope (v1)
+
+- Apps Script–first, Zapier/Make as core sync
+- Dual live sync Sheet ↔ Notion
+- Per-task due dates in UI (month-only scheduling)
+- Calendar view (any variant)
+- Defer as a first-class button
+- Storing completion notes on task templates
+
+---
+
+## 14. Revision log
 
 | Date | Change |
 |------|--------|
-| 2026-11-17 | Lock Streamlit + Sheet + GCal; per-task last-done + notes; Cursor-first |
-| 2026-11-17 | v1 monthly only; done/won’t do; auto month rollover; GCal → v2 |
-| 2026-11-17 | Data model: templates + sparse completions; pending computed in app |
-| 2026-11-19 | contractors tab; editable details drawer; template links/instructions; completion notes only on completions |
+| 2026-11-17 | Lock Streamlit + Sheet + GCal; Cursor-first |
+| 2026-11-17 | Sparse completions; pending computed in app |
+| 2026-11-19 | Mockup C: drawer, contractors, in progress, no due dates |
+| 2026-11-19 | **Pivot to Notion** — full architecture; Sheet superseded |

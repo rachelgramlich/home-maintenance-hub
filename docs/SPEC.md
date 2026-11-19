@@ -1,6 +1,8 @@
 # Household recurring tasks — technical specification (draft)
 
-Companion to [REQUIREMENTS.md](./REQUIREMENTS.md). Assumes decisions in §11 of requirements are resolved before build.
+> **Canonical architecture:** [ARCHITECTURE.md](./ARCHITECTURE.md) (Notion pivot, three databases, mockup C UI). This file is legacy detail; reconcile when implementation starts.
+
+Companion to [REQUIREMENTS.md](./REQUIREMENTS.md).
 
 ---
 

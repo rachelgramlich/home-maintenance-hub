@@ -2,7 +2,7 @@
 
 Monthly home maintenance checklist: **Done** / **Won’t do**, overdue carry-over, last-done notes.
 
-- **v1:** Streamlit + hidden **Google Sheet** (or **local JSON** for dev)
+- **v1:** Streamlit + **Notion** (three databases), or **local JSON** for dev/tests
 - **v2:** Google Calendar reminders (not implemented yet)
 
 Docs: [docs/FEATURES.md](docs/FEATURES.md) · [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
@@ -24,18 +24,17 @@ Copy `.env.example` → `.env` or `secrets.toml.example` → `secrets.toml`.
 
 | Variable | Default | Meaning |
 |----------|---------|---------|
-| `MAINTENANCE_WIZARD_STORE` | `local` | `local` or `google_sheets` |
-| `MAINTENANCE_WIZARD_SHEET_ID` | — | Google spreadsheet ID |
+| `MAINTENANCE_WIZARD_STORE` | `local` | `local` or `notion` |
+| `NOTION_API_KEY` | — | Notion integration token |
+| `MAINTENANCE_WIZARD_NOTION_*_DS_ID` | — | Data source IDs (tasks, contractors, completions) |
 | `MAINTENANCE_WIZARD_TIMEZONE` | `America/New_York` | Month/due boundaries |
 | `MAINTENANCE_WIZARD_DUE_SOON_DAYS` | `7` | Orange “due soon” window |
 
 Local data file: `.local/maintenance_wizard/data.json` (gitignored).
 
-## Google Sheets (production)
+## Notion (production)
 
-1. Create a spreadsheet with tabs **`templates`** and **`completions`** (headers match [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)).
-2. OAuth token at `.local/maintenance_wizard/token.json` (setup script coming in a follow-up).
-3. Set `MAINTENANCE_WIZARD_STORE=google_sheets` and `MAINTENANCE_WIZARD_SHEET_ID`.
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) §2–3: create **`[MW] Tasks`**, **`[MW] Contractors`**, **`[MW] Completions`**, share with your integration, set env vars, then run `just migrate-xlsx` (when implemented).
 
 ## Development
 
