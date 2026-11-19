@@ -1,6 +1,8 @@
-# Maintenance Wizard
+# maintenance-wizard
 
-Monthly home maintenance checklist: **Done** / **Won’t do**, overdue carry-over, last-done notes.
+**B & R Home Maintenance** — monthly checklist (**In progress** / **Done** / **Won’t do**), overdue carry-over, contractors, details drawer. Notion-backed.
+
+Repository: https://github.com/rachelgramlich/maintenance-wizard
 
 - **v1:** Streamlit + **Notion** (three databases), or **local JSON** for dev/tests
 - **v2:** Google Calendar reminders (not implemented yet)
