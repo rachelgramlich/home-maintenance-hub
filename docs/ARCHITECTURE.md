@@ -11,7 +11,7 @@
 
 **Superseded:** Hidden Google Sheet as production store (replaced by Notion 2026-11-19). Local JSON store remains for **offline dev/tests** only.
 
-See [FEATURES.md](./FEATURES.md) for scope. UI reference: mockup **`mockup-c-v4-in-progress-detail-pane-inside-card`**.
+See [FEATURES.md](./FEATURES.md) for scope. **Approved UI mockup:** [§9](#9-ui--ux-alignment) · `docs/images/ui-mockup-c-v4-approved.jpg`.
 
 ---
 
@@ -356,7 +356,11 @@ Optional Streamlit Cloud: `secrets.toml` mirroring grocery-wizard.
 
 ## 9. UI / UX alignment
 
-Approved layout: **mockup C v4** — wide layout, sidebar month + area filters, inline stats (`overdue · in progress · open`), cards with status icon, **note inside card**, **Details** → right drawer, **Manage contractors** in sidebar.
+**Approved mockup (v4)** — canonical target for v1 UI implementation:
+
+![B & R Home Maintenance — approved mockup C v4](./images/ui-mockup-c-v4-approved.jpg)
+
+Approved layout: **mockup C v4** — wide layout, sidebar month + area filters, inline stats (`overdue · in progress · open`), cards with status icon, **note inside card**, **Details** → right drawer, **Manage contractors** in sidebar. Actions: **In progress**, **Done**, **Won’t do**.
 
 **Theme:** Lavender palette (`#e6e0f2` background, `#3a2849` text, `#6341a5` accent) — see `ui/theme.py`.
 
@@ -416,3 +420,4 @@ Notion is **not** the recurrence engine for phone reminders in v2; **GCal** is. 
 | 2026-11-19 | Mockup C: drawer, contractors, in progress, no due dates |
 | 2026-11-19 | **Pivot to Notion** — full architecture; Sheet superseded |
 | 2026-11-19 | Drop **due soon** / `due_soon_days`; urgency is month-only (overdue, in progress, open, terminal) |
+| 2026-11-19 | Commit approved UI mockup to `docs/images/ui-mockup-c-v4-approved.jpg` |
