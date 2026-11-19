@@ -8,9 +8,6 @@ textColor = "#3a2849"
 [browser]
 gatherUsageStats = false
 
-[client]
-showSidebarNavigation = false
-
 [server]
 fileWatcherType = "none"
 headless = true

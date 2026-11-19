@@ -134,37 +134,9 @@ html {
 }
 
 .block-container {
-    max-width: 56rem;
-    padding-top: 1.25rem;
+    max-width: 44rem;
+    padding-top: 1.5rem;
     padding-bottom: 3rem;
-}
-
-.mw-stats-line {
-    margin: 0 0 1.25rem;
-    font-size: 0.95rem;
-    color: var(--mw-text-muted);
-}
-
-.mw-stats-line strong {
-    color: var(--mw-text);
-    font-weight: 700;
-}
-
-.mw-stat-sep {
-    margin: 0 0.5rem;
-    opacity: 0.55;
-}
-
-[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell) {
-    padding: 0.65rem 0.85rem 0.85rem;
-}
-
-[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell) [data-testid="stVerticalBlock"] {
-    align-items: flex-start !important;
-}
-
-.mw-actions-stack .stButton {
-    margin-bottom: 0.35rem;
 }
 
 .mw-hero {
