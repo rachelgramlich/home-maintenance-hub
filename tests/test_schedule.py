@@ -1,7 +1,11 @@
 from datetime import date
 
 from maintenance_wizard.domain.board import build_month_board
-from maintenance_wizard.domain.schedule import task_applies_to_board, terminal_completion_exists
+from maintenance_wizard.domain.schedule import (
+    completion_page_title,
+    task_applies_to_board,
+    terminal_completion_exists,
+)
 from maintenance_wizard.models import Completion, Template, Urgency
 
 
@@ -57,6 +61,27 @@ def test_priority_sort_within_bucket() -> None:
     ]
     board = build_month_board(templates, [], 2026, 3, date(2026, 3, 1))
     assert board[0].template.task_id == "high"
+
+
+def test_completion_page_title() -> None:
+    assert (
+        completion_page_title(
+            task_name="Replace HVAC filter",
+            period="2026-06",
+            status="done",
+        )
+        == "Done · Replace HVAC filter · Jun 2026"
+    )
+    assert (
+        completion_page_title(task_name="Clean gutters", period="2026-10", status="wont_do")
+        == "Won't do · Clean gutters · Oct 2026"
+    )
+    assert (
+        completion_page_title(
+            task_name="Winterize hose bibs", period="2026-09", status="in_progress"
+        )
+        == "In progress · Winterize hose bibs · Sep 2026"
+    )
 
 
 def test_terminal_completion_exists() -> None:

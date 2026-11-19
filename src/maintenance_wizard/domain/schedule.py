@@ -21,6 +21,31 @@ MONTH_NAMES = {
 
 MONTH_LABELS = {v: k.capitalize() for k, v in MONTH_NAMES.items()}
 
+MONTH_SHORT = {v: name[:3].title() for name, v in MONTH_NAMES.items()}
+
+COMPLETION_STATUS_LABELS: dict[str, str] = {
+    "done": "Done",
+    "wont_do": "Won't do",
+    "in_progress": "In progress",
+}
+
+
+def period_short_label(period: str) -> str:
+    """Turn ``YYYY-MM`` into a compact month label such as ``Jun 2026``."""
+    try:
+        year_s, month_s = period.split("-", 1)
+        month = int(month_s)
+    except (ValueError, IndexError):
+        return period
+    mon = MONTH_SHORT.get(month, month_s)
+    return f"{mon} {year_s}"
+
+
+def completion_page_title(*, task_name: str, period: str, status: str) -> str:
+    """Human-readable Notion completion row title."""
+    label = COMPLETION_STATUS_LABELS.get(status, status.replace("_", " ").title())
+    return f"{label} · {task_name} · {period_short_label(period)}"
+
 
 def period_key(year: int, month: int) -> str:
     return f"{year:04d}-{month:02d}"

@@ -83,6 +83,9 @@ migrate-xlsx *ARGS:
 import-completions *ARGS:
     uv run python -m maintenance_wizard.scripts.import_completions {{ARGS}}
 
+rename-completions *ARGS:
+    uv run python -m maintenance_wizard.scripts.rename_completions {{ARGS}}
+
 notion-audit *ARGS:
     uv run python -m maintenance_wizard.scripts.notion_row_audit {{ARGS}}
 

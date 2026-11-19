@@ -4,6 +4,7 @@ from datetime import date
 from typing import Any
 
 from maintenance_wizard.config import Settings
+from maintenance_wizard.domain.schedule import completion_page_title
 from maintenance_wizard.integrations.notion import client as nc
 from maintenance_wizard.integrations.notion.mappers import (
     page_to_completion,
@@ -35,6 +36,18 @@ class NotionTaskStore(TaskStore):
                 raise RuntimeError(msg)
         self._settings = settings
         self._client = nc.make_client(settings.notion_api_key)
+        self._task_name_cache: dict[str, str] | None = None
+
+    def _task_names_by_id(self) -> dict[str, str]:
+        if self._task_name_cache is None:
+            pages = nc.paginate_data_source(self._client, self._settings.notion_tasks_ds_id)
+            self._task_name_cache = {
+                page_to_template(p).task_id: page_to_template(p).name for p in pages
+            }
+        return self._task_name_cache
+
+    def _task_name(self, task_id: str) -> str:
+        return self._task_names_by_id().get(task_id, "Unknown task")
 
     def list_templates(self) -> list[Template]:
         pages = nc.paginate_data_source(self._client, self._settings.notion_tasks_ds_id)
@@ -75,7 +88,11 @@ class NotionTaskStore(TaskStore):
     ) -> Completion:
         index = self._completion_index()
         existing = index.get((task_id, period))
-        title = f"{period} · {status}"
+        title = completion_page_title(
+            task_name=self._task_name(task_id),
+            period=period,
+            status=status,
+        )
         props: dict[str, Any] = {
             "Name": nc.title_value(title),
             "Period": nc.rich_text_value(period),
@@ -119,6 +136,7 @@ class NotionTaskStore(TaskStore):
             props["Contractor"] = {"relation": []}
 
         updated = self._client.pages.update(page_id=template.task_id, properties=props)
+        self._task_name_cache = None
         return page_to_template(updated)
 
     def upsert_contractor(self, contractor: Contractor) -> Contractor:

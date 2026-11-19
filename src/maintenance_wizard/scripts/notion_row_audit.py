@@ -11,6 +11,7 @@ from datetime import date
 from pathlib import Path
 
 from maintenance_wizard.config import get_settings
+from maintenance_wizard.domain.schedule import completion_page_title
 from maintenance_wizard.integrations.notion import client as nc
 from maintenance_wizard.integrations.notion.mappers import page_to_completion, page_to_template
 
@@ -64,6 +65,8 @@ def audit_row_counts() -> dict[str, int | dict[str, int]]:
 def rewrite_completion_year(*, from_year: int, to_year: int, dry_run: bool) -> dict[str, int]:
     settings = get_settings()
     client = nc.make_client(settings.notion_api_key)
+    task_pages = nc.paginate_data_source(client, settings.notion_tasks_ds_id)
+    task_names = {page_to_template(p).task_id: page_to_template(p).name for p in task_pages}
     stats = {"updated": 0, "skipped": 0, "errors": 0}
     prefix = f"{from_year:04d}-"
 
@@ -80,7 +83,12 @@ def rewrite_completion_year(*, from_year: int, to_year: int, dry_run: bool) -> d
         new_period = f"{to_year:04d}-{month:02d}"
         _, last = calendar.monthrange(to_year, month)
         completed_on = date(to_year, month, last)
-        title = f"{new_period} · {comp.status}"
+        task_name = task_names.get(comp.task_id, "Unknown task")
+        title = completion_page_title(
+            task_name=task_name,
+            period=new_period,
+            status=comp.status,
+        )
         props: dict = {
             "Name": nc.title_value(title),
             "Period": nc.rich_text_value(new_period),

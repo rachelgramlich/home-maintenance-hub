@@ -137,7 +137,7 @@ One row per **task + period** while status is open or when terminalized. **Notes
 
 | Property | Type | Required | Notes |
 |----------|------|----------|--------|
-| **Name** | title | formula or manual | e.g. `{Task} · {Period}` |
+| **Name** | title | app on upsert | e.g. `Done · Replace HVAC filter · Jun 2026` |
 | **Task** | relation → Tasks | yes | |
 | **Period** | rich text | yes | `YYYY-MM` for the month the action applies to |
 | **Status** | select | yes | `in_progress`, `done`, `wont_do` |
