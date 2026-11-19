@@ -1,0 +1,89 @@
+{
+  "year": 2026,
+  "checks": [
+    {
+      "task": "Replace HVAC filter \u2014 June",
+      "area": "HVAC",
+      "month": "June",
+      "period": "2026-06",
+      "completed_on": "2026-06-30"
+    },
+    {
+      "task": "Replace HVAC filter \u2014 July",
+      "area": "HVAC",
+      "month": "July",
+      "period": "2026-07",
+      "completed_on": "2026-07-31"
+    },
+    {
+      "task": "Replace HVAC filter \u2014 August",
+      "area": "HVAC",
+      "month": "August",
+      "period": "2026-08",
+      "completed_on": "2026-08-31"
+    },
+    {
+      "task": "Replace HVAC filter \u2014 September",
+      "area": "HVAC",
+      "month": "September",
+      "period": "2026-09",
+      "completed_on": "2026-09-30"
+    },
+    {
+      "task": "Replace HVAC filter \u2014 October",
+      "area": "HVAC",
+      "month": "October",
+      "period": "2026-10",
+      "completed_on": "2026-10-31"
+    },
+    {
+      "task": "Replace HVAC filter \u2014 November",
+      "area": "HVAC",
+      "month": "November",
+      "period": "2026-11",
+      "completed_on": "2026-11-30"
+    },
+    {
+      "task": "Pest: Summer pest inspection",
+      "area": "Pest",
+      "month": "June",
+      "period": "2026-06",
+      "completed_on": "2026-06-30"
+    },
+    {
+      "task": "Exterior: Trim vegetation away from house (mid-summer)",
+      "area": "Exterior",
+      "month": "July",
+      "period": "2026-07",
+      "completed_on": "2026-07-31"
+    },
+    {
+      "task": "Exterior: Clean + inspect outdoor furniture/patio",
+      "area": "Exterior",
+      "month": "August",
+      "period": "2026-08",
+      "completed_on": "2026-08-31"
+    },
+    {
+      "task": "Basement: Shut off + store dehumidifier for winter",
+      "area": "Basement/Humidity",
+      "month": "September",
+      "period": "2026-09",
+      "completed_on": "2026-09-30"
+    },
+    {
+      "task": "Plumbing: Winterize outdoor hose bibs (before first frost)",
+      "area": "Plumbing",
+      "month": "October",
+      "period": "2026-10",
+      "completed_on": "2026-10-31"
+    },
+    {
+      "task": "Interior: Inspect + seal drafts around doors/windows (fall)",
+      "area": "Interior",
+      "month": "October",
+      "period": "2026-10",
+      "completed_on": "2026-10-31"
+    }
+  ]
+}

@@ -8,9 +8,10 @@ import json
 import os
 import sys
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any
+from zoneinfo import ZoneInfo
 
 from maintenance_wizard.config import get_settings
 from maintenance_wizard.integrations.notion import client as nc
@@ -32,7 +33,7 @@ from maintenance_wizard.migration.keys import (
 from maintenance_wizard.store.notion import NotionTaskStore
 
 DEPRECATED_DS = "d7cb0608-b694-4103-b3ce-65af4fc82d3c"
-DEFAULT_YEAR = 2025
+DEFAULT_YEAR = datetime.now(ZoneInfo("America/New_York")).year
 HOME_TAB = "Home Maintenance"
 _FIXTURE = Path(__file__).resolve().parents[3] / "tests" / "fixtures" / "home_maintenance_rows.json"
 
@@ -318,6 +319,14 @@ def run_migration(
         print("NOTION_API_KEY missing — aborting (dry-run logic unavailable for Notion).")
         return {"error": 1}
 
+    try:
+        from maintenance_wizard.scripts.notion_row_audit import audit_row_counts, format_audit
+
+        print("Before migration:")
+        print(format_audit(audit_row_counts()))
+    except Exception as exc:
+        print(f"(before audit skipped: {exc})")
+
     client = nc.make_client(settings.notion_api_key)
     store = NotionTaskStore(settings)
 
@@ -402,6 +411,14 @@ def run_migration(
 
     print("---")
     print(stats)
+    if not dry_run and not stats.get("error"):
+        try:
+            from maintenance_wizard.scripts.notion_row_audit import audit_row_counts, format_audit
+
+            print("After migration:")
+            print(format_audit(audit_row_counts()))
+        except Exception as exc:
+            print(f"(after audit skipped: {exc})")
     return stats
 
 
