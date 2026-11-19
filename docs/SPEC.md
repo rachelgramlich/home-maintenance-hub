@@ -88,9 +88,9 @@ All comparisons use timezone `TZ` (default `America/New_York`).
 if status in (Done, WontDo):
     display = hidden  # unless show_completed
 elif status == Pending and (carried_over or period_key < current_period or today > due_date):
-    display = overdue      # red — exact rule ties to requirement decision
+    display = overdue  # red — exact rule ties to requirement decision
 elif status == Pending and today >= due_date - due_soon_days:
-    display = due_soon     # orange
+    display = due_soon  # orange
 else:
     display = normal
 ```

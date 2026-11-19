@@ -6,9 +6,7 @@ from maintenance_wizard.domain import schedule
 from maintenance_wizard.models import BoardTask, Completion, Template, Urgency
 
 
-def last_done(
-    completions: list[Completion], task_id: str
-) -> tuple[date | None, str]:
+def last_done(completions: list[Completion], task_id: str) -> tuple[date | None, str]:
     done_rows = [c for c in completions if c.task_id == task_id and c.status == "done"]
     if not done_rows:
         return None, ""

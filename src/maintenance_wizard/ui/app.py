@@ -44,9 +44,7 @@ def load_board(year: int, month: int, show_closed: bool) -> list:
     templates = store.list_templates()
     completions = store.list_completions()
     today = today_in_tz()
-    board = build_month_board(
-        templates, completions, year, month, today, settings.due_soon_days
-    )
+    board = build_month_board(templates, completions, year, month, today, settings.due_soon_days)
     if not show_closed:
         board = [r for r in board if r.urgency not in (Urgency.DONE, Urgency.WONT_DO)]
     return board
@@ -143,7 +141,10 @@ def main() -> None:
             continue
 
         with st.container(border=True):
-            st.markdown('<span class="mw-task-shell" aria-hidden="true"></span>', unsafe_allow_html=True)
+            st.markdown(
+                '<span class="mw-task-shell" aria-hidden="true"></span>',
+                unsafe_allow_html=True,
+            )
             st.markdown(
                 f'<div class="{urgency_class(row.urgency)} mw-task--open">{card_html}</div>',
                 unsafe_allow_html=True,
@@ -164,9 +165,7 @@ def main() -> None:
                     use_container_width=True,
                 ):
                     try:
-                        store.add_completion(
-                            t.task_id, row.period, "done", today, notes or ""
-                        )
+                        store.add_completion(t.task_id, row.period, "done", today, notes or "")
                         load_board.clear()
                         st.rerun()
                     except ValueError as err:
@@ -179,9 +178,7 @@ def main() -> None:
                     use_container_width=True,
                 ):
                     try:
-                        store.add_completion(
-                            t.task_id, row.period, "wont_do", today, notes or ""
-                        )
+                        store.add_completion(t.task_id, row.period, "wont_do", today, notes or "")
                         load_board.clear()
                         st.rerun()
                     except ValueError as err:

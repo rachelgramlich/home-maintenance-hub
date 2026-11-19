@@ -26,9 +26,7 @@ def test_overdue_when_prior_month_open() -> None:
         Template("m", "Monthly", "monthly", 1, 1, "Other"),
     ]
     completions: list[Completion] = []
-    board = build_month_board(
-        templates, completions, 2026, 3, date(2026, 3, 5), 7
-    )
+    board = build_month_board(templates, completions, 2026, 3, date(2026, 3, 5), 7)
     assert len(board) == 1
     assert board[0].urgency == Urgency.OVERDUE
 
@@ -38,9 +36,7 @@ def test_done_hides_from_board_when_not_showing_closed() -> None:
     completions = [
         Completion("1", "m", "2026-03", "done", date(2026, 3, 1)),
     ]
-    board = build_month_board(
-        templates, completions, 2026, 3, date(2026, 3, 5), 7
-    )
+    board = build_month_board(templates, completions, 2026, 3, date(2026, 3, 5), 7)
     assert board[0].urgency == Urgency.DONE
 
 
