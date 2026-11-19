@@ -20,20 +20,35 @@ You want **lookup**, not a buried audit log:
 
 ---
 
-## Data model (Google Sheet — two tabs)
+## Data model (Google Sheet — three tabs)
 
 The sheet does **not** recur anything. **Recurrence lives in app code** (which templates apply to which month).
 
 | Tab | Role |
 |-----|------|
-| **templates** | **One row per task, forever** — name, cadence, due month/day, area, active, … |
-| **completions** | **Sparse** — one row only when you act: Done or Won’t do for a given `period` (`YYYY-MM`) |
+| **templates** | **One row per task** (per your import: often one row per task × month) — name, area, type, effort, priority, month, instructions, links, `contractor_id`, active, … |
+| **completions** | **Sparse** — one row only when you act: Done or Won’t do for a given `period` (`YYYY-MM`); **`notes` live here only** (not on template). |
+| **contractors** | **Source of truth** for vendors — one row per company/contact; tasks **link** via `contractor_id`, not duplicated phone/email on every task. |
 
 **Pending / overdue are computed**, not stored as monthly instance rows.
 
-**templates columns (minimum):** `task_id`, `name`, `cadence`, `due_month`, `due_day`, `area`, `active` (+ `gcal_series_id` in **v2**)
+**templates columns (minimum):** `task_id`, `name`, `month` (or `due_month` for annual), `area`, `type`, `effort`, `priority`, `active`, optional `instructions` (text), `links` (JSON or pipe-delimited label\|url rows), `contractor_id` (+ `gcal_series_id` in **v2**)
 
 **completions columns (minimum):** `completion_id`, `task_id`, `period` (`YYYY-MM`), `status` (`done` / `wont_do`), `completed_on`, `notes` (+ `gcal_instance_id` in **v2**)
+
+**contractors columns (minimum):** `contractor_id`, `name`, `trade` (e.g. Plumber, HVAC, Duct cleaning), `phone`, `email`, `website`, `notes`, `active`
+
+### Linking plumbers (and others) to tasks
+
+- Edit a contractor once in **contractors**; every template with that `contractor_id` shows the same phone/email in the details drawer.
+- Picker in the drawer is filtered by **trade** when the task’s area/type implies it (e.g. Plumbing → Plumber), but you can pick any active contractor or **unlink**.
+- Optional later: bulk “assign default Plumber to all templates with `trade=Plumber`” — still one foreign key per template row.
+
+### Details drawer (view vs edit)
+
+- **View:** instructions, links (open in new tab), contractor block (tap-to-call / mailto), read-only template summary.
+- **Edit** (in-drawer): same fields as template row — name, area, type, effort, priority, instructions, add/remove links, **contractor** dropdown (+ shortcut **Manage contractors**). Save writes **templates** (and **contractors** only when creating/updating a contractor from the directory UI, not by copying contact onto each task).
+- Completion **notes** and **last done** are never edited here; they come from **completions** only.
 
 ### How v1 builds the monthly list
 
@@ -92,3 +107,4 @@ Not applicable if we **start** with Streamlit + Sheet. The earlier Apps Script p
 | 2026-11-17 | Lock Streamlit + Sheet + GCal; per-task last-done + notes; Cursor-first |
 | 2026-11-17 | v1 monthly only; done/won’t do; auto month rollover; GCal → v2 |
 | 2026-11-17 | Data model: templates + sparse completions; pending computed in app |
+| 2026-11-19 | contractors tab; editable details drawer; template links/instructions; completion notes only on completions |
