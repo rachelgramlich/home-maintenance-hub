@@ -1,12 +1,32 @@
-.venv/
-.env
-secrets.toml
+# Local runtime data
 .local/
+secrets.toml
+.streamlit/secrets.toml
+.env
+
+# Python
+.venv/
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+
+# IDE
+.vscode/
+.cursor/mcp.json
+
+# uv
+.uv/
+*.egg-info/
+dist/
+build/
+
+# Test / lint caches
 .pytest_cache/
 .ruff_cache/
+.mypy_cache/
 .coverage
 htmlcov/
-dist/
-*.egg-info/
+
+# Streamlit agent skills (environment-specific symlinks into .venv)
+.agents/skills/developing-with-streamlit
+.cursor/skills/developing-with-streamlit

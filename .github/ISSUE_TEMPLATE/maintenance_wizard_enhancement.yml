@@ -1,0 +1,42 @@
+name: Maintenance Wizard enhancement
+description: Feature or improvement for the backlog (picked up via /work-on-issue)
+labels:
+  - maintenance-wizard
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Pick up with `/work-on-issue <issue-number>`.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What should change and why?
+      placeholder: User-visible outcome, constraints, links, acceptance hints…
+    validations:
+      required: true
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected behavior & manual test hints
+      description: |
+        How should it work when done? Include surface (UI/CLI), where to go, steps, and expected results —
+        these flow into the PR **Manual verification** section.
+      placeholder: |
+        Surface: Streamlit …
+        Steps: 1. … 2. …
+        Expected: …
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - ui
+        - store
+        - domain
+        - notion
+        - other
+    validations:
+      required: true
