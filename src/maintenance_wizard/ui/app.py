@@ -1,4 +1,4 @@
-"""Maintenance Wizard — monthly checklist."""
+"""B & R Home Maintenance — monthly checklist."""
 
 from __future__ import annotations
 
@@ -52,7 +52,7 @@ def load_board(year: int, month: int, show_closed: bool) -> list:
     return board
 
 
-def _render_hero(month_label: str, store_label: str) -> None:
+def _render_hero(month_label: str) -> None:
     st.markdown(
         f'<div class="mw-hero">'
         f"<h1>B &amp; R Home Maintenance</h1>"
@@ -60,14 +60,26 @@ def _render_hero(month_label: str, store_label: str) -> None:
         f"</div>",
         unsafe_allow_html=True,
     )
-    st.caption(f"Data source: {store_label}")
+
+
+def _render_inline_stats(overdue: int, soon: int, open_n: int) -> None:
+    st.markdown(
+        f'<p class="mw-stats-line">'
+        f'<span class="mw-stat"><strong>{overdue}</strong> overdue</span>'
+        f'<span class="mw-stat-sep">·</span>'
+        f'<span class="mw-stat"><strong>{soon}</strong> due soon</span>'
+        f'<span class="mw-stat-sep">·</span>'
+        f'<span class="mw-stat"><strong>{open_n}</strong> open</span>'
+        f"</p>",
+        unsafe_allow_html=True,
+    )
 
 
 def main() -> None:
     st.set_page_config(
         page_title="B & R Home Maintenance",
         page_icon="🏠",
-        layout="centered",
+        layout="wide",
     )
     inject_app_styles()
 
@@ -75,7 +87,7 @@ def main() -> None:
     today = today_in_tz()
 
     with st.sidebar:
-        st.header("Month")
+        st.header("Filters")
         year = st.number_input("Year", min_value=2020, max_value=2035, value=today.year)
         month = st.selectbox(
             "Month",
@@ -86,12 +98,13 @@ def main() -> None:
         show_closed = st.toggle("Show done & won't do", value=False)
         areas = sorted({t.area for t in get_store().list_templates()})
         area_filter = st.multiselect("Area", options=areas)
-        if st.button("Refresh", use_container_width=True):
+        if st.button("Refresh", use_container_width=True, type="secondary"):
             load_board.clear()
             st.rerun()
+        st.caption(f"Source: {settings.store}")
 
     month_label = date(year, month, 1).strftime("%B %Y")
-    _render_hero(month_label, settings.store)
+    _render_hero(month_label)
 
     try:
         board = load_board(year, month, show_closed)
@@ -105,12 +118,8 @@ def main() -> None:
 
     overdue_n = sum(1 for r in board if r.urgency == Urgency.OVERDUE)
     soon_n = sum(1 for r in board if r.urgency == Urgency.DUE_SOON)
-    open_n = len(board) - overdue_n - soon_n
-
-    m1, m2, m3 = st.columns(3)
-    m1.metric("Overdue", overdue_n)
-    m2.metric("Due soon", soon_n)
-    m3.metric("Open", max(open_n, 0))
+    open_n = max(len(board) - overdue_n - soon_n, 0)
+    _render_inline_stats(overdue_n, soon_n, open_n)
 
     if not board:
         st.success("Nothing open for this month — or all tasks are complete.")
@@ -128,7 +137,7 @@ def main() -> None:
                 last_html += f" — {row.last_done_notes}"
             last_html += "</p>"
 
-        card_html = (
+        header_html = (
             f"{badge}"
             f'<p class="mw-task-title">{t.name}</p>'
             f'<p class="mw-meta">{t.area} · {t.cadence} · {row.period}</p>'
@@ -137,26 +146,34 @@ def main() -> None:
 
         if row.urgency in (Urgency.DONE, Urgency.WONT_DO):
             st.markdown(
-                f'<div class="mw-task-card {urgency_class(row.urgency)}">{card_html}</div>',
+                f'<div class="mw-task-card {urgency_class(row.urgency)}">{header_html}</div>',
                 unsafe_allow_html=True,
             )
             continue
 
         with st.container(border=True):
-            st.markdown('<span class="mw-task-shell" aria-hidden="true"></span>', unsafe_allow_html=True)
             st.markdown(
-                f'<div class="{urgency_class(row.urgency)} mw-task--open">{card_html}</div>',
+                '<span class="mw-task-shell" aria-hidden="true"></span>',
                 unsafe_allow_html=True,
             )
-            notes_key = f"notes_{t.task_id}_{row.period}"
-            notes = st.text_input(
-                "Notes",
-                key=notes_key,
-                placeholder="Optional notes",
-                label_visibility="collapsed",
+            info_col, note_col, act_col = st.columns(
+                [2.2, 2.5, 1.1], gap="medium", vertical_alignment="top"
             )
-            done_col, skip_col = st.columns(2)
-            with done_col:
+            with info_col:
+                st.markdown(
+                    f'<div class="{urgency_class(row.urgency)} mw-task--open">{header_html}</div>',
+                    unsafe_allow_html=True,
+                )
+            notes_key = f"notes_{t.task_id}_{row.period}"
+            with note_col:
+                notes = st.text_input(
+                    "Note",
+                    key=notes_key,
+                    placeholder="Add a note for this completion…",
+                    help="Saved when you mark Done or Won't do.",
+                )
+            with act_col:
+                st.markdown('<div class="mw-actions-stack">', unsafe_allow_html=True)
                 if st.button(
                     "Done",
                     key=f"done_{t.task_id}_{row.period}",
@@ -171,7 +188,6 @@ def main() -> None:
                         st.rerun()
                     except ValueError as err:
                         st.warning(str(err))
-            with skip_col:
                 if st.button(
                     "Won't do",
                     key=f"wont_{t.task_id}_{row.period}",
