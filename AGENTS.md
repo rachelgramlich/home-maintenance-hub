@@ -81,3 +81,7 @@ After **`just setup`**, `.cursor/skills/developing-with-streamlit` symlinks from
 - **UI tests:** `tests/ui/ui_source.py` for `APP_PATH` / `ui_source()` — no ad-hoc path literals in tests.
 
 **Requires `gh`** authenticated for this repo when filing or shipping backlog issues.
+
+## Agent delivery default
+
+After **substantive** implementation (not Q&A-only): run checks → commit → push → **open a PR** (`gh pr create`). Do not wait for the user to ask for a PR — include the PR link in your final message. See `.cursor/rules/always-open-pr.mdc`.
