@@ -11,7 +11,6 @@ CompletionStatus = Literal["done", "wont_do"]
 
 class Urgency(StrEnum):
     OVERDUE = "overdue"
-    DUE_SOON = "due_soon"
     NORMAL = "normal"
     DONE = "done"
     WONT_DO = "wont_do"

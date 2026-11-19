@@ -18,7 +18,7 @@ Household maintenance and recurring chores are spread across a Google Sheet and 
 |----|------|
 | G1 | **Weekly list** (primary) with optional month view of recurring tasks (monthly and annual cadences). |
 | G2 | **Split source of truth:** Notion = task catalog + completion history; **Google Calendar** = when things recur and phone reminders (dedicated calendar). |
-| G3 | **Clear urgency** in the UI: overdue (red), due soon (orange), normal, completed hidden by default. |
+| G3 | **Clear urgency** in the UI: overdue (red), open, completed hidden by default. No day-level “due soon” window. |
 | G4 | **Carry-over:** unfinished tasks from prior periods surface as overdue until resolved (done, won’t do, or defer). |
 | G5 | **Migrate** existing task list from Google Sheet (and optionally the 61-row deprecated Notion catalog). |
 | G6 | **Household-friendly deploy** later (Streamlit Cloud + Google allowlist), matching grocery-wizard operations. |
@@ -111,7 +111,7 @@ One row per **(template, period)** when the task is in play for that period.
 | Req ID | Rule |
 |--------|------|
 | FR-S1 | **Overdue (red):** Period ended (or due date passed — **decision needed**) AND status still `Pending`, OR carried-over row from earlier period still `Pending`. |
-| FR-S2 | **Due soon (orange):** `Pending` AND due date within **N days** (default **N = 7**, configurable). |
+| FR-S2 | **Open:** `Pending` for the view month. Stays open for the whole month; there is no due-soon day window. |
 | FR-S3 | **Deferred:** Current period row → `Deferred`; create/activate **next** period row as `Pending` (not overdue until that period’s rules say so). |
 | FR-S4 | **Won't do:** Terminal for that period; no carry-over. |
 | FR-S5 | **Done:** Terminal for that period; optional append to **completion log** for history (merge with or replace legacy Completions DB — **decision needed**). |
@@ -122,8 +122,8 @@ One row per **(template, period)** when the task is in play for that period.
 | Req ID | Requirement |
 |--------|-------------|
 | FR-U1 | Sidebar: month picker, filters (Area, cadence), toggle “Show completed”. |
-| FR-U2 | Main: sections **Overdue** → **Due this week** → **Later this month** (order fixed). |
-| FR-U3 | Each task row: title, area, effort, due date, badges (overdue / due soon). |
+| FR-U2 | Main: **Overdue**, then open tasks for the month (order fixed). |
+| FR-U3 | Each task row: title, area, effort, badges (overdue). |
 | FR-U4 | Actions: Done, Won’t do, Defer (confirm on defer optional). |
 | FR-U5 | Empty states: no tasks, all complete, Notion misconfigured. |
 | FR-U6 | Link to Notion page for power users (optional). |
@@ -133,7 +133,7 @@ One row per **(template, period)** when the task is in play for that period.
 | Req ID | Requirement |
 |--------|-------------|
 | FR-X1 | Env: `NOTION_API_KEY`, `NOTION_TASK_CATALOG_DATABASE_ID`, `NOTION_PERIOD_RECORDS_DATABASE_ID`. |
-| FR-X2 | Optional: `HOUSEHOLD_TASKS_DUE_SOON_DAYS`, timezone default `America/New_York`. |
+| FR-X2 | Timezone default `America/New_York`. No due-soon days setting. |
 | FR-X3 | Local dev without auth; Cloud deploy with Google allowlist (parity with grocery-wizard). |
 
 ### 6.6 Migration

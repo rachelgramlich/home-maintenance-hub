@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from calendar import monthrange
 from datetime import date
 
 from maintenance_wizard.models import Completion, Template
@@ -23,11 +22,6 @@ MONTH_NAMES = {
 
 def period_key(year: int, month: int) -> str:
     return f"{year:04d}-{month:02d}"
-
-
-def due_date_in_month(template: Template, year: int, month: int) -> date:
-    day = max(1, min(template.due_day, monthrange(year, month)[1]))
-    return date(year, month, day)
 
 
 def completion_for_period(
@@ -94,36 +88,9 @@ def is_overdue(
             return True
         prev_month, prev_year = (month - 1, year) if month > 1 else (12, year - 1)
         prior = period_key(prev_year, prev_month)
-        if prior < current_period and not terminal_completion_exists(
+        return prior < current_period and not terminal_completion_exists(
             completions, template.task_id, prior
-        ):
-            return True
-        if today.year == year and today.month == month:
-            due = due_date_in_month(template, year, month)
-            if today > due:
-                return True
-        return False
+        )
 
-    # annual: overdue after due month day until completed
-    due = due_date_in_month(template, year, template.due_month)
-    if (year, month) > (due.year, due.month):
-        return True
-    return (year, month) == (due.year, due.month) and today > due
-
-
-def is_due_soon(
-    template: Template,
-    year: int,
-    month: int,
-    today: date,
-    due_soon_days: int,
-) -> bool:
-    if today.year != year or today.month != month:
-        return False
-    if template.cadence == "annual" and month != template.due_month:
-        return False
-    due = due_date_in_month(
-        template, year, month if template.cadence == "monthly" else template.due_month
-    )
-    delta = (due - today).days
-    return 0 <= delta <= due_soon_days
+    # annual: overdue only after the due month, until completed
+    return (year, month) > (year, template.due_month)

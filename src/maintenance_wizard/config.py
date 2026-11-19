@@ -21,7 +21,6 @@ class Settings(BaseSettings):
     store: Literal["local", "google_sheets"] = "local"
     sheet_id: str = ""
     timezone: str = "America/New_York"
-    due_soon_days: int = Field(default=7, ge=1, le=31)
     local_data_path: Path = Field(
         default_factory=lambda: _REPO_ROOT / ".local" / "maintenance_wizard" / "data.json"
     )
