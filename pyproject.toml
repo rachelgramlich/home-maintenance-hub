@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "maintenance-wizard"
 version = "0.1.0"
-description = "Monthly home maintenance checklist (Google Sheet backend)"
+description = "Monthly home maintenance checklist (local JSON or Google Sheets)"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "google-auth>=2.29.0",
@@ -19,8 +19,10 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "mypy>=1.11",
+    "pre-commit>=4.0.0",
     "pytest>=8.2.2",
-    "ruff>=0.15.0",
+    "ruff>=0.16.6",
 ]
 
 [tool.ruff]
@@ -28,11 +30,64 @@ line-length = 100
 target-version = "py312"
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B", "N", "SIM", "RUF"]
+select = [
+    "E",
+    "F",
+    "I",
+    "UP",
+    "B",
+    "N",
+    "SIM",
+    "RUF",
+    "C4",
+    "PIE",
+    "RET",
+    "ISC",
+    "PGH",
+    "DTZ",
+    "PERF",
+    "FLY",
+    "PT",
+    "PLR",
+    "PLE",
+    "PLW",
+    "TRY",
+    "EM",
+    "FURB",
+    "ANN",
+]
+ignore = [
+    "EM101",
+    "EM102",
+    "TRY003",
+    "PLR2004",
+    "PLR0912",
+    "PLR0913",
+    "PLR0915",
+    "PLR0911",
+    "SIM108",
+    "ANN401",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["E501", "PLR2004", "ANN"]
+"src/maintenance_wizard/ui/app.py" = ["E402"]
+
+[tool.ruff.lint.flake8-annotations]
+allow-star-arg-any = true
+mypy-init-return = true
+suppress-dummy-args = true
+suppress-none-returning = true
+
+[tool.ruff.format]
+docstring-code-format = true
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.pytest.ini_options]
-pythonpath = ["src"]
+pythonpath = [".", "src"]
 testpaths = ["tests"]
+markers = [
+    "holistic_ui_smoke: headless AppTest smoke for app load and primary UI (just smoke-ui)",
+]

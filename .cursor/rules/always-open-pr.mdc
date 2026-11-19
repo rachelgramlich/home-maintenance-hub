@@ -1,0 +1,18 @@
+---
+description: After substantive repo changes, commit and open a PR without waiting to be asked
+alwaysApply: true
+---
+
+# Always open a PR
+
+When you finish **substantive work** in this repo (features, tooling, docs that ship together, refactors, CI/config), **always**:
+
+1. Run `just check` or `just ci` when relevant.
+2. **Commit** on a branch (user may still forbid commits in edge cases; default is to commit).
+3. **Push** and **`gh pr create`** ready for review — unless the user explicitly said not to or asked for local-only edits.
+
+Do **not** stop at “changes are on disk” or “CI passed locally.” The deliverable includes the **PR URL**.
+
+Pushes/PRs without an explicit “create a PR” from the user are **expected** here (unlike repos where commit-only rules apply).
+
+Question-only or review-only turns with no files to ship: no PR.

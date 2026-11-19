@@ -1,6 +1,6 @@
 # maintenance-wizard
 
-**B & R Home Maintenance** — monthly checklist (**In progress** / **Done** / **Won’t do**), overdue carry-over, contractors, details drawer. Notion-backed.
+**B & R Home Maintenance** — monthly checklist (**In progress** / **Done** / **Won't do**), overdue carry-over, contractors, details drawer. Notion-backed.
 
 Repository: https://github.com/rachelgramlich/maintenance-wizard
 
@@ -13,6 +13,7 @@ Docs: [docs/FEATURES.md](docs/FEATURES.md) · [docs/ARCHITECTURE.md](docs/ARCHIT
 
 ```bash
 brew install just uv   # if needed
+git submodule update --init --recursive   # shared Cursor commands (rg-ai)
 just setup
 just init-local-data
 just ui
@@ -26,20 +27,31 @@ Copy `.env.example` → `.env` or `secrets.toml.example` → `secrets.toml`.
 
 | Variable | Default | Meaning |
 |----------|---------|---------|
-| `MAINTENANCE_WIZARD_STORE` | `local` | `local` or `notion` |
-| `NOTION_API_KEY` | — | Notion integration token |
-| `MAINTENANCE_WIZARD_NOTION_*_DS_ID` | — | Data source IDs (tasks, contractors, completions) |
+| `MAINTENANCE_WIZARD_STORE` | `local` | `local` or `google_sheets` |
+| `MAINTENANCE_WIZARD_SHEET_ID` | — | Google Sheet ID when using `google_sheets` |
 | `MAINTENANCE_WIZARD_TIMEZONE` | `America/New_York` | Month boundaries |
 
 Local data file: `.local/maintenance_wizard/data.json` (gitignored).
 
 ## Notion (production)
 
-Notion databases already exist — [docs/NOTION_SETUP.md](docs/NOTION_SETUP.md). Connect **your** integration to the hub page, set `NOTION_API_KEY` + data source IDs in `.env`, then run `just migrate-xlsx` (when implemented).
+Notion databases — [docs/NOTION_SETUP.md](docs/NOTION_SETUP.md). Store integration is in progress; use **local** for dev.
 
 ## Development
 
+| Doc | Contents |
+|-----|----------|
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Lint, tests, code review standards |
+| [`AGENTS.md`](AGENTS.md) | Cursor agents and GitHub backlog workflow |
+
 ```bash
-just check    # ruff check + format check + pytest (same as CI)
+just check      # ruff check + format --check + pytest (same as CI)
+just ci         # locked sync + workflow lint + same checks as check
+just smoke-ui   # headless Streamlit smoke tests
 just format
+just pre-commit # all pre-commit hooks
 ```
+
+### Cursor (optional)
+
+Backlog: GitHub Issues (label `maintenance-wizard`). Follow [AGENTS.md](AGENTS.md). Slash commands under **`.cursor/commands/`** (shared via **rg-ai** submodule). Do not commit `.cursor/mcp.json`.

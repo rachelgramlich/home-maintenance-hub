@@ -9,7 +9,7 @@ import streamlit as st
 
 from maintenance_wizard.config import get_settings
 from maintenance_wizard.domain.board import build_month_board
-from maintenance_wizard.models import Urgency
+from maintenance_wizard.models import BoardTask, Urgency
 from maintenance_wizard.store.factory import get_store
 from maintenance_wizard.ui.styles import inject_app_styles
 
@@ -35,7 +35,7 @@ def urgency_badge(urgency: Urgency) -> str:
 
 
 @st.cache_data(ttl=30)
-def load_board(year: int, month: int, show_closed: bool) -> list:
+def load_board(year: int, month: int, show_closed: bool) -> list[BoardTask]:
     store = get_store()
     templates = store.list_templates()
     completions = store.list_completions()

@@ -10,20 +10,18 @@ from maintenance_wizard.store.base import TaskStore
 
 
 def _parse_templates(raw: list[dict]) -> list[Template]:
-    out: list[Template] = []
-    for row in raw:
-        out.append(
-            Template(
-                task_id=str(row["task_id"]),
-                name=str(row["name"]),
-                cadence=row["cadence"],
-                due_month=int(row.get("due_month", 1)),
-                due_day=int(row.get("due_day", 1)),
-                area=str(row.get("area", "Other")),
-                active=bool(row.get("active", True)),
-            )
+    return [
+        Template(
+            task_id=str(row["task_id"]),
+            name=str(row["name"]),
+            cadence=row["cadence"],
+            due_month=int(row.get("due_month", 1)),
+            due_day=int(row.get("due_day", 1)),
+            area=str(row.get("area", "Other")),
+            active=bool(row.get("active", True)),
         )
-    return out
+        for row in raw
+    ]
 
 
 def _parse_completions(raw: list[dict]) -> list[Completion]:
