@@ -14,7 +14,7 @@
 | **`/create-command`** | Add slash command or skill without name collisions (shared: `.cursor/commands/shared/create-command.md`) |
 | *(automatic)* **`tidy-first` skill** | While implementing work: tidy inline, **S** vs **B** in separate commits |
 
-**Layout:** [rg-ai](https://github.com/rachelgramlich/rg-ai) **git submodule** at **`.cursor/rg-ai`**. Shared slash files via **`.cursor/commands/shared/`** → `.cursor/rg-ai/.cursor/commands`. Maintenance-only commands in **`.cursor/commands/maintenance-wizard/`**. After clone or new worktree: **`git submodule update --init --recursive`** once if `/` doesn’t list shared commands.
+**Layout:** [rg-ai](https://github.com/rachelgramlich/rg-ai) **git submodule** at **`.cursor/rg-ai`** (private). Shared slash files via **`.cursor/commands/shared/`** → `.cursor/rg-ai/.cursor/commands`. Maintenance-only commands in **`.cursor/commands/maintenance-wizard/`**. After clone or new worktree: **`git submodule update --init --recursive`** once if `/` doesn’t list shared commands — **your Mac only**; GitHub Actions sets **`submodules: false`** (see `.github/workflows/ci.yml`) because `just ci` does not need rg-ai.
 
 ### Labels and areas (for `/create-issues`, `/work-on-issue`)
 
