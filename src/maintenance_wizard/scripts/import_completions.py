@@ -4,14 +4,16 @@ from __future__ import annotations
 
 import argparse
 import calendar
+import json
 import sys
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
+from typing import Any
 
 from maintenance_wizard.config import get_settings
 from maintenance_wizard.integrations.notion import client as nc
-from maintenance_wizard.integrations.notion.mappers import page_to_template
+from maintenance_wizard.integrations.notion.mappers import page_to_completion, page_to_template
 from maintenance_wizard.migration.cadence import (
     canonical_group_key,
     monthly_stable_key,
@@ -21,10 +23,14 @@ from maintenance_wizard.migration.keys import map_area, month_number, stable_key
 from maintenance_wizard.models import Template
 from maintenance_wizard.store.notion import NotionTaskStore
 
-DEFAULT_YEAR = 2025
-LOG_PATH = Path("/opt/cursor/artifacts/completions-import.log")
+SCREENSHOT_NOTES = "Imported from checklist screenshot"
+DEFAULT_YEAR = 2026
+LOG_PATH = Path("/opt/cursor/artifacts/completions-import-2026.log")
+_FIXTURE = (
+    Path(__file__).resolve().parents[3] / "tests" / "fixtures" / "screenshot_completions.json"
+)
 
-# Verified from user screenshots (2025 checklist).
+# Verified from user screenshots (2026 checklist).
 CHECKED: tuple[tuple[str, str, str], ...] = (
     ("Replace HVAC filter — June", "HVAC", "June"),
     ("Replace HVAC filter — July", "HVAC", "July"),
@@ -57,6 +63,25 @@ class CompletionSpec:
     def completed_on(self, year: int) -> date:
         _, last = calendar.monthrange(year, self.month_num)
         return date(year, self.month_num, last)
+
+
+def export_fixture(year: int) -> None:
+    specs = [CompletionSpec(t, a, m) for t, a, m in CHECKED]
+    payload: dict[str, Any] = {
+        "year": year,
+        "checks": [
+            {
+                "task": s.task,
+                "area": s.area,
+                "month": s.month,
+                "period": s.period(year),
+                "completed_on": s.completed_on(year).isoformat(),
+            }
+            for s in specs
+        ],
+    }
+    _FIXTURE.parent.mkdir(parents=True, exist_ok=True)
+    _FIXTURE.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
 
 def last_day_of_month(year: int, month: int) -> date:
@@ -113,7 +138,39 @@ def resolve_task_id(
     return None
 
 
-def run_import(*, dry_run: bool, year: int) -> dict[str, int]:
+def is_screenshot_import(notes: str) -> bool:
+    return SCREENSHOT_NOTES.lower() in (notes or "").lower()
+
+
+def purge_wrong_year_screenshot_rows(
+    store: NotionTaskStore,
+    *,
+    year: int,
+    dry_run: bool,
+) -> tuple[int, list[str]]:
+    """Archive completion rows from prior screenshot imports for a different calendar year."""
+    lines: list[str] = []
+    archived = 0
+    prefix = f"{year:04d}-"
+    pages = nc.paginate_data_source(store._client, store._settings.notion_completions_ds_id)
+    for page in pages:
+        comp = page_to_completion(page)
+        if not is_screenshot_import(comp.notes):
+            continue
+        if comp.period and comp.period.startswith(prefix):
+            continue
+        page_id = str(page["id"])
+        if dry_run:
+            lines.append(f"PURGE dry_run {comp.period} {page_id[:8]}…")
+            archived += 1
+            continue
+        store._client.pages.update(page_id=page_id, archived=True)
+        lines.append(f"PURGED {comp.period} {page_id}")
+        archived += 1
+    return archived, lines
+
+
+def run_import(*, dry_run: bool, year: int, purge_legacy: bool) -> dict[str, int]:
     settings = get_settings()
     if not settings.notion_api_key:
         print("NOTION_API_KEY missing")
@@ -123,8 +180,20 @@ def run_import(*, dry_run: bool, year: int) -> dict[str, int]:
     by_slot, by_monthly, by_canonical = build_task_indexes(store)
     specs = [CompletionSpec(t, a, m) for t, a, m in CHECKED]
 
-    stats = {"created_or_updated": 0, "skipped_no_task": 0, "errors": 0}
+    stats: dict[str, int] = {
+        "purged_wrong_year": 0,
+        "created_or_updated": 0,
+        "skipped_no_task": 0,
+        "errors": 0,
+    }
     lines: list[str] = [f"import_completions year={year} dry_run={dry_run}", "---"]
+
+    if purge_legacy:
+        purged, purge_lines = purge_wrong_year_screenshot_rows(store, year=year, dry_run=dry_run)
+        stats["purged_wrong_year"] = purged
+        lines.extend(purge_lines)
+        if purge_lines:
+            lines.append("---")
 
     for spec in specs:
         task_id = resolve_task_id(
@@ -150,7 +219,7 @@ def run_import(*, dry_run: bool, year: int) -> dict[str, int]:
                 period,
                 "done",
                 completed_on,
-                notes="Imported from checklist screenshot",
+                notes=SCREENSHOT_NOTES,
             )
             stats["created_or_updated"] += 1
             lines.append(f"OK {period} @ {completed_on} task={task_id} {spec.task}")
@@ -163,6 +232,7 @@ def run_import(*, dry_run: bool, year: int) -> dict[str, int]:
     LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
     LOG_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print("\n".join(lines))
+    export_fixture(year)
     return stats
 
 
@@ -170,8 +240,17 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Import completions from verified checklist")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--year", type=int, default=DEFAULT_YEAR)
+    parser.add_argument(
+        "--no-purge-legacy",
+        action="store_true",
+        help="Do not archive screenshot imports for other years before upserting",
+    )
     args = parser.parse_args(argv)
-    stats = run_import(dry_run=args.dry_run, year=args.year)
+    stats = run_import(
+        dry_run=args.dry_run,
+        year=args.year,
+        purge_legacy=not args.no_purge_legacy,
+    )
     if stats.get("error"):
         return 1
     if stats.get("errors"):
