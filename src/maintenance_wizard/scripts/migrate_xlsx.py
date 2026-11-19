@@ -15,6 +15,13 @@ from typing import Any
 from maintenance_wizard.config import get_settings
 from maintenance_wizard.integrations.notion import client as nc
 from maintenance_wizard.integrations.notion.mappers import page_to_template
+from maintenance_wizard.migration.cadence import (
+    canonical_group_key,
+    display_month_for_cadence,
+    infer_cadence_plans,
+    monthly_stable_key,
+    strip_month_suffix,
+)
 from maintenance_wizard.migration.keys import (
     map_area,
     map_effort,
@@ -49,6 +56,23 @@ class ImportRow:
     @property
     def key(self) -> str:
         return stable_key(self.task, self.area, self.month)
+
+
+@dataclass
+class CatalogRow:
+    """One Notion task row to upsert (annual slot or consolidated monthly)."""
+
+    task: str
+    month: str
+    month_num: int
+    area: str
+    task_type: str
+    priority: str
+    effort: str
+    season: str
+    instructions: str
+    cadence: str
+    migration_key: str
 
 
 def last_day_of_month(year: int, month: int) -> date:
@@ -140,7 +164,8 @@ def read_deprecated_notion(client: Any) -> list[ImportRow]:
     return out
 
 
-def build_task_props(row: ImportRow) -> dict[str, Any]:
+def build_task_props(row: CatalogRow) -> dict[str, Any]:
+    cadence_label = "Monthly" if row.cadence == "monthly" else "Annual"
     props: dict[str, Any] = {
         "Task": nc.title_value(row.task),
         "Month": nc.select_value(row.month),
@@ -150,7 +175,8 @@ def build_task_props(row: ImportRow) -> dict[str, Any]:
         "Priority": nc.select_value(row.priority or "Medium"),
         "Effort": nc.select_value(map_effort(row.effort)),
         "Instructions": nc.rich_text_value(row.instructions),
-        "Stable key": nc.rich_text_value(row.key),
+        "Stable key": nc.rich_text_value(row.migration_key),
+        "Cadence": nc.select_value(cadence_label),
         "Active": nc.checkbox_prop(True),
         "Links JSON": nc.rich_text_value("[]"),
     }
@@ -159,13 +185,122 @@ def build_task_props(row: ImportRow) -> dict[str, Any]:
     return props
 
 
+def catalog_rows_from_import(rows: list[ImportRow]) -> list[CatalogRow]:
+    plan_input = [(r.task, r.area, r.month, r.month_num) for r in rows]
+    plans = infer_cadence_plans(plan_input)
+    monthly_done: set[str] = set()
+    catalog: list[CatalogRow] = []
+    for row in rows:
+        group = canonical_group_key(row.task, row.area)
+        plan = plans[group]
+        if plan.cadence == "monthly":
+            if group in monthly_done:
+                continue
+            monthly_done.add(group)
+            catalog.append(
+                CatalogRow(
+                    task=plan.canonical_name,
+                    month=display_month_for_cadence("monthly", 1),
+                    month_num=1,
+                    area=row.area,
+                    task_type=row.task_type,
+                    priority=row.priority,
+                    effort=row.effort,
+                    season=row.season,
+                    instructions=row.instructions,
+                    cadence="monthly",
+                    migration_key=monthly_stable_key(plan.canonical_name, row.area),
+                )
+            )
+        else:
+            catalog.append(
+                CatalogRow(
+                    task=row.task,
+                    month=row.month,
+                    month_num=row.month_num,
+                    area=row.area,
+                    task_type=row.task_type,
+                    priority=row.priority,
+                    effort=row.effort,
+                    season=row.season,
+                    instructions=row.instructions,
+                    cadence="annual",
+                    migration_key=row.key,
+                )
+            )
+    return catalog
+
+
+def monthly_task_id_for_row(row: ImportRow, task_id_by_key: dict[str, str]) -> str | None:
+    base = strip_month_suffix(row.task)
+    mkey = monthly_stable_key(base, row.area)
+    return task_id_by_key.get(mkey) or task_id_by_key.get(row.key)
+
+
+def dedupe_monthly_slots(
+    store: NotionTaskStore,
+    *,
+    dry_run: bool,
+    rows: list[ImportRow],
+) -> dict[str, int]:
+    """Collapse duplicate per-month Notion rows into one monthly template."""
+    plan_input = [(r.task, r.area, r.month, r.month_num) for r in rows]
+    plans = infer_cadence_plans(plan_input)
+    pages = nc.paginate_data_source(store._client, store._settings.notion_tasks_ds_id)
+    templates = [page_to_template(p) for p in pages]
+    by_group: dict[str, list] = {}
+    for page, tmpl in zip(pages, templates, strict=True):
+        cg = canonical_group_key(tmpl.name, tmpl.area)
+        plan = plans.get(cg)
+        if plan and plan.cadence == "monthly":
+            by_group.setdefault(cg, []).append((page, tmpl))
+
+    stats = {"keepers_updated": 0, "slots_deactivated": 0}
+    for group, members in by_group.items():
+        plan = plans[group]
+        if len(members) < 2:
+            continue
+        members.sort(key=lambda m: (0 if m[1].cadence == "monthly" else 1, m[1].due_month))
+        _, keeper = members[0]
+        keeper_id = keeper.task_id
+        mkey = monthly_stable_key(plan.canonical_name, keeper.area)
+        props = {
+            "Task": nc.title_value(plan.canonical_name),
+            "Month": nc.select_value("January"),
+            "Month #": nc.number_prop(1),
+            "Cadence": nc.select_value("Monthly"),
+            "Stable key": nc.rich_text_value(mkey),
+            "Active": nc.checkbox_prop(True),
+        }
+        if dry_run:
+            print(f"  dedupe keeper {plan.canonical_name} ← {len(members)} slots")
+            stats["keepers_updated"] += 1
+            stats["slots_deactivated"] += len(members) - 1
+            continue
+        store._client.pages.update(page_id=keeper_id, properties=props)
+        stats["keepers_updated"] += 1
+        for _, tmpl in members[1:]:
+            if tmpl.task_id == keeper_id:
+                continue
+            store._client.pages.update(
+                page_id=tmpl.task_id,
+                properties={"Active": nc.checkbox_prop(False)},
+            )
+            stats["slots_deactivated"] += 1
+    return stats
+
+
 def index_tasks_by_key(store: NotionTaskStore) -> dict[str, str]:
     pages = nc.paginate_data_source(store._client, store._settings.notion_tasks_ds_id)
     out: dict[str, str] = {}
     for page in pages:
         tmpl = page_to_template(page)
-        key = tmpl.stable_key or stable_key(tmpl.name, tmpl.area, tmpl.month_name)
+        if tmpl.stable_key:
+            out[tmpl.stable_key] = tmpl.task_id
+        key = stable_key(tmpl.name, tmpl.area, tmpl.month_name)
         out[key] = tmpl.task_id
+        if tmpl.cadence == "monthly":
+            out[monthly_stable_key(strip_month_suffix(tmpl.name), tmpl.area)] = tmpl.task_id
     return out
 
 
@@ -176,6 +311,7 @@ def run_migration(
     from_deprecated: bool,
     fixture: Path | None,
     completion_year: int,
+    apply_cadence_dedupe: bool,
 ) -> dict[str, int]:
     settings = get_settings()
     if not settings.notion_api_key:
@@ -199,23 +335,29 @@ def run_migration(
         return {"error": 1}
 
     print(f"Source: {source} — {len(rows)} rows")
+    if apply_cadence_dedupe:
+        dedupe_stats = dedupe_monthly_slots(store, dry_run=dry_run, rows=rows)
+        print(f"Cadence dedupe: {dedupe_stats}")
+
+    catalog = catalog_rows_from_import(rows)
+    print(f"Catalog rows (after cadence consolidate): {len(catalog)}")
     existing = index_tasks_by_key(store)
     stats = {"create": 0, "update": 0, "skip": 0, "completions": 0, "completion_skip": 0}
 
     task_id_by_key: dict[str, str] = dict(existing)
 
-    for row in rows:
-        props = build_task_props(row)
-        page_id = task_id_by_key.get(row.key)
+    for cat in catalog:
+        props = build_task_props(cat)
+        page_id = task_id_by_key.get(cat.migration_key)
         if page_id:
             if dry_run:
-                print(f"  update  {row.key}")
+                print(f"  update  {cat.migration_key}")
                 stats["update"] += 1
             else:
                 store._client.pages.update(page_id=page_id, properties=props)
                 stats["update"] += 1
         elif dry_run:
-            print(f"  create  {row.key}")
+            print(f"  create  {cat.migration_key}")
             stats["create"] += 1
         else:
             created = store._client.pages.create(
@@ -225,29 +367,38 @@ def run_migration(
                 },
                 properties=props,
             )
-            task_id_by_key[row.key] = str(created["id"])
+            task_id_by_key[cat.migration_key] = str(created["id"])
             stats["create"] += 1
 
-        if row.done and row.month_num:
-            period = f"{completion_year:04d}-{row.month_num:02d}"
-            completed_on = last_day_of_month(completion_year, row.month_num)
+    plan_input = [(r.task, r.area, r.month, r.month_num) for r in rows]
+    plans = infer_cadence_plans(plan_input)
+
+    for row in rows:
+        if not row.done or not row.month_num:
+            continue
+        group = canonical_group_key(row.task, row.area)
+        plan = plans[group]
+        if plan.cadence == "monthly":
+            tid = monthly_task_id_for_row(row, task_id_by_key)
+        else:
             tid = task_id_by_key.get(row.key)
-            if not tid:
-                continue
-            if dry_run:
-                print(f"  completion {period} done @ {completed_on} for {row.task[:40]}")
-                stats["completions"] += 1
-            else:
-                store.upsert_completion(
-                    tid,
-                    period,
-                    "done",
-                    completed_on,
-                    notes="Imported from xlsx (Done?)",
-                )
-                stats["completions"] += 1
-        elif row.done and dry_run is False:
+        period = f"{completion_year:04d}-{row.month_num:02d}"
+        completed_on = last_day_of_month(completion_year, row.month_num)
+        if not tid:
             stats["completion_skip"] += 1
+            continue
+        if dry_run:
+            print(f"  completion {period} done @ {completed_on} for {row.task[:40]}")
+            stats["completions"] += 1
+        else:
+            store.upsert_completion(
+                tid,
+                period,
+                "done",
+                completed_on,
+                notes="Imported from xlsx (Done?)",
+            )
+            stats["completions"] += 1
 
     print("---")
     print(stats)
@@ -266,6 +417,11 @@ def main(argv: list[str] | None = None) -> int:
         help="JSON rows (e.g. tests/fixtures/home_maintenance_rows.json)",
     )
     parser.add_argument("--completion-year", type=int, default=DEFAULT_YEAR)
+    parser.add_argument(
+        "--apply-cadence-dedupe",
+        action="store_true",
+        help="Deactivate duplicate monthly slot rows; keep one Monthly template",
+    )
     args = parser.parse_args(argv)
 
     xlsx = args.xlsx or get_settings().xlsx_path
@@ -284,6 +440,7 @@ def main(argv: list[str] | None = None) -> int:
         from_deprecated=args.from_deprecated,
         fixture=fixture,
         completion_year=args.completion_year,
+        apply_cadence_dedupe=args.apply_cadence_dedupe,
     )
     return 1 if stats.get("error") else 0
 

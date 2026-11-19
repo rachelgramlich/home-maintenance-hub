@@ -80,6 +80,9 @@ dev-setup: setup format lint test
 migrate-xlsx *ARGS:
     uv run python -m maintenance_wizard.scripts.migrate_xlsx {{ARGS}}
 
+import-completions *ARGS:
+    uv run python -m maintenance_wizard.scripts.import_completions {{ARGS}}
+
 info:
     @echo "Python version:"
     @uv run python --version

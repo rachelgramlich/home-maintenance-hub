@@ -110,7 +110,8 @@ One row per **scheduled appearance** (matches your xlsx: e.g. “Replace HVAC fi
 | **Instructions** | rich text | no | Standing steps; editable in drawer or Notion |
 | **Links** | rich text or multi URL | no | Label + URL pairs; v1: rich text lines or JSON in a text property `Links JSON` if needed |
 | **Contractor** | relation → Contractors | no | Single relation |
-| **Stable key** | rich text | no | `normalize(task)\|normalize(area)\|month` for idempotent migration |
+| **Cadence** | select | yes | `Annual` (default) or `Monthly` — monthly tasks appear every board month |
+| **Stable key** | rich text | no | Annual: `task\|area\|month`; Monthly: `task_base\|area\|monthly` |
 | **gcal_series_id** | rich text | no | **v2** only |
 
 **Not stored on Tasks:** completion notes, last done date, in-progress state (live on **Completions**).
@@ -271,7 +272,7 @@ src/maintenance_wizard/
   config.py
 ```
 
-**Cadence note:** Imported xlsx uses **one row per month appearance** instead of a `cadence` column. Domain may set `cadence=monthly` implicitly with `due_month` from **Month #**. Annual tasks are rows that appear only in one month per year (same as today’s sheet).
+**Cadence note:** Migration infers **Monthly** when the same canonical task+area appears in multiple xlsx months (e.g. HVAC filter slots → one `Monthly` template). Completions use **`YYYY-MM` period keys** per board month for monthly tasks. Annual tasks keep one row per assigned month.
 
 ---
 

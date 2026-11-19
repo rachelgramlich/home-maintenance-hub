@@ -22,6 +22,7 @@ def _parse_templates(raw: list[dict]) -> list[Template]:
             name=str(row["name"]),
             due_month=int(row.get("due_month", 1)),
             area=str(row.get("area", "Other")),
+            cadence=row.get("cadence", "annual"),  # type: ignore[arg-type]
             active=bool(row.get("active", True)),
             month_name=str(row.get("month_name", "")),
             task_type=str(row.get("task_type", "")),

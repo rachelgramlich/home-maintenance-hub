@@ -52,6 +52,8 @@ def task_applies_to_board(
 ) -> bool:
     if not template.active:
         return False
+    if template.cadence == "monthly":
+        return True
     if template.due_month == month:
         return True
     if template.due_month < month:
@@ -60,7 +62,9 @@ def task_applies_to_board(
     return False
 
 
-def board_period_for_task(template: Template, year: int, _month: int) -> str:
+def board_period_for_task(template: Template, year: int, month: int) -> str:
+    if template.cadence == "monthly":
+        return template.period_key(year, board_month=month)
     return template.period_key(year)
 
 
@@ -71,6 +75,8 @@ def is_overdue(
     _today: date,
     completions: list[Completion],
 ) -> bool:
+    if template.cadence == "monthly":
+        return False
     period = template.period_key(year)
     row = completion_for_period(completions, template.task_id, period)
     if row and is_terminal_status(row.status):
