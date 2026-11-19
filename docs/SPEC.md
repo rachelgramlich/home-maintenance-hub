@@ -88,9 +88,9 @@ All comparisons use timezone `TZ` (default `America/New_York`).
 if status in (Done, WontDo):
     display = hidden  # unless show_completed
 elif status == Pending and (carried_over or period_key < current_period):
-    display = overdue      # red — earlier month still open
+    display = overdue  # red — earlier month still open
 else:
-    display = normal       # open for the whole view month; no due-soon window
+    display = normal  # open for the whole view month; no due-soon window
 ```
 
 ### 3.4 Month open workflow (`ensure_month_periods`)

@@ -33,9 +33,7 @@ def completion_for_period(
     return None
 
 
-def terminal_completion_exists(
-    completions: list[Completion], task_id: str, period: str
-) -> bool:
+def terminal_completion_exists(completions: list[Completion], task_id: str, period: str) -> bool:
     row = completion_for_period(completions, task_id, period)
     return row is not None
 
@@ -59,7 +57,7 @@ def task_applies_to_board(
         return False
     if template.cadence == "monthly":
         return True
-  # annual
+    # annual
     if month == template.due_month:
         return True
     if month > template.due_month:

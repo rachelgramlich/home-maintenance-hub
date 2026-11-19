@@ -159,9 +159,7 @@ def main() -> None:
                     use_container_width=True,
                 ):
                     try:
-                        store.add_completion(
-                            t.task_id, row.period, "done", today, notes or ""
-                        )
+                        store.add_completion(t.task_id, row.period, "done", today, notes or "")
                         load_board.clear()
                         st.rerun()
                     except ValueError as err:
@@ -174,9 +172,7 @@ def main() -> None:
                     use_container_width=True,
                 ):
                     try:
-                        store.add_completion(
-                            t.task_id, row.period, "wont_do", today, notes or ""
-                        )
+                        store.add_completion(t.task_id, row.period, "wont_do", today, notes or "")
                         load_board.clear()
                         st.rerun()
                     except ValueError as err:

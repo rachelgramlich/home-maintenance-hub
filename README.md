@@ -40,6 +40,6 @@ Notion databases already exist — [docs/NOTION_SETUP.md](docs/NOTION_SETUP.md).
 ## Development
 
 ```bash
-just check    # ruff + pytest
+just check    # ruff check + format check + pytest (same as CI)
 just format
 ```

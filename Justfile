@@ -9,6 +9,12 @@ setup:
 sync:
     uv sync --group dev
 
+lint-check:
+    uv run ruff check
+
+format-check:
+    uv run ruff format --check
+
 lint:
     uv run ruff check --fix
 
@@ -18,7 +24,12 @@ format:
 test:
     uv run pytest
 
-check: lint test
+check: lint-check format-check test
+
+workflow-lint:
+    uvx --from actionlint-py==1.7.12.25 actionlint
+
+ci: sync workflow-lint lint-check format-check test
 
 ui *ARGS:
     uv run streamlit run src/maintenance_wizard/ui/app.py --server.port 8765 {{ARGS}}
