@@ -132,9 +132,24 @@ html {
 }
 
 .block-container {
-    max-width: 44rem;
+    max-width: 80rem;
     padding-top: 1.5rem;
     padding-bottom: 3rem;
+}
+
+.mw-badge-progress {
+    display: inline-block;
+    background: var(--mw-blue-strong);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    margin-bottom: 0.35rem;
+}
+
+.mw-in-progress {
+    border-left: 4px solid var(--mw-blue-strong);
 }
 
 .mw-hero {

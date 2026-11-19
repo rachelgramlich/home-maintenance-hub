@@ -27,15 +27,23 @@ Copy `.env.example` → `.env` or `secrets.toml.example` → `secrets.toml`.
 
 | Variable | Default | Meaning |
 |----------|---------|---------|
-| `MAINTENANCE_WIZARD_STORE` | `local` | `local` or `google_sheets` |
-| `MAINTENANCE_WIZARD_SHEET_ID` | — | Google Sheet ID when using `google_sheets` |
+| `MAINTENANCE_WIZARD_STORE` | `local` | `local` or `notion` |
+| `NOTION_API_KEY` | — | Notion integration token |
+| `MAINTENANCE_WIZARD_NOTION_*_DS_ID` | — | Data source IDs (tasks, contractors, completions) |
 | `MAINTENANCE_WIZARD_TIMEZONE` | `America/New_York` | Month boundaries |
 
 Local data file: `.local/maintenance_wizard/data.json` (gitignored).
 
 ## Notion (production)
 
-Notion databases — [docs/NOTION_SETUP.md](docs/NOTION_SETUP.md). Store integration is in progress; use **local** for dev.
+Notion databases — [docs/NOTION_SETUP.md](docs/NOTION_SETUP.md). Connect **your** integration to the hub page, set `NOTION_API_KEY` + data source IDs in `.env`, then:
+
+```bash
+just migrate-xlsx --xlsx /path/to/Ocala.xlsx   # Home Maintenance tab
+just migrate-xlsx --dry-run
+```
+
+Set `MAINTENANCE_WIZARD_STORE=notion` for production UI. Use **local** for offline dev/CI.
 
 ## Development
 

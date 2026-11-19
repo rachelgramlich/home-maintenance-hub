@@ -77,6 +77,9 @@ pre-commit:
 dev-setup: setup format lint test
     @echo "Development setup complete!"
 
+migrate-xlsx *ARGS:
+    uv run python -m maintenance_wizard.scripts.migrate_xlsx {{ARGS}}
+
 info:
     @echo "Python version:"
     @uv run python --version
