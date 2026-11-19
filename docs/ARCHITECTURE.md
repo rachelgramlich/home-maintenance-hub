@@ -82,6 +82,8 @@ Streamlit does **not** run background jobs. Reminders are **v2 (GCal)** or optio
 5. Run migration dry-run, then apply.
 6. Smoke-test: `just ui` with `MAINTENANCE_WIZARD_STORE=notion`.
 
+**Live workspace IDs:** see [NOTION_SETUP.md](./NOTION_SETUP.md) (hub page + three data source IDs created 2026-11-19).
+
 Deprecated catalog (`Maintenance Tasks` 61 rows) may be **merged or replaced** by migration; do not maintain two live task catalogs.
 
 ---

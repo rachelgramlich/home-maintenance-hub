@@ -34,7 +34,7 @@ Local data file: `.local/maintenance_wizard/data.json` (gitignored).
 
 ## Notion (production)
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) §2–3: create **`[MW] Tasks`**, **`[MW] Contractors`**, **`[MW] Completions`**, share with your integration, set env vars, then run `just migrate-xlsx` (when implemented).
+Notion databases already exist — [docs/NOTION_SETUP.md](docs/NOTION_SETUP.md). Connect **your** integration to the hub page, set `NOTION_API_KEY` + data source IDs in `.env`, then run `just migrate-xlsx` (when implemented).
 
 ## Development
 
