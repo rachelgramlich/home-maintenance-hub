@@ -64,6 +64,7 @@ just ui
 |---------|---------|
 | `just migrate-xlsx --xlsx PATH [--apply-cadence-dedupe]` | Templates from Ocala xlsx |
 | `just import-completions` (default year = current calendar year) | Backfill completions from checklist screenshots |
+| `just rename-completions [--dry-run]` | Retitle existing completion rows after task renames |
 | `just purge-inactive-duplicates [--dry-run]` | Archive inactive slot rows + orphan completion rows |
 
 After cadence dedupe, run `purge-inactive-duplicates` so the Notion task board does not show deactivated duplicate rows.
