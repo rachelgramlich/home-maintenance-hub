@@ -68,3 +68,13 @@ def test_holistic_first_run_renders_board_shell() -> None:
     feedback_src = (APP_PATH.parent / "components" / "feedback.py").read_text(encoding="utf-8")
     assert "render_feedback_controls" in app_src
     assert "Send feedback" in feedback_src
+
+    settings_btn = [b for b in at.button if "Settings" in (b.label or "")]
+    assert settings_btn, "Settings nav button should be enabled"
+    settings_btn[0].click().run(timeout=120)
+    apptest_assert_no_exception(at, context="settings page")
+    settings_blob = " ".join(m.value or "" for m in at.markdown) + " ".join(
+        i.label or "" for i in at.text_input
+    )
+    assert "Timezone" in settings_blob
+    assert "Store mode" in settings_blob

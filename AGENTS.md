@@ -51,7 +51,7 @@ Area from label `mw-area-<name>` or `### Area` in the issue body.
 just init-local-data && PYTHONPATH=src uv run python -c "from maintenance_wizard.config import get_settings; get_settings(); print('config ok')"
 ```
 
-**Browser smoke:** when using real Notion or Google Sheets later, start **`just ui`** and walk month picker, filters, Done / Won't do. For now default **local** store: confirm task cards render after `just init-local-data`.
+**Browser smoke:** with **notion** store, start **`just ui`** and walk month picker, filters, Done / Won't do against your workspace. Default **local** store: confirm task cards render after `just init-local-data`.
 
 State in chat and PR:
 

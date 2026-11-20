@@ -1,6 +1,6 @@
 # Household recurring tasks — technical specification (draft)
 
-> **Canonical architecture:** [ARCHITECTURE.md](./ARCHITECTURE.md) (Notion pivot, three databases, mockup C UI). This file is legacy detail; reconcile when implementation starts.
+> **Canonical architecture:** [ARCHITECTURE.md](./ARCHITECTURE.md) (Notion, three databases, mockup C UI). This file is supplementary legacy detail — prefer ARCHITECTURE + FEATURES for v1 scope.
 
 Companion to [REQUIREMENTS.md](./REQUIREMENTS.md).
 
@@ -55,8 +55,8 @@ src/household_tasks/
     theme.py                  # CSS for status chips
     views/month_board.py
 scripts/
-  migrate_gsheet_csv.py
-  migrate_deprecated_notion.py
+  migrate_xlsx.py              # one-time Ocala xlsx → Notion
+  import_completions.py
   send_reminders.py           # v1.1
 tests/src/household_tasks/domain/
 ```

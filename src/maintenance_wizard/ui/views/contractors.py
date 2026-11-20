@@ -1,8 +1,14 @@
 from __future__ import annotations
 
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 import streamlit as st
 
-from maintenance_wizard.models import Contractor
+from maintenance_wizard.config import get_settings
+from maintenance_wizard.domain.display import display_task_name
+from maintenance_wizard.domain.schedule import board_period_for_task
+from maintenance_wizard.models import Contractor, Template
 from maintenance_wizard.store.base import TaskStore
 
 TRADES = ["Plumber", "HVAC", "Electrician", "General", "Duct cleaning", "Other"]
@@ -13,10 +19,13 @@ def render_contractors_admin(store: TaskStore) -> None:
     st.caption("Contact records linked from task details. Store: " + type(store).__name__)
 
     contractors = store.list_contractors(active_only=False)
+    templates = store.list_templates()
     task_counts: dict[str, int] = {}
-    for tmpl in store.list_templates():
+    tasks_by_contractor: dict[str, list[Template]] = {}
+    for tmpl in templates:
         if tmpl.contractor_id:
             task_counts[tmpl.contractor_id] = task_counts.get(tmpl.contractor_id, 0) + 1
+            tasks_by_contractor.setdefault(tmpl.contractor_id, []).append(tmpl)
 
     if contractors:
         for c in contractors:
@@ -33,6 +42,24 @@ def render_contractors_admin(store: TaskStore) -> None:
             if c.notes:
                 st.caption(c.notes)
             with st.expander(f"Edit {c.name}"):
+                linked = tasks_by_contractor.get(c.contractor_id, [])
+                if linked:
+                    st.markdown(f"**Linked tasks ({len(linked)})**")
+                    tz = ZoneInfo(get_settings().timezone)
+                    today = datetime.now(tz).date()
+                    for tmpl in sorted(linked, key=lambda t: t.name.lower()):
+                        period = board_period_for_task(tmpl, today.year, today.month)
+                        label = display_task_name(tmpl.name)
+                        if st.button(
+                            f"Open board · {label}",
+                            key=f"ctr_task_{c.contractor_id}_{tmpl.task_id}",
+                            use_container_width=True,
+                        ):
+                            st.session_state.page = "board"
+                            st.session_state.drawer_task = (tmpl.task_id, period)
+                            st.session_state.drawer_edit = False
+                            st.rerun()
+                    st.divider()
                 _contractor_form(store, c)
             st.divider()
     else:

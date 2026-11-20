@@ -336,7 +336,7 @@ src/maintenance_wizard/
 ├── domain/       # Schedule logic + month board assembly
 ├── models.py     # Template, Completion, BoardTask
 ├── scripts/      # Local data seeding
-├── store/        # TaskStore implementations (local JSON, Google Sheets)
+├── store/        # TaskStore implementations (local JSON, Notion)
 └── ui/           # Streamlit app, theme, styles
 ```
 
