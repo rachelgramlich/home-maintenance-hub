@@ -27,6 +27,12 @@ html {
 [data-testid="stSidebar"] {
     background-color: var(--mw-input-bg);
     border-right: 1px solid var(--mw-border);
+    min-width: 17.5rem;
+}
+
+[data-testid="stSidebar"] > div:first-child {
+    width: 17.5rem;
+    min-width: 17.5rem;
 }
 
 .stApp h1, .stApp h2, .stApp h3, .stApp label,

@@ -1,14 +1,16 @@
 # Household recurring tasks — requirements & specification
 
-**Status:** Draft for review (architecture pivot under discussion)  
-**Product:** Streamlit **weekly list** + **Google Calendar** for recurrence/reminders; Notion for catalog, history, and rich metadata (pattern: [grocery-wizard](https://github.com/rachelgramlich/grocery-wizard) for ops only)  
-**Working name:** Household Tasks (repo TBD)
+> **Scope note (2026-11):** Shipped v1 is documented in [FEATURES.md](./FEATURES.md) and [ARCHITECTURE.md](./ARCHITECTURE.md). **Production data** is **Notion** (three databases) with **local JSON** for dev/CI only. Google Sheet is a **one-time migration source**, not a live backend. Sections below retain historical user stories where still relevant; defer to ARCHITECTURE when they conflict.
+
+**Status:** Historical requirements + open product ideas  
+**Product:** Streamlit **monthly maintenance board** on Notion (task catalog, completions, contractors)  
+**Repo:** `maintenance-wizard`
 
 ---
 
 ## 1. Problem statement
 
-Household maintenance and recurring chores are spread across a Google Sheet and a partly deprecated Notion setup. There is no single place to see **what is due this month**, what **carried over as overdue**, or to record **done / won’t do / defer** with history. The goal is a focused Streamlit UI on top of Notion, with optional proactive reminders.
+Household maintenance and recurring chores were spread across spreadsheets and legacy Notion pages. v1 delivers a single **monthly board** in Streamlit backed by Notion: overdue carry-over, completion history, contractors, and a details drawer for rich metadata. Optional proactive reminders remain a later phase.
 
 ---
 
@@ -16,12 +18,12 @@ Household maintenance and recurring chores are spread across a Google Sheet and 
 
 | ID | Goal |
 |----|------|
-| G1 | **Weekly list** (primary) with optional month view of recurring tasks (monthly and annual cadences). |
-| G2 | **Split source of truth:** Notion = task catalog + completion history; **Google Calendar** = when things recur and phone reminders (dedicated calendar). |
+| G1 | **Monthly board** (primary v1) for recurring tasks (monthly and annual cadences). |
+| G2 | **Notion** = task catalog, completion history, and contractors (single write path in prod). |
 | G3 | **Clear urgency** in the UI: overdue (red), open, completed hidden by default. No day-level “due soon” window. |
 | G4 | **Carry-over:** unfinished tasks from prior periods surface as overdue until resolved (done, won’t do, or defer). |
-| G5 | **Migrate** existing task list from Google Sheet (and optionally the 61-row deprecated Notion catalog). |
-| G6 | **Household-friendly deploy** later (Streamlit Cloud + Google allowlist), matching grocery-wizard operations. |
+| G5 | **Migrate** legacy xlsx/Sheet export into Notion (`just migrate-xlsx`); Sheet not used after cutover. |
+| G6 | **Household deploy** on Streamlit Community Cloud + optional Google OIDC allowlist (see DEPLOYMENT.md). |
 
 ---
 
@@ -32,7 +34,7 @@ Household maintenance and recurring chores are spread across a Google Sheet and 
 - Replacing Notion for free-form notes (app complements Notion).
 - Native mobile app (responsive web is enough).
 - Automatic vendor scheduling or cost analytics (optional fields only).
-- Full bidirectional sync with Google Sheet after migration (Notion wins).
+- Live Google Sheet backend or bidirectional Sheet sync (Notion wins after migration).
 
 ---
 
@@ -43,7 +45,7 @@ Household maintenance and recurring chores are spread across a Google Sheet and 
 - **Usage pattern:** Short sessions (5–10 min) at month start or when a reminder fires; occasional mid-month checkoffs.
 - **Existing data:**
   - Deprecated Notion DB: **Maintenance Tasks** (61 templates) + **Maintenance Completions** (log without period/status).
-  - Google Sheet: canonical list to migrate (structure TBD).
+  - Legacy Sheet/xlsx: one-time import only (see `scripts/migrate_xlsx.py`).
 
 ---
 

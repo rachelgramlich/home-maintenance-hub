@@ -23,6 +23,7 @@ from maintenance_wizard.ui.session_log import (
 from maintenance_wizard.ui.styles import inject_app_styles
 from maintenance_wizard.ui.views.contractors import render_contractors_admin
 from maintenance_wizard.ui.views.drawer import render_drawer
+from maintenance_wizard.ui.views.settings import render_settings_page
 
 
 def today_in_tz() -> date:
@@ -134,6 +135,8 @@ def main() -> None:
         st.session_state.drawer_task = None
     if "drawer_edit" not in st.session_state:
         st.session_state.drawer_edit = False
+    if "mw_area_filter" not in st.session_state:
+        st.session_state.mw_area_filter = []
 
     with st.sidebar:
         _render_sidebar_brand()
@@ -150,11 +153,11 @@ def main() -> None:
         if st.button(
             "⚙️  Settings",
             use_container_width=True,
-            type="secondary",
-            disabled=True,
+            type="primary" if st.session_state.page == "settings" else "secondary",
             key="settings_nav",
         ):
-            pass  # Settings page TBD
+            st.session_state.page = "settings"
+            st.rerun()
 
         if st.session_state.page == "board":
             st.markdown("**Filter by month**")
@@ -188,16 +191,29 @@ def main() -> None:
             }
             if areas:
                 st.markdown("#### Categories")
+                selected_areas = set(st.session_state.mw_area_filter)
                 for area in areas:
                     icon = area_icons.get(area, "⚙️")
-                    st.button(
+                    active = area in selected_areas
+                    if st.button(
                         f"{icon}  {area}",
                         key=f"cat_{area}",
                         use_container_width=True,
-                        type="secondary",
-                    )
+                        type="primary" if active else "secondary",
+                    ):
+                        if active:
+                            selected_areas.discard(area)
+                        else:
+                            selected_areas.add(area)
+                        st.session_state.mw_area_filter = sorted(selected_areas)
+                        load_board.clear()
+                        st.rerun()
+                if selected_areas and st.button("Clear category filters", use_container_width=True):
+                    st.session_state.mw_area_filter = []
+                    load_board.clear()
+                    st.rerun()
                 st.markdown("---")
-                area_filter = st.multiselect("Area", options=areas)
+                area_filter = list(st.session_state.mw_area_filter)
             else:
                 area_filter = []
             type_filter = st.multiselect("Type", options=types)
@@ -205,6 +221,7 @@ def main() -> None:
             if st.button("Refresh", use_container_width=True):
                 load_board.clear()
                 st.session_state.drawer_task = None
+                st.session_state.mw_area_filter = []
                 st.rerun()
             latest = latest_session_log_path()
             with st.expander("Session debug", expanded=False):
@@ -239,6 +256,10 @@ def main() -> None:
 
     if st.session_state.page == "contractors":
         render_contractors_admin(get_store())
+        return
+
+    if st.session_state.page == "settings":
+        render_settings_page(settings)
         return
 
     month_label_long = date(year, month, 1).strftime("%B %Y")

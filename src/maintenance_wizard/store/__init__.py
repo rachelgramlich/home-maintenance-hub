@@ -1,1 +1,1 @@
-"""Task persistence (local JSON or Google Sheets)."""
+"""Task persistence (local JSON or Notion)."""
