@@ -23,3 +23,17 @@ def test_task_context_fields_in_drawer() -> None:
     assert fields["Period"] == "2026-03"
     assert fields["Cadence"] == "Monthly"
     assert "Area: HVAC" in format_drawer_task_meta(t, "2026-03")
+
+
+def test_task_context_shows_annual_cadence() -> None:
+    t = Template(
+        task_id="2",
+        name="Electrical: Test GFCI outlets",
+        due_month=4,
+        area="Electrical",
+        month_name="April",
+        task_type="Inspect/Test",
+        cadence="annual",
+    )
+    fields = dict(task_context_fields(t, "2026-04"))
+    assert fields["Cadence"] == "Annual"
