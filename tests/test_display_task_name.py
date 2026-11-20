@@ -17,3 +17,11 @@ def test_leaves_non_season_parentheticals() -> None:
 
 def test_leaves_mid_sentence_seasons() -> None:
     assert display_task_name("Service (spring + fall) units") == "Service (spring + fall) units"
+
+
+def test_strips_trailing_month_suffix() -> None:
+    assert display_task_name("Replace HVAC filter — March") == "Replace HVAC filter"
+    assert display_task_name("Replace HVAC filter \u2013 June") == "Replace HVAC filter"
+    assert display_task_name("Laundry: Professional dryer vent cleaning — March") == (
+        "Laundry: Professional dryer vent cleaning"
+    )

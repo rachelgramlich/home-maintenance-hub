@@ -9,16 +9,17 @@ from maintenance_wizard.config import get_settings
 SAMPLE = {
     "templates": [
         {
-            "task_id": "hvac-filter-mar",
-            "name": "Replace HVAC filter — March",
-            "due_month": 3,
+            "task_id": "hvac-filter-monthly",
+            "name": "Replace HVAC filter",
+            "due_month": 1,
             "area": "HVAC",
-            "month_name": "March",
+            "month_name": "January",
             "task_type": "Replace",
             "effort": "XS",
             "priority": "High",
             "active": True,
-            "stable_key": "replace hvac filter — march|hvac|march",
+            "cadence": "monthly",
+            "stable_key": "replace hvac filter|hvac|monthly",
         },
         {
             "task_id": "hvac-service-heat",
