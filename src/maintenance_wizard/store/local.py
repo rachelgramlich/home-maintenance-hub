@@ -10,6 +10,7 @@ from maintenance_wizard.models import (
     CompletionStatus,
     Contractor,
     Template,
+    links_to_json,
     parse_links_json,
 )
 from maintenance_wizard.store.base import TaskStore
@@ -215,7 +216,7 @@ class LocalTaskStore(TaskStore):
                 "priority": t.priority,
                 "season": t.season,
                 "instructions": t.instructions,
-                "links_json": "",
+                "links_json": links_to_json(t.links),
                 "contractor_id": t.contractor_id,
                 "stable_key": t.stable_key,
             }
@@ -226,6 +227,7 @@ class LocalTaskStore(TaskStore):
                     "area": template.area,
                     "priority": template.priority,
                     "instructions": template.instructions,
+                    "links_json": links_to_json(template.links),
                     "contractor_id": template.contractor_id,
                     "task_type": template.task_type,
                     "effort": template.effort,
