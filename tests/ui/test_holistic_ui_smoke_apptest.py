@@ -45,9 +45,24 @@ def test_holistic_first_run_renders_board_shell() -> None:
     assert done_buttons, "Expected at least one open task with a Done button"
 
     assert "mw-task-title" in markdown_blob, "Task cards must expose mw-task-title"
+    assert "mw-meta-row" not in markdown_blob, "Board cards must not render subheader meta row"
+    assert "Period 20" not in markdown_blob, (
+        "Period detail belongs in the drawer, not on card faces"
+    )
     assert "HVAC filter" in markdown_blob or "Electrical" in markdown_blob, (
         "Expected seeded task name text on open cards"
     )
+
+    details_buttons = [b for b in at.button if b.label == "Details"]
+    assert details_buttons, "Expected Details button on an open task card"
+    details_buttons[0].click().run(timeout=120)
+    apptest_assert_no_exception(at, context="details drawer open")
+
+    drawer_blob = " ".join(m.value or "" for m in at.markdown)
+    assert "mw-drawer-fields" in drawer_blob, "Drawer must render task context field grid"
+    assert "Task details" in drawer_blob
+    assert "Area" in drawer_blob, "Drawer should label area when Details is opened"
+    assert "HVAC" in drawer_blob, "Drawer should show task area value"
 
     app_src = (APP_PATH.parent / "app.py").read_text(encoding="utf-8")
     feedback_src = (APP_PATH.parent / "components" / "feedback.py").read_text(encoding="utf-8")

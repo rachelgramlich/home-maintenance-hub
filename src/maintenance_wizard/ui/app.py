@@ -10,7 +10,7 @@ import streamlit as st
 from maintenance_wizard.config import get_settings
 from maintenance_wizard.domain.board import build_month_board
 from maintenance_wizard.domain.display import display_task_name
-from maintenance_wizard.models import BoardTask, Priority, Template, Urgency
+from maintenance_wizard.models import BoardTask, Priority, Urgency
 from maintenance_wizard.store.factory import get_store
 from maintenance_wizard.ui.access_gate import enforce_access_gate
 from maintenance_wizard.ui.components.feedback import render_feedback_controls
@@ -63,21 +63,6 @@ def status_glyph(urgency: Urgency) -> str:
     if urgency == Urgency.IN_PROGRESS:
         return '<span class="mw-status-icon mw-status-progress" aria-hidden="true">↻</span>'
     return '<span class="mw-status-icon mw-status-open" aria-hidden="true">◎</span>'
-
-
-def format_card_meta(template: Template, period: str) -> str:
-    """Mockup C v4 subline: area · type · effort · priority · Period YYYY-MM."""
-    parts: list[str] = []
-    if template.area:
-        parts.append(template.area)
-    if template.task_type:
-        parts.append(template.task_type)
-    if template.effort:
-        parts.append(template.effort)
-    if template.priority:
-        parts.append(f"{template.priority} priority")
-    parts.append(f"Period {period}")
-    return " · ".join(parts)
 
 
 def format_last_done_html(row: BoardTask) -> str:
@@ -335,7 +320,6 @@ def main() -> None:
                 badge = urgency_badge(row.urgency)
                 prio = priority_badge(t.priority)
                 glyph = status_glyph(row.urgency)
-                meta = format_card_meta(t, row.period)
                 last_html = format_last_done_html(row)
 
                 head_html = (
@@ -344,9 +328,8 @@ def main() -> None:
                     f"{glyph}"
                     f'<div class="mw-card-head-text">'
                     f'<div class="mw-title-row">'
-                    f'<span class="mw-task-title">{display_task_name(t.name)}</span></div>'
-                    f'<div class="mw-meta-row">'
-                    f'{prio}<p class="mw-meta">{meta}</p></div>'
+                    f'<span class="mw-task-title">{display_task_name(t.name)}</span>'
+                    f"{prio}</div>"
                     f"{last_html}"
                     f"</div></div>"
                     f"{badge}"
@@ -362,7 +345,7 @@ def main() -> None:
 
                 with st.container(border=True):
                     uclass = urgency_class(row.urgency)
-                    head_col, det_col = st.columns([6, 1], vertical_alignment="top")
+                    head_col, det_col = st.columns([6, 1], vertical_alignment="center")
                     with head_col:
                         st.markdown(
                             f'<div class="mw-task-shell {uclass} mw-task--open">{head_html}</div>',
