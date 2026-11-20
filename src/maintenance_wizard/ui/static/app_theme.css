@@ -270,23 +270,6 @@ html {
     margin: 0.35rem 0 0.2rem;
 }
 
-.mw-meta-row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.35rem 0.45rem;
-    margin-top: 0.25rem;
-}
-
-.mw-meta {
-    color: var(--mw-text-muted);
-    font-size: 0.82rem;
-    line-height: 1.35;
-    margin: 0;
-    flex: 1 1 auto;
-    min-width: 0;
-}
-
 .mw-last {
     margin-top: 0.25rem;
     font-size: 0.75rem;
@@ -395,8 +378,8 @@ html {
     letter-spacing: 0.05em;
     padding: 3px 8px;
     border-radius: 4px;
-    margin-right: 0.5rem;
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .mw-priority-high {
@@ -420,6 +403,21 @@ html {
     gap: 0.65rem;
     align-items: center;
     justify-content: space-between;
+    width: 100%;
+}
+
+.mw-card-head-left {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
+    > [data-testid="stVerticalBlock"]
+    > [data-testid="stHorizontalBlock"]:first-child {
+    align-items: center !important;
 }
 
 .mw-status-icon {
@@ -480,6 +478,64 @@ html {
 
 .mw-drawer-root {
     display: none;
+}
+
+.mw-drawer-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem 0.75rem;
+    margin-bottom: 0.35rem;
+}
+
+.mw-drawer-header .mw-drawer-task-title {
+    margin-bottom: 0;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.mw-drawer-fields {
+    display: grid;
+    grid-template-columns: minmax(5.5rem, 38%) 1fr;
+    gap: 0.35rem 0.65rem;
+    margin: 0.15rem 0 0.5rem;
+    font-size: 0.84rem;
+    line-height: 1.4;
+}
+
+.mw-drawer-field {
+    display: contents;
+}
+
+.mw-drawer-field-label {
+    color: var(--mw-text-muted);
+    font-weight: 600;
+}
+
+.mw-drawer-field-value {
+    color: var(--mw-text);
+    word-break: break-word;
+}
+
+.mw-drawer-empty {
+    color: var(--mw-text-muted);
+    font-size: 0.84rem;
+    margin: 0;
+}
+
+.mw-badge-open {
+    background: #ede8f4;
+    color: var(--mw-text-muted);
+}
+
+.mw-badge-done {
+    background: #d4edda;
+    color: #1e5f32;
+}
+
+.mw-badge-wont {
+    background: #f0e8e8;
+    color: #6b4a4a;
 }
 
 .mw-drawer-section-title {
