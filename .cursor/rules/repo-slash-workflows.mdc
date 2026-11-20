@@ -1,0 +1,25 @@
+---
+description: Map /workflow names to prompt files for Cloud Agents (when the / picker is empty)
+alwaysApply: true
+---
+
+# Repo slash workflows (Cloud + desktop)
+
+When the user names a **`/<kebab-case>`** workflow from **AGENTS.md** or asks to run a slash command, **read the matching file** below and follow it. On **Cursor Cloud / web**, the `/` menu may not list repo commands — this rule still applies.
+
+| Invoke | Prompt file (read this) |
+| --- | --- |
+| `/create-issues` | `.cursor/commands/shared/create-issues.md` |
+| `/triage-feedback-inbox` | `.cursor/commands/maintenance-wizard/triage-feedback-inbox.md` |
+| `/create-issues-from-backlog` | `.cursor/commands/maintenance-wizard/create-issues-from-backlog.md` |
+| `/app-review` | `.cursor/commands/maintenance-wizard/app-review.md` |
+| `/app-smoke` | `.cursor/commands/maintenance-wizard/app-smoke.md` |
+| `/architecture-review` | `.cursor/commands/shared/architecture-review.md` |
+| `/list-enhancements` | `.cursor/commands/maintenance-wizard/list-enhancements.md` |
+| `/work-on-issue` | `.cursor/commands/shared/work-on-issue.md` |
+| `/tidy-project` | `.cursor/commands/shared/tidy-project.md` |
+| `/create-command` | `.cursor/commands/shared/create-command.md` |
+
+**Not a command file:** **`tidy-first`** is the **`.cursor/skills/tidy-first/SKILL.md`** skill (auto or manual), not a duplicate of **`/tidy-project`**.
+
+**Source layout:** canonical copies live under **`.cursor/commands/shared/`** (rg-ai submodule) and **`.cursor/commands/maintenance-wizard/`**. After clone: `git submodule update --init --recursive`.

@@ -1,4 +1,4 @@
-"""Maintenance Wizard — monthly checklist (mockup C)."""
+"""Maintenance Wizard — monthly checklist (mockup C v4)."""
 
 from __future__ import annotations
 
@@ -9,8 +9,16 @@ import streamlit as st
 
 from maintenance_wizard.config import get_settings
 from maintenance_wizard.domain.board import build_month_board
-from maintenance_wizard.models import BoardTask, Urgency
+from maintenance_wizard.models import BoardTask, Priority, Urgency
 from maintenance_wizard.store.factory import get_store
+from maintenance_wizard.ui.access_gate import enforce_access_gate
+from maintenance_wizard.ui.components.feedback import render_feedback_controls
+from maintenance_wizard.ui.session_log import (
+    BoardSessionTrace,
+    build_session_log,
+    latest_session_log_path,
+    write_session_log,
+)
 from maintenance_wizard.ui.styles import inject_app_styles
 from maintenance_wizard.ui.views.contractors import render_contractors_admin
 from maintenance_wizard.ui.views.drawer import render_drawer
@@ -39,6 +47,36 @@ def urgency_badge(urgency: Urgency) -> str:
     return ""
 
 
+def priority_badge(priority: Priority) -> str:
+    css = {
+        "High": "mw-priority-high",
+        "Medium": "mw-priority-medium",
+        "Low": "mw-priority-low",
+    }.get(priority, "mw-priority-medium")
+    return f'<span class="mw-priority-badge {css}">{priority}</span>'
+
+
+def status_glyph(urgency: Urgency) -> str:
+    if urgency == Urgency.OVERDUE:
+        return '<span class="mw-status-icon mw-status-overdue" aria-hidden="true">!</span>'
+    if urgency == Urgency.IN_PROGRESS:
+        return '<span class="mw-status-icon mw-status-progress" aria-hidden="true">↻</span>'
+    return '<span class="mw-status-icon mw-status-open" aria-hidden="true">◎</span>'
+
+
+def stats_pills_html(*, overdue: int, in_progress: int, open_count: int) -> str:
+    return (
+        '<div class="mw-stats-row">'
+        f'<span class="mw-stat-pill mw-stat-overdue">'
+        f'<span class="mw-stat-dot" aria-hidden="true">!</span> {overdue} overdue</span>'
+        f'<span class="mw-stat-pill mw-stat-progress">'
+        f'<span class="mw-stat-dot" aria-hidden="true">●</span> {in_progress} in progress</span>'
+        f'<span class="mw-stat-pill mw-stat-open">'
+        f'<span class="mw-stat-dot" aria-hidden="true">○</span> {open_count} open</span>'
+        "</div>"
+    )
+
+
 @st.cache_data(ttl=30)
 def load_board(year: int, month: int, show_closed: bool) -> list[BoardTask]:
     store = get_store()
@@ -51,15 +89,21 @@ def load_board(year: int, month: int, show_closed: bool) -> list[BoardTask]:
     return board
 
 
-def _render_hero(month_label: str, store_label: str) -> None:
+def _render_sidebar_brand() -> None:
     st.markdown(
-        f'<div class="mw-hero">'
-        f"<h1>B &amp; R Home Maintenance</h1>"
-        f'<p class="mw-hero-month">{month_label}</p>'
-        f"</div>",
+        '<div class="mw-sidebar-brand">'
+        '<span class="mw-brand-icon" aria-hidden="true">🏠</span> '
+        "<span>B &amp; R Home Maintenance</span></div>",
         unsafe_allow_html=True,
     )
-    st.caption(f"Data source: {store_label}")
+
+
+def _render_month_chip(month_label: str) -> None:
+    st.markdown(
+        f'<div class="mw-month-chip" title="Selected month">'
+        f'<span aria-hidden="true">📅</span> {month_label}</div>',
+        unsafe_allow_html=True,
+    )
 
 
 def main() -> None:
@@ -68,6 +112,7 @@ def main() -> None:
         page_icon="🏠",
         layout="wide",
     )
+    enforce_access_gate()
     inject_app_styles()
 
     settings = get_settings()
@@ -81,17 +126,19 @@ def main() -> None:
         st.session_state.drawer_edit = False
 
     with st.sidebar:
-        st.header("Navigation")
-        nav = st.radio(
-            "View",
-            ["Monthly board", "Manage contractors"],
-            index=0 if st.session_state.page == "board" else 1,
-            label_visibility="collapsed",
-        )
-        st.session_state.page = "board" if nav == "Monthly board" else "contractors"
+        _render_sidebar_brand()
+        st.divider()
+
+        if st.button(
+            "Monthly board",
+            use_container_width=True,
+            type="primary" if st.session_state.page == "board" else "secondary",
+        ):
+            st.session_state.page = "board"
+            st.rerun()
 
         if st.session_state.page == "board":
-            st.header("Month")
+            st.markdown("**Filter by month**")
             year = st.number_input("Year", min_value=2020, max_value=2035, value=today.year)
             month = st.selectbox(
                 "Month",
@@ -99,6 +146,9 @@ def main() -> None:
                 format_func=lambda m: date(year, m, 1).strftime("%B"),
                 index=today.month - 1,
             )
+            month_label = date(year, month, 1).strftime("%b %Y")
+            _render_month_chip(month_label)
+
             show_closed = st.toggle("Show done & won't do", value=False)
             try:
                 templates = get_store().list_templates()
@@ -109,13 +159,29 @@ def main() -> None:
                 areas = []
                 types = []
                 seasons = []
-            area_filter = st.multiselect("Area", options=areas)
+            if areas:
+                area_filter = st.multiselect("Area", options=areas)
+            else:
+                area_filter = []
             type_filter = st.multiselect("Type", options=types)
             season_filter = st.multiselect("Season", options=seasons)
             if st.button("Refresh", use_container_width=True):
                 load_board.clear()
                 st.session_state.drawer_task = None
                 st.rerun()
+            latest = latest_session_log_path()
+            with st.expander("Session debug", expanded=False):
+                if latest and latest.is_file():
+                    st.caption(f"Latest log: `{latest.name}`")
+                    st.download_button(
+                        "Download debug JSON",
+                        data=latest.read_text(encoding="utf-8"),
+                        file_name=latest.name,
+                        mime="application/json",
+                        use_container_width=True,
+                    )
+                else:
+                    st.caption("No session log yet — open the monthly board.")
         else:
             year = today.year
             month = today.month
@@ -124,15 +190,32 @@ def main() -> None:
             type_filter = []
             season_filter = []
 
+        st.divider()
+        if st.button(
+            "Manage contractors",
+            use_container_width=True,
+            type="primary" if st.session_state.page == "contractors" else "secondary",
+        ):
+            st.session_state.page = "contractors"
+            st.rerun()
+
     if st.session_state.page == "contractors":
         render_contractors_admin(get_store())
         return
 
-    month_label = date(year, month, 1).strftime("%B %Y")
+    month_label_long = date(year, month, 1).strftime("%B %Y")
     main_col, drawer_col = st.columns([2, 1], gap="large")
 
     with main_col:
-        _render_hero(month_label, settings.store)
+        title_col, fb_col = st.columns([5, 1])
+        with title_col:
+            st.markdown(
+                f'<h2 class="mw-board-month">{month_label_long}</h2>',
+                unsafe_allow_html=True,
+            )
+            st.caption(f"Data source: {settings.store}")
+        with fb_col:
+            render_feedback_controls(surface="monthly")
 
         try:
             board = load_board(year, month, show_closed)
@@ -148,15 +231,47 @@ def main() -> None:
         if season_filter:
             board = [r for r in board if r.template.season in season_filter]
 
+        trace = BoardSessionTrace(
+            month_key=f"{year:04d}-{month:02d}",
+            store_mode=settings.store,
+            filters={
+                "areas": area_filter,
+                "types": type_filter,
+                "seasons": season_filter,
+            },
+        )
+        trace.record_board(board)
+        session_log = build_session_log(trace)
+        log_path = write_session_log(session_log)
+        st.session_state.mw_session_debug_log = session_log
+        st.session_state.mw_session_debug_path = str(log_path) if log_path else None
+
         overdue_n = sum(1 for r in board if r.urgency == Urgency.OVERDUE)
         inprog_n = sum(1 for r in board if r.urgency == Urgency.IN_PROGRESS)
         open_n = sum(1 for r in board if r.urgency == Urgency.NORMAL)
 
-        s1, s2, s3 = st.columns(3)
-        s1.metric("Overdue", overdue_n)
-        s2.metric("In progress", inprog_n)
-        s3.metric("Open", open_n)
-        st.caption("Sorted by urgency, then priority (High → Low), area, and name.")
+        pill_row, sort_col = st.columns([3, 1])
+        with pill_row:
+            st.markdown(
+                stats_pills_html(
+                    overdue=overdue_n,
+                    in_progress=inprog_n,
+                    open_count=open_n,
+                ),
+                unsafe_allow_html=True,
+            )
+        with sort_col:
+            st.selectbox(
+                "Sorted by",
+                ["Priority (High → Low)"],
+                index=0,
+                label_visibility="visible",
+            )
+
+        st.markdown(
+            '<p class="mw-sort-caption">Urgency first, then priority, area, and name.</p>',
+            unsafe_allow_html=True,
+        )
 
         if not board:
             st.success("Nothing open for this month — or all tasks are complete.")
@@ -165,7 +280,9 @@ def main() -> None:
             for row in board:
                 t = row.template
                 badge = urgency_badge(row.urgency)
-                meta = f"{t.area} · {t.priority} priority · {row.period}"
+                prio = priority_badge(t.priority)
+                glyph = status_glyph(row.urgency)
+                meta = f"{t.area} · {t.task_type or 'Task'} · {row.period}"
                 last_html = ""
                 if row.last_done_on:
                     last_html = f'<p class="mw-last">Last done {row.last_done_on.isoformat()}'
@@ -173,16 +290,20 @@ def main() -> None:
                         last_html += f" — {row.last_done_notes}"
                     last_html += "</p>"
 
-                card_html = (
-                    f"{badge}"
-                    f'<p class="mw-task-title">{t.name}</p>'
+                head_html = (
+                    f'<div class="mw-card-head">'
+                    f"{glyph}"
+                    f'<div class="mw-card-head-text">'
+                    f'<div class="mw-title-row">{badge}{prio}'
+                    f'<span class="mw-task-title">{t.name}</span></div>'
                     f'<p class="mw-meta">{meta}</p>'
                     f"{last_html}"
+                    f"</div></div>"
                 )
 
                 if row.urgency in (Urgency.DONE, Urgency.WONT_DO):
                     st.markdown(
-                        f'<div class="mw-task-card {urgency_class(row.urgency)}">{card_html}</div>',
+                        f'<div class="mw-task-card {urgency_class(row.urgency)}">{head_html}</div>',
                         unsafe_allow_html=True,
                     )
                     continue
@@ -190,17 +311,24 @@ def main() -> None:
                 with st.container(border=True):
                     uclass = urgency_class(row.urgency)
                     st.markdown(
-                        f'<div class="{uclass} mw-task--open">{card_html}</div>',
+                        f'<div class="mw-task-shell {uclass} mw-task--open">{head_html}</div>',
                         unsafe_allow_html=True,
                     )
+                    det_key = f"det_{t.task_id}_{row.period}"
+                    det_col, _ = st.columns([5, 1])
+                    with det_col:
+                        if st.button("Details", key=det_key, type="secondary"):
+                            st.session_state.drawer_task = (t.task_id, row.period)
+                            st.session_state.drawer_edit = False
+                            st.rerun()
                     notes_key = f"notes_{t.task_id}_{row.period}"
                     notes = st.text_input(
                         "Completion note",
                         key=notes_key,
-                        placeholder="Optional — saved on Done / Won't do",
+                        placeholder="Add note for this completion (optional)",
                         label_visibility="collapsed",
                     )
-                    b1, b2, b3, b4 = st.columns(4)
+                    b1, b2, b3 = st.columns(3)
                     prog_key = f"prog_{t.task_id}_{row.period}"
                     with b1:
                         if st.button("In progress", key=prog_key, use_container_width=True):
@@ -213,9 +341,21 @@ def main() -> None:
                             except Exception as err:
                                 st.warning(str(err))
                     with b2:
+                        wont_key = f"wont_{t.task_id}_{row.period}"
+                        if st.button("Won't do", key=wont_key, use_container_width=True):
+                            try:
+                                store.upsert_completion(
+                                    t.task_id, row.period, "wont_do", today, notes or ""
+                                )
+                                load_board.clear()
+                                st.rerun()
+                            except Exception as err:
+                                st.warning(str(err))
+                    with b3:
+                        done_key = f"done_{t.task_id}_{row.period}"
                         if st.button(
                             "Done",
-                            key=f"done_{t.task_id}_{row.period}",
+                            key=done_key,
                             type="primary",
                             use_container_width=True,
                         ):
@@ -227,28 +367,9 @@ def main() -> None:
                                 st.rerun()
                             except Exception as err:
                                 st.warning(str(err))
-                    with b3:
-                        if st.button(
-                            "Won't do",
-                            key=f"wont_{t.task_id}_{row.period}",
-                            use_container_width=True,
-                        ):
-                            try:
-                                store.upsert_completion(
-                                    t.task_id, row.period, "wont_do", today, notes or ""
-                                )
-                                load_board.clear()
-                                st.rerun()
-                            except Exception as err:
-                                st.warning(str(err))
-                    det_key = f"det_{t.task_id}_{row.period}"
-                    with b4:
-                        if st.button("Details", key=det_key, use_container_width=True):
-                            st.session_state.drawer_task = (t.task_id, row.period)
-                            st.session_state.drawer_edit = False
-                            st.rerun()
 
     with drawer_col:
+        st.markdown('<div class="mw-drawer-shell">', unsafe_allow_html=True)
         st.markdown("#### Details")
         if st.session_state.drawer_task:
             tid, period = st.session_state.drawer_task
@@ -267,6 +388,7 @@ def main() -> None:
                 st.caption("Select a task card.")
         else:
             st.caption("Choose **Details** on a task to open instructions, links, and contractor.")
+        st.markdown("</div>", unsafe_allow_html=True)
 
 
 if __name__ == "__main__":

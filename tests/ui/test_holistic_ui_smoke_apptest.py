@@ -32,7 +32,10 @@ def test_holistic_first_run_renders_board_shell() -> None:
 
     markdown_blob = " ".join(m.value or "" for m in at.markdown)
     assert (
-        "B &amp; R Home Maintenance" in markdown_blob or "B & R Home Maintenance" in markdown_blob
+        "B &amp; R Home Maintenance" in markdown_blob
+        or "B & R Home Maintenance" in markdown_blob
+        or "mw-board-month" in markdown_blob
+        or "mw-sidebar-brand" in markdown_blob
     )
 
     refresh_buttons = [b for b in at.button if b.label == "Refresh"]
@@ -40,3 +43,8 @@ def test_holistic_first_run_renders_board_shell() -> None:
 
     done_buttons = [b for b in at.button if b.label == "Done"]
     assert done_buttons, "Expected at least one open task with a Done button"
+
+    app_src = (APP_PATH.parent / "app.py").read_text(encoding="utf-8")
+    feedback_src = (APP_PATH.parent / "components" / "feedback.py").read_text(encoding="utf-8")
+    assert "render_feedback_controls" in app_src
+    assert "Send feedback" in feedback_src

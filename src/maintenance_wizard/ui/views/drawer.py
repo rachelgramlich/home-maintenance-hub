@@ -17,20 +17,26 @@ def render_drawer(row: BoardTask, store: TaskStore, *, editing: bool) -> None:
         _edit_form(t, store)
     else:
         if t.instructions:
+            st.markdown('<div class="mw-drawer-section">', unsafe_allow_html=True)
             st.markdown("**Instructions**")
             st.write(t.instructions)
+            st.markdown("</div>", unsafe_allow_html=True)
         if t.links:
+            st.markdown('<div class="mw-drawer-section">', unsafe_allow_html=True)
             st.markdown("**Links**")
             for link in t.links:
                 st.markdown(f"- [{link.label}]({link.url})")
+            st.markdown("</div>", unsafe_allow_html=True)
         contractor = store.get_contractor(t.contractor_id) if t.contractor_id else None
         if contractor:
+            st.markdown('<div class="mw-drawer-section">', unsafe_allow_html=True)
             st.markdown("**Contractor**")
             st.write(f"{contractor.name} · {contractor.trade}")
             if contractor.phone:
                 st.markdown(f"[Call](tel:{contractor.phone})")
             if contractor.email:
                 st.markdown(f"[Email](mailto:{contractor.email})")
+            st.markdown("</div>", unsafe_allow_html=True)
         if st.button("Manage contractors", key=f"mwc_{t.task_id}"):
             st.session_state.page = "contractors"
             st.rerun()

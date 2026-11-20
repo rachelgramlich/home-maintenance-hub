@@ -40,6 +40,17 @@ class Settings(BaseSettings):
         default_factory=lambda: _notion_ds_id("MAINTENANCE_WIZARD_NOTION_COMPLETIONS_DS_ID")
     )
     xlsx_path: Path | None = None
+    github_feedback_token: str = Field(
+        default_factory=lambda: os.environ.get("GITHUB_FEEDBACK_TOKEN", "")
+    )
+    github_feedback_repository: str = Field(
+        default_factory=lambda: os.environ.get(
+            "GITHUB_FEEDBACK_REPOSITORY",
+            "rachelgramlich/maintenance-wizard",
+        )
+    )
+    require_auth: bool = False
+    auth_email_allowlist: str = ""
 
 
 @lru_cache
