@@ -86,6 +86,9 @@ import-completions *ARGS:
 rename-completions *ARGS:
     uv run python -m maintenance_wizard.scripts.rename_completions {{ARGS}}
 
+normalize-task-titles *ARGS:
+    uv run python -m maintenance_wizard.scripts.normalize_task_titles {{ARGS}}
+
 notion-audit *ARGS:
     uv run python -m maintenance_wizard.scripts.notion_row_audit {{ARGS}}
 
