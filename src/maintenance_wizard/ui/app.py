@@ -11,6 +11,7 @@ from maintenance_wizard.config import get_settings
 from maintenance_wizard.domain.board import build_month_board
 from maintenance_wizard.models import BoardTask, Priority, Urgency
 from maintenance_wizard.store.factory import get_store
+from maintenance_wizard.ui.components.feedback import render_feedback_controls
 from maintenance_wizard.ui.styles import inject_app_styles
 from maintenance_wizard.ui.views.contractors import render_contractors_admin
 from maintenance_wizard.ui.views.drawer import render_drawer
@@ -185,11 +186,15 @@ def main() -> None:
     main_col, drawer_col = st.columns([2, 1], gap="large")
 
     with main_col:
-        st.markdown(
-            f'<h2 class="mw-board-month">{month_label_long}</h2>',
-            unsafe_allow_html=True,
-        )
-        st.caption(f"Data source: {settings.store}")
+        title_col, fb_col = st.columns([5, 1])
+        with title_col:
+            st.markdown(
+                f'<h2 class="mw-board-month">{month_label_long}</h2>',
+                unsafe_allow_html=True,
+            )
+            st.caption(f"Data source: {settings.store}")
+        with fb_col:
+            render_feedback_controls(surface="monthly")
 
         try:
             board = load_board(year, month, show_closed)
