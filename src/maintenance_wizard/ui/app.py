@@ -162,6 +162,15 @@ def main() -> None:
             st.session_state.page = "board"
             st.rerun()
 
+        if st.button(
+            "⚙️  Settings",
+            use_container_width=True,
+            type="secondary",
+            disabled=True,
+            key="settings_nav",
+        ):
+            pass  # Settings page TBD
+
         if st.session_state.page == "board":
             st.markdown("**Filter by month**")
             year = st.number_input("Year", min_value=2020, max_value=2035, value=today.year)
