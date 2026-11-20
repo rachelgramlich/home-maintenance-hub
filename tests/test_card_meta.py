@@ -14,4 +14,7 @@ def test_format_card_meta_mockup_shape() -> None:
         effort="XS",
         priority="High",
     )
-    assert format_card_meta(t, "2026-03") == "HVAC · Replace · XS · High priority · Period 2026-03"
+    assert (
+        format_card_meta(t, "2026-03")
+        == "HVAC · Replace · XS · High priority · Period 2026-03"
+    )

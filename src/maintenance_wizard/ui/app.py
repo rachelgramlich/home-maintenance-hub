@@ -84,11 +84,9 @@ def format_last_done_html(row: BoardTask) -> str:
     if not row.last_done_on:
         return ""
     d = row.last_done_on
-    label = d.strftime(f"%b {d.day}")
-    html = f'<p class="mw-last">Last done {label}'
-    if row.last_done_notes:
-        html += f" — {row.last_done_notes}"
-    return html + "</p>"
+    # Mockup format: "Last done Oct 12"
+    label = d.strftime("%b %d")
+    return f'<p class="mw-last">Last done {label}</p>'
 
 
 def stats_pills_html(*, overdue: int, in_progress: int, open_count: int) -> str:
@@ -186,7 +184,25 @@ def main() -> None:
                 areas = []
                 types = []
                 seasons = []
+            # Category buttons with icons (mockup C v4)
+            area_icons = {
+                "HVAC": "❄️",
+                "Plumbing": "💧",
+                "Electrical": "⚡",
+                "Laundry": "🧺",
+                "Settings": "⚙️",
+            }
             if areas:
+                st.markdown("#### Categories")
+                for area in areas:
+                    icon = area_icons.get(area, "⚙️")
+                    st.button(
+                        f"{icon}  {area}",
+                        key=f"cat_{area}",
+                        use_container_width=True,
+                        type="secondary",
+                    )
+                st.markdown("---")
                 area_filter = st.multiselect("Area", options=areas)
             else:
                 area_filter = []
@@ -218,8 +234,9 @@ def main() -> None:
             season_filter = []
 
         st.divider()
+        st.markdown('<div style="margin-top: 2rem;"></div>', unsafe_allow_html=True)
         if st.button(
-            "Manage contractors",
+            "👥  Manage contractors",
             use_container_width=True,
             type="primary" if st.session_state.page == "contractors" else "secondary",
         ):
