@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import streamlit as st
 
+from maintenance_wizard.domain.display import display_task_name
 from maintenance_wizard.models import BoardTask, Template, links_to_json, parse_links_json
 from maintenance_wizard.store.base import TaskStore
 
@@ -16,7 +17,7 @@ def _section_title(label: str, *, first: bool = False) -> None:
 
 def render_drawer(row: BoardTask, store: TaskStore, *, editing: bool) -> None:
     t = row.template
-    st.markdown(f"### {t.name}")
+    st.markdown(f"### {display_task_name(t.name)}")
     st.caption(f"{t.area} · {t.month_name or t.due_month} · {row.period}")
     if t.notion_url:
         st.link_button("Open in Notion", t.notion_url)
