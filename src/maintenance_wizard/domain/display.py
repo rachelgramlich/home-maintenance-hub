@@ -1,13 +1,8 @@
 from __future__ import annotations
 
-import re
-
-_TRAILING_SEASON_PAREN = re.compile(
-    r"\s*\((?:fall|spring|summer|winter|mid-summer)\)\s*$",
-    re.IGNORECASE,
-)
+from maintenance_wizard.migration.names import strip_seasonal_parens
 
 
 def display_task_name(name: str) -> str:
-    """Strip redundant trailing season parentheticals for UI labels only."""
-    return _TRAILING_SEASON_PAREN.sub("", name.strip())
+    """Task title for UI; mirrors stored names after seasonal cleanup."""
+    return strip_seasonal_parens(name)

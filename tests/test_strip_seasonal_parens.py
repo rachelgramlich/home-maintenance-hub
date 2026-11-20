@@ -12,6 +12,7 @@ def test_strip_seasonal_parens_trailing() -> None:
     assert strip_seasonal_parens("Task (SUMMER)") == "Task"
     assert strip_seasonal_parens("Task (Mid-Summer)") == "Task"
     assert strip_seasonal_parens("Task (mid summer)") == "Task"
+    assert strip_seasonal_parens("Task (mid summer)") == "Task"
 
 
 def test_strip_seasonal_parens_leaves_other() -> None:

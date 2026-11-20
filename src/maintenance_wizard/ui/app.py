@@ -9,6 +9,7 @@ import streamlit as st
 
 from maintenance_wizard.config import get_settings
 from maintenance_wizard.domain.board import build_month_board
+from maintenance_wizard.domain.display import display_task_name
 from maintenance_wizard.models import BoardTask, Priority, Urgency
 from maintenance_wizard.store.factory import get_store
 from maintenance_wizard.ui.access_gate import enforce_access_gate
@@ -290,12 +291,13 @@ def main() -> None:
                         last_html += f" — {row.last_done_notes}"
                     last_html += "</p>"
 
+                task_title = display_task_name(t.name)
                 head_html = (
                     f'<div class="mw-card-head">'
                     f"{glyph}"
                     f'<div class="mw-card-head-text">'
                     f'<div class="mw-title-row">'
-                    f'<span class="mw-task-title">{t.name}</span>{prio}{badge}</div>'
+                    f'<span class="mw-task-title">{task_title}</span>{prio}{badge}</div>'
                     f'<p class="mw-meta">{meta}</p>'
                     f"{last_html}"
                     f"</div></div>"
