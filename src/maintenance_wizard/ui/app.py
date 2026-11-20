@@ -331,14 +331,17 @@ def main() -> None:
 
                 head_html = (
                     f'<div class="mw-card-head">'
+                    f'<div class="mw-card-head-left">'
                     f"{glyph}"
                     f'<div class="mw-card-head-text">'
                     f'<div class="mw-title-row">'
-                    f'<span class="mw-task-title">{display_task_name(t.name)}</span>{badge}</div>'
+                    f'<span class="mw-task-title">{display_task_name(t.name)}</span></div>'
                     f'<div class="mw-meta-row">'
-                    f'<p class="mw-meta">{meta}</p>{prio}</div>'
+                    f'{prio}<p class="mw-meta">{meta}</p></div>'
                     f"{last_html}"
                     f"</div></div>"
+                    f"{badge}"
+                    f"</div>"
                 )
 
                 if row.urgency in (Urgency.DONE, Urgency.WONT_DO):
