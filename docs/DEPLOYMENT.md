@@ -2,6 +2,8 @@
 
 Household production target: **Streamlit Community Cloud** with **Notion** as the data store (no Google Sheets).
 
+**Operations runbook (auth, feedback PAT, smoke):** [operations/household-deploy.md](operations/household-deploy.md).
+
 ## Prerequisites
 
 1. Notion hub + three databases — [NOTION_SETUP.md](NOTION_SETUP.md).

@@ -49,6 +49,8 @@ class Settings(BaseSettings):
             "rachelgramlich/maintenance-wizard",
         )
     )
+    require_auth: bool = False
+    auth_email_allowlist: str = ""
 
 
 @lru_cache

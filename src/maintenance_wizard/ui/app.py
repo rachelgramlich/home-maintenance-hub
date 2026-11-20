@@ -11,6 +11,7 @@ from maintenance_wizard.config import get_settings
 from maintenance_wizard.domain.board import build_month_board
 from maintenance_wizard.models import BoardTask, Priority, Urgency
 from maintenance_wizard.store.factory import get_store
+from maintenance_wizard.ui.access_gate import enforce_access_gate
 from maintenance_wizard.ui.components.feedback import render_feedback_controls
 from maintenance_wizard.ui.session_log import (
     BoardSessionTrace,
@@ -111,6 +112,7 @@ def main() -> None:
         page_icon="🏠",
         layout="wide",
     )
+    enforce_access_gate()
     inject_app_styles()
 
     settings = get_settings()
