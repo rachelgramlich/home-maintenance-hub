@@ -17,7 +17,15 @@ def _section_title(label: str, *, first: bool = False) -> None:
 
 def render_drawer(row: BoardTask, store: TaskStore, *, editing: bool) -> None:
     t = row.template
-    st.markdown(f"### {display_task_name(t.name)}")
+    # Mockup-style drawer header
+    st.markdown(
+        f'<h3 class="mw-drawer-task-title">{display_task_name(t.name)}</h3>', unsafe_allow_html=True
+    )
+    # Show "In progress" badge if applicable
+    if row.urgency.value == "in_progress":
+        st.markdown(
+            '<span class="mw-badge mw-badge-progress">IN PROGRESS</span>', unsafe_allow_html=True
+        )
     st.caption(f"{t.area} · {t.month_name or t.due_month} · {row.period}")
     if t.notion_url:
         st.link_button("Open in Notion", t.notion_url)

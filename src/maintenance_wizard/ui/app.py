@@ -84,11 +84,9 @@ def format_last_done_html(row: BoardTask) -> str:
     if not row.last_done_on:
         return ""
     d = row.last_done_on
-    label = d.strftime(f"%b {d.day}")
-    html = f'<p class="mw-last">Last done {label}'
-    if row.last_done_notes:
-        html += f" — {row.last_done_notes}"
-    return html + "</p>"
+    # Mockup format: "Last done Oct 12"
+    label = d.strftime("%b %d")
+    return f'<p class="mw-last">Last done {label}</p>'
 
 
 def stats_pills_html(*, overdue: int, in_progress: int, open_count: int) -> str:
@@ -164,6 +162,15 @@ def main() -> None:
             st.session_state.page = "board"
             st.rerun()
 
+        if st.button(
+            "⚙️  Settings",
+            use_container_width=True,
+            type="secondary",
+            disabled=True,
+            key="settings_nav",
+        ):
+            pass  # Settings page TBD
+
         if st.session_state.page == "board":
             st.markdown("**Filter by month**")
             year = st.number_input("Year", min_value=2020, max_value=2035, value=today.year)
@@ -186,7 +193,25 @@ def main() -> None:
                 areas = []
                 types = []
                 seasons = []
+            # Category buttons with icons (mockup C v4)
+            area_icons = {
+                "HVAC": "❄️",
+                "Plumbing": "💧",
+                "Electrical": "⚡",
+                "Laundry": "🧺",
+                "Settings": "⚙️",
+            }
             if areas:
+                st.markdown("#### Categories")
+                for area in areas:
+                    icon = area_icons.get(area, "⚙️")
+                    st.button(
+                        f"{icon}  {area}",
+                        key=f"cat_{area}",
+                        use_container_width=True,
+                        type="secondary",
+                    )
+                st.markdown("---")
                 area_filter = st.multiselect("Area", options=areas)
             else:
                 area_filter = []
@@ -218,8 +243,9 @@ def main() -> None:
             season_filter = []
 
         st.divider()
+        st.markdown('<div style="margin-top: 2rem;"></div>', unsafe_allow_html=True)
         if st.button(
-            "Manage contractors",
+            "👥  Manage contractors",
             use_container_width=True,
             type="primary" if st.session_state.page == "contractors" else "secondary",
         ):
@@ -314,14 +340,17 @@ def main() -> None:
 
                 head_html = (
                     f'<div class="mw-card-head">'
+                    f'<div class="mw-card-head-left">'
                     f"{glyph}"
                     f'<div class="mw-card-head-text">'
                     f'<div class="mw-title-row">'
-                    f'<span class="mw-task-title">{display_task_name(t.name)}</span>{badge}</div>'
+                    f'<span class="mw-task-title">{display_task_name(t.name)}</span></div>'
                     f'<div class="mw-meta-row">'
-                    f'<p class="mw-meta">{meta}</p>{prio}</div>'
+                    f'{prio}<p class="mw-meta">{meta}</p></div>'
                     f"{last_html}"
                     f"</div></div>"
+                    f"{badge}"
+                    f"</div>"
                 )
 
                 if row.urgency in (Urgency.DONE, Urgency.WONT_DO):
