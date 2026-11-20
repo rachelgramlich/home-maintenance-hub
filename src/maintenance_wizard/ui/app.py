@@ -9,7 +9,8 @@ import streamlit as st
 
 from maintenance_wizard.config import get_settings
 from maintenance_wizard.domain.board import build_month_board
-from maintenance_wizard.models import BoardTask, Priority, Urgency
+from maintenance_wizard.domain.display import display_task_name
+from maintenance_wizard.models import BoardTask, Priority, Template, Urgency
 from maintenance_wizard.store.factory import get_store
 from maintenance_wizard.ui.access_gate import enforce_access_gate
 from maintenance_wizard.ui.components.feedback import render_feedback_controls
@@ -62,6 +63,32 @@ def status_glyph(urgency: Urgency) -> str:
     if urgency == Urgency.IN_PROGRESS:
         return '<span class="mw-status-icon mw-status-progress" aria-hidden="true">↻</span>'
     return '<span class="mw-status-icon mw-status-open" aria-hidden="true">◎</span>'
+
+
+def format_card_meta(template: Template, period: str) -> str:
+    """Mockup C v4 subline: area · type · effort · priority · Period YYYY-MM."""
+    parts: list[str] = []
+    if template.area:
+        parts.append(template.area)
+    if template.task_type:
+        parts.append(template.task_type)
+    if template.effort:
+        parts.append(template.effort)
+    if template.priority:
+        parts.append(f"{template.priority} priority")
+    parts.append(f"Period {period}")
+    return " · ".join(parts)
+
+
+def format_last_done_html(row: BoardTask) -> str:
+    if not row.last_done_on:
+        return ""
+    d = row.last_done_on
+    label = d.strftime(f"%b {d.day}")
+    html = f'<p class="mw-last">Last done {label}'
+    if row.last_done_notes:
+        html += f" — {row.last_done_notes}"
+    return html + "</p>"
 
 
 def stats_pills_html(*, overdue: int, in_progress: int, open_count: int) -> str:
@@ -282,21 +309,17 @@ def main() -> None:
                 badge = urgency_badge(row.urgency)
                 prio = priority_badge(t.priority)
                 glyph = status_glyph(row.urgency)
-                meta = f"{t.area} · {t.task_type or 'Task'} · {row.period}"
-                last_html = ""
-                if row.last_done_on:
-                    last_html = f'<p class="mw-last">Last done {row.last_done_on.isoformat()}'
-                    if row.last_done_notes:
-                        last_html += f" — {row.last_done_notes}"
-                    last_html += "</p>"
+                meta = format_card_meta(t, row.period)
+                last_html = format_last_done_html(row)
 
                 head_html = (
                     f'<div class="mw-card-head">'
                     f"{glyph}"
                     f'<div class="mw-card-head-text">'
                     f'<div class="mw-title-row">'
-                    f'<span class="mw-task-title">{t.name}</span>{prio}{badge}</div>'
-                    f'<p class="mw-meta">{meta}</p>'
+                    f'<span class="mw-task-title">{display_task_name(t.name)}</span>{badge}</div>'
+                    f'<div class="mw-meta-row">'
+                    f'<p class="mw-meta">{meta}</p>{prio}</div>'
                     f"{last_html}"
                     f"</div></div>"
                 )
@@ -310,13 +333,18 @@ def main() -> None:
 
                 with st.container(border=True):
                     uclass = urgency_class(row.urgency)
-                    st.markdown(
-                        f'<div class="mw-task-shell {uclass} mw-task--open">{head_html}</div>',
-                        unsafe_allow_html=True,
-                    )
-                    det_key = f"det_{t.task_id}_{row.period}"
-                    det_col, _ = st.columns([5, 1])
+                    head_col, det_col = st.columns([6, 1], vertical_alignment="top")
+                    with head_col:
+                        st.markdown(
+                            f'<div class="mw-task-shell {uclass} mw-task--open">{head_html}</div>',
+                            unsafe_allow_html=True,
+                        )
                     with det_col:
+                        st.markdown(
+                            '<span class="mw-card-details-anchor" aria-hidden="true"></span>',
+                            unsafe_allow_html=True,
+                        )
+                        det_key = f"det_{t.task_id}_{row.period}"
                         if st.button("Details", key=det_key, type="secondary"):
                             st.session_state.drawer_task = (t.task_id, row.period)
                             st.session_state.drawer_edit = False

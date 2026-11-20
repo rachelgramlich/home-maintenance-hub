@@ -128,7 +128,45 @@ html {
 }
 
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell) .stButton {
-    margin-top: 0.15rem;
+    margin-top: 0;
+}
+
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
+    [data-testid="column"]:has(.mw-card-details-anchor) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-start;
+}
+
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
+    [data-testid="column"]:has(.mw-card-details-anchor)
+    .stButton
+    button {
+    background: transparent !important;
+    border: none !important;
+    color: var(--mw-accent) !important;
+    font-weight: 600 !important;
+    min-height: auto !important;
+    padding: 0.15rem 0.35rem !important;
+    box-shadow: none !important;
+}
+
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
+    [data-testid="column"]:has(.mw-card-details-anchor)
+    .stButton
+    button
+    p {
+    color: var(--mw-accent) !important;
+    -webkit-text-fill-color: var(--mw-accent) !important;
+}
+
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
+    [data-testid="column"]:has(.mw-card-details-anchor)
+    .stButton
+    button:hover {
+    text-decoration: underline;
+    background: transparent !important;
 }
 
 .block-container {
@@ -230,11 +268,21 @@ html {
     margin: 0.35rem 0 0.2rem;
 }
 
+.mw-meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.5rem;
+    margin-top: 0.15rem;
+}
+
 .mw-meta {
     color: var(--mw-text-muted);
     font-size: 0.82rem;
     line-height: 1.35;
     margin: 0;
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 .mw-last {
