@@ -12,6 +12,12 @@ from maintenance_wizard.domain.board import build_month_board
 from maintenance_wizard.models import BoardTask, Priority, Urgency
 from maintenance_wizard.store.factory import get_store
 from maintenance_wizard.ui.components.feedback import render_feedback_controls
+from maintenance_wizard.ui.session_log import (
+    BoardSessionTrace,
+    build_session_log,
+    latest_session_log_path,
+    write_session_log,
+)
 from maintenance_wizard.ui.styles import inject_app_styles
 from maintenance_wizard.ui.views.contractors import render_contractors_admin
 from maintenance_wizard.ui.views.drawer import render_drawer
@@ -161,6 +167,19 @@ def main() -> None:
                 load_board.clear()
                 st.session_state.drawer_task = None
                 st.rerun()
+            latest = latest_session_log_path()
+            with st.expander("Session debug", expanded=False):
+                if latest and latest.is_file():
+                    st.caption(f"Latest log: `{latest.name}`")
+                    st.download_button(
+                        "Download debug JSON",
+                        data=latest.read_text(encoding="utf-8"),
+                        file_name=latest.name,
+                        mime="application/json",
+                        use_container_width=True,
+                    )
+                else:
+                    st.caption("No session log yet — open the monthly board.")
         else:
             year = today.year
             month = today.month
@@ -209,6 +228,21 @@ def main() -> None:
             board = [r for r in board if r.template.task_type in type_filter]
         if season_filter:
             board = [r for r in board if r.template.season in season_filter]
+
+        trace = BoardSessionTrace(
+            month_key=f"{year:04d}-{month:02d}",
+            store_mode=settings.store,
+            filters={
+                "areas": area_filter,
+                "types": type_filter,
+                "seasons": season_filter,
+            },
+        )
+        trace.record_board(board)
+        session_log = build_session_log(trace)
+        log_path = write_session_log(session_log)
+        st.session_state.mw_session_debug_log = session_log
+        st.session_state.mw_session_debug_path = str(log_path) if log_path else None
 
         overdue_n = sum(1 for r in board if r.urgency == Urgency.OVERDUE)
         inprog_n = sum(1 for r in board if r.urgency == Urgency.IN_PROGRESS)
