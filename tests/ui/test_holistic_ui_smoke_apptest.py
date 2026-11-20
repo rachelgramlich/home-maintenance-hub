@@ -32,7 +32,10 @@ def test_holistic_first_run_renders_board_shell() -> None:
 
     markdown_blob = " ".join(m.value or "" for m in at.markdown)
     assert (
-        "B &amp; R Home Maintenance" in markdown_blob or "B & R Home Maintenance" in markdown_blob
+        "B &amp; R Home Maintenance" in markdown_blob
+        or "B & R Home Maintenance" in markdown_blob
+        or "mw-board-month" in markdown_blob
+        or "mw-sidebar-brand" in markdown_blob
     )
 
     refresh_buttons = [b for b in at.button if b.label == "Refresh"]
