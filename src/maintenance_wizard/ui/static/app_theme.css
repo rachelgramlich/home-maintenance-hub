@@ -173,8 +173,12 @@ html {
     line-height: 1.25;
 }
 
+/* Marker for Streamlit bordered cards — keep content visible (no display:none). */
 .mw-task-shell {
-    display: none;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
 }
 
 /* Open task cards only — scoped via .mw-task-shell */
@@ -408,26 +412,36 @@ html {
 
 .mw-title-row .mw-task-title {
     margin: 0;
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
-.mw-drawer-shell {
+/* Drawer column — Streamlit widgets cannot nest in a single HTML wrapper div. */
+[data-testid="stHorizontalBlock"]:has(> [data-testid="column"] .mw-drawer-root)
+    > [data-testid="column"]:last-child {
     background: var(--mw-card-bg);
     border: 1px solid var(--mw-border);
     border-radius: 14px;
     padding: 0.75rem 1rem 1.25rem;
     box-shadow: 0 1px 4px rgba(58, 40, 73, 0.08);
-    min-height: 12rem;
 }
 
-.mw-drawer-section {
-    margin: 0.75rem 0;
-    padding-top: 0.5rem;
+.mw-drawer-root {
+    display: none;
+}
+
+.mw-drawer-section-title {
+    margin: 0.85rem 0 0.35rem;
+    padding-top: 0.65rem;
     border-top: 1px solid var(--mw-border);
+    font-size: 0.95rem;
+    color: var(--mw-text);
 }
 
-.mw-drawer-section:first-of-type {
-    border-top: none;
+.mw-drawer-section-title.mw-drawer-section-title--first {
+    margin-top: 0.35rem;
     padding-top: 0;
+    border-top: none;
 }
 
 #MainMenu, footer, [data-testid="stToolbar"] {

@@ -44,6 +44,11 @@ def test_holistic_first_run_renders_board_shell() -> None:
     done_buttons = [b for b in at.button if b.label == "Done"]
     assert done_buttons, "Expected at least one open task with a Done button"
 
+    assert "mw-task-title" in markdown_blob, "Task cards must expose mw-task-title"
+    assert "HVAC filter" in markdown_blob or "Electrical" in markdown_blob, (
+        "Expected seeded task name text on open cards"
+    )
+
     app_src = (APP_PATH.parent / "app.py").read_text(encoding="utf-8")
     feedback_src = (APP_PATH.parent / "components" / "feedback.py").read_text(encoding="utf-8")
     assert "render_feedback_controls" in app_src

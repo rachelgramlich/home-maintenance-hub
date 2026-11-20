@@ -294,8 +294,8 @@ def main() -> None:
                     f'<div class="mw-card-head">'
                     f"{glyph}"
                     f'<div class="mw-card-head-text">'
-                    f'<div class="mw-title-row">{badge}{prio}'
-                    f'<span class="mw-task-title">{t.name}</span></div>'
+                    f'<div class="mw-title-row">'
+                    f'<span class="mw-task-title">{t.name}</span>{prio}{badge}</div>'
                     f'<p class="mw-meta">{meta}</p>'
                     f"{last_html}"
                     f"</div></div>"
@@ -369,7 +369,10 @@ def main() -> None:
                                 st.warning(str(err))
 
     with drawer_col:
-        st.markdown('<div class="mw-drawer-shell">', unsafe_allow_html=True)
+        st.markdown(
+            '<span class="mw-drawer-root" aria-hidden="true"></span>',
+            unsafe_allow_html=True,
+        )
         st.markdown("#### Details")
         if st.session_state.drawer_task:
             tid, period = st.session_state.drawer_task
@@ -388,7 +391,6 @@ def main() -> None:
                 st.caption("Select a task card.")
         else:
             st.caption("Choose **Details** on a task to open instructions, links, and contractor.")
-        st.markdown("</div>", unsafe_allow_html=True)
 
 
 if __name__ == "__main__":
