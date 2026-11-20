@@ -22,7 +22,7 @@ SAMPLE = {
         },
         {
             "task_id": "hvac-service-heat",
-            "name": "Service heating (fall)",
+            "name": "Service heating",
             "due_month": 10,
             "area": "HVAC",
             "month_name": "October",
