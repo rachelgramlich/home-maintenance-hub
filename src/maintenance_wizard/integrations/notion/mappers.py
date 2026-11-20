@@ -18,11 +18,13 @@ def page_to_template(page: dict[str, Any]) -> Template:
     links_raw = nc.plain_text(props.get("Links JSON"))
     rel = nc.relation_ids(props.get("Contractor"))
     stable = nc.plain_text(props.get("Stable key"))
-    cadence_raw = (nc.select_name(props.get("Cadence")) or "Annual").lower()
-    if stable.endswith("|monthly"):
+    cadence_select = nc.select_name(props.get("Cadence"))
+    if cadence_select:
+        cadence = "monthly" if cadence_select.lower().startswith("month") else "annual"
+    elif stable.endswith("|monthly"):
         cadence = "monthly"
     else:
-        cadence = "monthly" if cadence_raw.startswith("month") else "annual"
+        cadence = "annual"
     return Template(
         task_id=page_id,
         name=nc.plain_text(props.get("Task")),

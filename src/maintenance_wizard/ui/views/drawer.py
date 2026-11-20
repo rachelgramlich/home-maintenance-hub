@@ -21,8 +21,8 @@ def task_context_fields(template: Template, period: str) -> list[tuple[str, str]
         ("Month slot", month_slot),
         ("Period", period),
     ]
-    if template.cadence == "monthly":
-        fields.append(("Cadence", "Monthly"))
+    cadence_label = "Monthly" if template.cadence == "monthly" else "Annual"
+    fields.append(("Cadence", cadence_label))
     return fields
 
 

@@ -92,6 +92,9 @@ normalize-task-titles *ARGS:
 notion-audit *ARGS:
     uv run python -m maintenance_wizard.scripts.notion_row_audit {{ARGS}}
 
+audit-cadence *ARGS:
+    uv run python -m maintenance_wizard.scripts.audit_task_cadence {{ARGS}}
+
 purge-inactive-duplicates *ARGS:
     uv run python -m maintenance_wizard.scripts.purge_inactive_duplicates {{ARGS}}
 
