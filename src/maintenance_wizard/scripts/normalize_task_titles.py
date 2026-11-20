@@ -1,4 +1,4 @@
-"""One-time / periodic backfill: strip trailing season parens from [MW] Tasks titles."""
+"""One-time / periodic backfill: normalize [MW] Tasks titles (season parens, month suffixes)."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from pathlib import Path
 from maintenance_wizard.config import get_settings
 from maintenance_wizard.integrations.notion import client as nc
 from maintenance_wizard.integrations.notion.mappers import page_to_template
-from maintenance_wizard.migration.names import strip_seasonal_parens
+from maintenance_wizard.migration.names import normalize_task_title
 
 LOG_PATH = Path("/opt/cursor/artifacts/notion-title-cleanup.log")
 
@@ -28,7 +28,7 @@ def normalize_task_titles(*, dry_run: bool) -> dict[str, int]:
     for page in nc.paginate_data_source(client, settings.notion_tasks_ds_id):
         tmpl = page_to_template(page)
         current = tmpl.name
-        cleaned = strip_seasonal_parens(current)
+        cleaned = normalize_task_title(current)
         if cleaned == current:
             stats["unchanged"] += 1
             continue
@@ -64,7 +64,7 @@ def normalize_task_titles(*, dry_run: bool) -> dict[str, int]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Strip trailing (fall)|(spring)|… from Notion [MW] Tasks titles",
+        description="Strip trailing (season) parens and — Month suffixes from Notion [MW] Tasks",
     )
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--apply", action="store_true", help="Apply updates (default is dry-run)")

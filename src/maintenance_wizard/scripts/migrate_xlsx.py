@@ -30,7 +30,7 @@ from maintenance_wizard.migration.keys import (
     month_number,
     stable_key,
 )
-from maintenance_wizard.migration.names import strip_seasonal_parens
+from maintenance_wizard.migration.names import normalize_task_title
 from maintenance_wizard.store.notion import NotionTaskStore
 
 DEPRECATED_DS = "d7cb0608-b694-4103-b3ce-65af4fc82d3c"
@@ -169,7 +169,7 @@ def read_deprecated_notion(client: Any) -> list[ImportRow]:
 def build_task_props(row: CatalogRow) -> dict[str, Any]:
     cadence_label = "Monthly" if row.cadence == "monthly" else "Annual"
     props: dict[str, Any] = {
-        "Task": nc.title_value(strip_seasonal_parens(row.task)),
+        "Task": nc.title_value(normalize_task_title(row.task)),
         "Month": nc.select_value(row.month),
         "Month #": nc.number_prop(row.month_num),
         "Area": nc.select_value(map_area(row.area)),
@@ -201,7 +201,7 @@ def catalog_rows_from_import(rows: list[ImportRow]) -> list[CatalogRow]:
             monthly_done.add(group)
             catalog.append(
                 CatalogRow(
-                    task=strip_seasonal_parens(plan.canonical_name),
+                    task=normalize_task_title(plan.canonical_name),
                     month=display_month_for_cadence("monthly", 1),
                     month_num=1,
                     area=row.area,
@@ -217,7 +217,7 @@ def catalog_rows_from_import(rows: list[ImportRow]) -> list[CatalogRow]:
         else:
             catalog.append(
                 CatalogRow(
-                    task=strip_seasonal_parens(row.task),
+                    task=normalize_task_title(row.task),
                     month=row.month,
                     month_num=row.month_num,
                     area=row.area,
@@ -267,7 +267,7 @@ def dedupe_monthly_slots(
         keeper_id = keeper.task_id
         mkey = monthly_stable_key(plan.canonical_name, keeper.area)
         props = {
-            "Task": nc.title_value(strip_seasonal_parens(plan.canonical_name)),
+            "Task": nc.title_value(normalize_task_title(plan.canonical_name)),
             "Month": nc.select_value("January"),
             "Month #": nc.number_prop(1),
             "Cadence": nc.select_value("Monthly"),
