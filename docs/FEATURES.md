@@ -1,4 +1,4 @@
-# Maintenance Wizard — feature scope
+# Home Maintenance Hub — feature scope
 
 **Product:** B & R Home Maintenance · **UI:** mockup C (monthly board + details drawer + Manage contractors)
 

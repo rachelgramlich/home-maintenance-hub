@@ -1,13 +1,13 @@
 name: Bug report
-description: Something is broken in Maintenance Wizard (not a backlog feature request)
-title: "[Maintenance Wizard] "
+description: Something is broken in Home Maintenance Hub (not a backlog feature request)
+title: "[Home Maintenance Hub] "
 labels:
   - bug
 body:
   - type: markdown
     attributes:
       value: |
-        For **new product work**, use **Maintenance Wizard enhancement** instead.
+        For **new product work**, use **Home Maintenance Hub enhancement** instead.
         Bugs are fixed via `/work-on-issue <issue-number>` (not the enhancement backlog list).
   - type: textarea
     id: description

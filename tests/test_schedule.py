@@ -1,12 +1,12 @@
 from datetime import date
 
-from maintenance_wizard.domain.board import build_month_board
-from maintenance_wizard.domain.schedule import (
+from home_maintenance_hub.domain.board import build_month_board
+from home_maintenance_hub.domain.schedule import (
     completion_page_title,
     task_applies_to_board,
     terminal_completion_exists,
 )
-from maintenance_wizard.models import Completion, Template, Urgency
+from home_maintenance_hub.models import Completion, Template, Urgency
 
 
 def _t(task_id: str, month: int, area: str = "HVAC", priority: str = "Medium") -> Template:

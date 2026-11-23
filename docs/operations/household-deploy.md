@@ -1,6 +1,6 @@
 # Household deploy (Streamlit Community Cloud)
 
-Ship **B & R Home Maintenance** as a private Streamlit Community Cloud app with **Google allowlist**, **Notion secrets server-side**, and **GitHub feedback inbox** (`user-feedback-inbox`). Matches the grocery-wizard household pattern (issue #4).
+Ship **B & R Home Maintenance** as a private Streamlit Community Cloud app with **Google allowlist**, **Notion secrets server-side**, and **GitHub feedback inbox** (`user-feedback-inbox`). Matches the grocery-hub household pattern (issue #4).
 
 ## Architecture
 
@@ -20,7 +20,7 @@ flowchart LR
 
 ### 1. Google OAuth
 
-Reuse the **same Google Cloud OAuth Web client** as grocery-wizard. Add redirect URIs:
+Reuse the **same Google Cloud OAuth Web client** as grocery-hub. Add redirect URIs:
 
 | App | Redirect URI |
 | --- | --- |
@@ -31,29 +31,29 @@ Each app needs its own `[auth].redirect_uri` and a **new** `cookie_secret` in Cl
 
 ### 2. Streamlit Community Cloud app
 
-1. Connect `rachelgramlich/maintenance-wizard`, branch `main`.
-2. **Main file path:** `src/maintenance_wizard/ui/app.py`.
+1. Connect `rachelgramlich/home-maintenance-hub`, branch `main`.
+2. **Main file path:** `src/home_maintenance_hub/ui/app.py`.
 3. Private app; paste **Secrets** TOML (shape: root `secrets.toml.example`).
 
 | Secret | Purpose |
 | --- | --- |
-| `NOTION_*`, `MAINTENANCE_WIZARD_*` | Notion store (see `docs/NOTION_SETUP.md`) |
-| `MAINTENANCE_WIZARD_STORE` | `notion` |
+| `NOTION_*`, `HOME_MAINTENANCE_HUB_*` | Notion store (see `docs/NOTION_SETUP.md`) |
+| `HOME_MAINTENANCE_HUB_STORE` | `notion` |
 | `[auth]` | Google OIDC (`client_id`, `client_secret`, `redirect_uri`, `cookie_secret`, `server_metadata_url`) |
-| `MAINTENANCE_WIZARD_REQUIRE_AUTH` | `true` |
-| `MAINTENANCE_WIZARD_AUTH_EMAIL_ALLOWLIST` | Comma-separated household emails |
-| `GITHUB_FEEDBACK_REPOSITORY` | `rachelgramlich/maintenance-wizard` |
+| `HOME_MAINTENANCE_HUB_REQUIRE_AUTH` | `true` |
+| `HOME_MAINTENANCE_HUB_AUTH_EMAIL_ALLOWLIST` | Comma-separated household emails |
+| `GITHUB_FEEDBACK_REPOSITORY` | `rachelgramlich/home-maintenance-hub` |
 | `GITHUB_FEEDBACK_TOKEN` | Fine-grained PAT, **issues:write** on this repo only |
 
-**Local:** copy `secrets.toml.example` → `secrets.toml`, run `just link-secrets`. Default `MAINTENANCE_WIZARD_REQUIRE_AUTH = false`.
+**Local:** copy `secrets.toml.example` → `secrets.toml`, run `just link-secrets`. Default `HOME_MAINTENANCE_HUB_REQUIRE_AUTH = false`.
 
 **Deps:** `streamlit[auth]` in `pyproject.toml` — run `just setup` / `uv sync` after pull.
 
 ### 3. GitHub feedback PAT
 
-Create a **fine-grained** PAT: repository `maintenance-wizard`, permission **Issues → Read and write**. Paste as `GITHUB_FEEDBACK_TOKEN` in Cloud Secrets → **Reboot app**.
+Create a **fine-grained** PAT: repository `home-maintenance-hub`, permission **Issues → Read and write**. Paste as `GITHUB_FEEDBACK_TOKEN` in Cloud Secrets → **Reboot app**.
 
-Verify: submit **Send feedback** → `gh issue list --label user-feedback-inbox --repo rachelgramlich/maintenance-wizard`.
+Verify: submit **Send feedback** → `gh issue list --label user-feedback-inbox --repo rachelgramlich/home-maintenance-hub`.
 
 ## Manual smoke (after deploy)
 
@@ -68,7 +68,7 @@ Verify: submit **Send feedback** → `gh issue list --label user-feedback-inbox 
 
 | Setting | Local `just ui` | Cloud |
 | --- | --- | --- |
-| `MAINTENANCE_WIZARD_REQUIRE_AUTH` | `false` | `true` |
+| `HOME_MAINTENANCE_HUB_REQUIRE_AUTH` | `false` | `true` |
 | Store | `local` or `notion` | `notion` |
 | Feedback | GitHub when token set | GitHub |
 
@@ -79,6 +79,6 @@ Verify: submit **Send feedback** → `gh issue list --label user-feedback-inbox 
 | OAuth redirect mismatch | Match `[auth].redirect_uri` to Google Console and Cloud URL |
 | `StreamlitMissingAuthlibError` | `uv sync` / `just setup` for `streamlit[auth]` |
 | Feedback failures | Check `GITHUB_FEEDBACK_TOKEN` in Secrets; reboot app |
-| “Not authorized” after login | Add email to `MAINTENANCE_WIZARD_AUTH_EMAIL_ALLOWLIST` |
+| “Not authorized” after login | Add email to `HOME_MAINTENANCE_HUB_AUTH_EMAIL_ALLOWLIST` |
 
 See also [docs/DEPLOYMENT.md](../DEPLOYMENT.md).

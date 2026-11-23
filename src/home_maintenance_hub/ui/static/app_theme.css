@@ -1,0 +1,571 @@
+/* Home Maintenance Hub — lavender theme (Grocery Hub contrast pattern). */
+
+:root {
+    --mw-bg: #e6e0f2;
+    --mw-text: #3a2849;
+    --mw-text-muted: #5a4868;
+    --mw-input-bg: #f8f6fc;
+    --mw-accent: #6341a5;
+    --mw-blue: #c8d8f0;
+    --mw-blue-strong: #7ba3d4;
+    --mw-blue-text: #1e3d5c;
+    --mw-card-bg: #ffffff;
+    --mw-border: #a894c8;
+    --mw-overdue: #b71c3a;
+    --mw-overdue-bg: #fce8ec;
+}
+
+html {
+    color-scheme: light;
+}
+
+.stApp {
+    background-color: var(--mw-bg);
+    color: var(--mw-text);
+}
+
+[data-testid="stSidebar"] {
+    background-color: var(--mw-input-bg);
+    border-right: 1px solid var(--mw-border);
+    min-width: 17.5rem;
+}
+
+[data-testid="stSidebar"] > div:first-child {
+    width: 17.5rem;
+    min-width: 17.5rem;
+}
+
+.stApp h1, .stApp h2, .stApp h3, .stApp label,
+.stApp [data-testid="stMarkdownContainer"] p,
+.stApp [data-testid="stWidgetLabel"] p {
+    color: var(--mw-text);
+}
+
+.stApp [data-testid="stCaptionContainer"],
+.stApp .stCaption {
+    color: var(--mw-text-muted);
+}
+
+[data-testid="stMetric"] {
+    background: var(--mw-card-bg);
+    border: 1px solid var(--mw-border);
+    border-radius: 12px;
+    padding: 0.65rem 0.9rem;
+    box-shadow: 0 1px 3px rgba(58, 40, 73, 0.08);
+}
+
+[data-testid="stMetricLabel"] {
+    color: var(--mw-text-muted) !important;
+    font-size: 0.8rem !important;
+}
+
+[data-testid="stMetricValue"] {
+    color: var(--mw-text) !important;
+    font-weight: 700 !important;
+}
+
+[data-testid="stTextInputRootElement"],
+[data-testid="stNumberInputContainer"],
+[data-testid="stMultiSelect"] div:has([data-testid="stMultiSelectTagsContainer"]),
+[data-testid="stSelectbox"] div:has(button[aria-label="Open"]) {
+    background-color: var(--mw-input-bg) !important;
+    border-color: var(--mw-border) !important;
+    border-radius: 8px !important;
+}
+
+[data-testid="stTextInputField"],
+.stTextInput input {
+    background-color: transparent !important;
+    color: var(--mw-text) !important;
+    -webkit-text-fill-color: var(--mw-text) !important;
+}
+
+.stTextInput input::placeholder {
+    color: var(--mw-text-muted) !important;
+    opacity: 0.75 !important;
+}
+
+/* Buttons — mirror grocery-hub label/fill rules (Streamlit 1.6x). */
+.stButton button[kind="primary"],
+.stButton button[kind^="primary"],
+.stButton button[data-testid^="stBaseButton-primary"],
+.stButton button[data-testid^="baseButton-primary"] {
+    background-color: var(--mw-accent) !important;
+    border-color: var(--mw-accent) !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    min-height: 2.5rem !important;
+}
+
+.stButton button[kind="primary"] *,
+.stButton button[kind^="primary"] *,
+.stButton button[data-testid^="stBaseButton-primary"] *,
+.stButton button[data-testid^="baseButton-primary"] *,
+.stButton button[kind="primary"] p,
+.stButton button[kind^="primary"] p,
+.stButton button[data-testid^="stBaseButton-primary"] p {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+.stButton button[kind="secondary"],
+.stButton button[kind^="secondary"],
+.stButton button[data-testid^="stBaseButton-secondary"],
+.stButton button[data-testid^="baseButton-secondary"] {
+    background-color: var(--mw-input-bg) !important;
+    border: 1px solid var(--mw-border) !important;
+    color: var(--mw-text) !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    min-height: 2.5rem !important;
+}
+
+.stButton button[kind="secondary"] *,
+.stButton button[kind^="secondary"] *,
+.stButton button[data-testid^="stBaseButton-secondary"] *,
+.stButton button[data-testid^="baseButton-secondary"] *,
+.stButton button[kind="secondary"] p,
+.stButton button[kind^="secondary"] p {
+    color: var(--mw-text) !important;
+    -webkit-text-fill-color: var(--mw-text) !important;
+    font-weight: 600 !important;
+}
+
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell) .stButton {
+    margin-top: 0;
+}
+
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
+    [data-testid="column"]:has(.mw-card-details-anchor) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-start;
+}
+
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
+    [data-testid="column"]:has(.mw-card-details-anchor)
+    .stButton
+    button {
+    background: transparent !important;
+    border: none !important;
+    color: var(--mw-accent) !important;
+    font-weight: 600 !important;
+    min-height: auto !important;
+    padding: 0.15rem 0.35rem !important;
+    box-shadow: none !important;
+}
+
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
+    [data-testid="column"]:has(.mw-card-details-anchor)
+    .stButton
+    button
+    p {
+    color: var(--mw-accent) !important;
+    -webkit-text-fill-color: var(--mw-accent) !important;
+}
+
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
+    [data-testid="column"]:has(.mw-card-details-anchor)
+    .stButton
+    button:hover {
+    text-decoration: underline;
+    background: transparent !important;
+}
+
+.block-container {
+    max-width: 80rem;
+    padding-top: 1.5rem;
+    padding-bottom: 3rem;
+}
+
+.mw-badge-progress {
+    display: inline-flex;
+    align-items: center;
+    background: var(--mw-blue-strong);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.25rem 0.55rem;
+    border-radius: 4px;
+    white-space: nowrap;
+    align-self: flex-start;
+}
+
+.mw-in-progress {
+    border-left: 4px solid var(--mw-blue-strong);
+}
+
+.mw-hero {
+    margin-bottom: 1.25rem;
+}
+
+.mw-hero h1 {
+    font-size: 1.85rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.25rem 0;
+    color: var(--mw-text);
+}
+
+.mw-hero-month {
+    margin: 0.35rem 0 0;
+    color: var(--mw-text);
+    font-size: 1.45rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+}
+
+/* Marker for Streamlit bordered cards — keep content visible (no display:none). */
+.mw-task-shell {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Open task cards only — scoped via .mw-task-shell */
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell) {
+    background: var(--mw-card-bg) !important;
+    border-color: var(--mw-border) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 1px 3px rgba(58, 40, 73, 0.07);
+    margin-bottom: 1rem;
+    padding: 0.5rem 0.65rem 0.85rem;
+}
+
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-overdue.mw-task--open) {
+    border-color: var(--mw-overdue) !important;
+    border-left-width: 4px !important;
+    background: linear-gradient(90deg, var(--mw-overdue-bg) 0%, var(--mw-card-bg) 48%) !important;
+}
+
+.mw-task-card {
+    background: var(--mw-card-bg);
+    border: 1px solid var(--mw-border);
+    border-radius: 14px;
+    padding: 1rem 1.1rem;
+    margin-bottom: 0.85rem;
+    box-shadow: 0 1px 3px rgba(58, 40, 73, 0.07);
+}
+
+.mw-task-card.mw-overdue {
+    border-color: var(--mw-overdue);
+    border-left-width: 4px;
+    background: linear-gradient(90deg, var(--mw-overdue-bg) 0%, var(--mw-card-bg) 48%);
+}
+
+.mw-task {
+    background: transparent;
+    border: none;
+    padding: 0.25rem 0.5rem 0;
+}
+
+.mw-task.mw-done,
+.mw-task.mw-wont {
+    opacity: 0.88;
+}
+
+.mw-task-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--mw-text);
+    margin: 0.35rem 0 0.2rem;
+}
+
+.mw-last {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--mw-text-muted);
+    font-style: italic;
+}
+
+.mw-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 3px 9px;
+    border-radius: 6px;
+}
+
+.mw-badge-overdue {
+    background: var(--mw-overdue);
+    color: #ffffff;
+}
+
+.mw-sidebar-brand {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--mw-text);
+    line-height: 1.35;
+    padding: 0.25rem 0 0.5rem;
+}
+
+.mw-brand-icon {
+    font-size: 1.1rem;
+}
+
+.mw-month-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: var(--mw-accent);
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0.45rem 0.75rem;
+    border-radius: 999px;
+    margin: 0.35rem 0 0.85rem;
+    box-shadow: 0 1px 2px rgba(58, 40, 73, 0.12);
+}
+
+.mw-board-month {
+    font-size: 1.65rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.35rem;
+    color: var(--mw-text);
+}
+
+.mw-stats-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0.5rem 0 0.25rem;
+}
+
+.mw-stat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.35rem 0.65rem;
+    border-radius: 999px;
+    border: 1px solid var(--mw-border);
+    background: var(--mw-card-bg);
+}
+
+.mw-stat-overdue {
+    border-color: var(--mw-overdue);
+    background: var(--mw-overdue-bg);
+    color: var(--mw-overdue);
+}
+
+.mw-stat-progress {
+    border-color: var(--mw-blue-strong);
+    background: var(--mw-blue);
+    color: var(--mw-blue-text);
+}
+
+.mw-stat-open {
+    border-color: var(--mw-accent);
+    background: var(--mw-input-bg);
+    color: var(--mw-text);
+}
+
+.mw-sort-caption {
+    font-size: 0.75rem;
+    color: var(--mw-text-muted);
+    margin: 0 0 1rem;
+}
+
+.mw-priority-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 3px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.mw-priority-high {
+    background: var(--mw-overdue);
+    color: #fff;
+}
+
+.mw-priority-medium {
+    background: var(--mw-accent);
+    color: #fff;
+}
+
+.mw-priority-low {
+    background: var(--mw-input-bg);
+    color: var(--mw-text-muted);
+    border: 1px solid var(--mw-border);
+}
+
+.mw-card-head {
+    display: flex;
+    gap: 0.65rem;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.mw-card-head-left {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
+    > [data-testid="stVerticalBlock"]
+    > [data-testid="stHorizontalBlock"]:first-child {
+    align-items: center !important;
+}
+
+.mw-status-icon {
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1rem;
+}
+
+.mw-status-overdue {
+    background: var(--mw-overdue);
+    color: #fff;
+}
+
+.mw-status-progress {
+    background: var(--mw-blue-strong);
+    color: #fff;
+}
+
+.mw-status-open {
+    background: var(--mw-input-bg);
+    color: var(--mw-accent);
+    border: 1px solid var(--mw-border);
+}
+
+.mw-card-head-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.mw-title-row {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.mw-title-row .mw-task-title {
+    margin: 0;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* Drawer column — Streamlit widgets cannot nest in a single HTML wrapper div. */
+[data-testid="stHorizontalBlock"]:has(> [data-testid="column"] .mw-drawer-root)
+    > [data-testid="column"]:last-child {
+    background: var(--mw-card-bg);
+    border: 1px solid var(--mw-border);
+    border-radius: 14px;
+    padding: 0.75rem 1rem 1.25rem;
+    box-shadow: 0 1px 4px rgba(58, 40, 73, 0.08);
+}
+
+.mw-drawer-root {
+    display: none;
+}
+
+.mw-drawer-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem 0.75rem;
+    margin-bottom: 0.35rem;
+}
+
+.mw-drawer-header .mw-drawer-task-title {
+    margin-bottom: 0;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.mw-drawer-fields {
+    display: grid;
+    grid-template-columns: minmax(5.5rem, 38%) 1fr;
+    gap: 0.35rem 0.65rem;
+    margin: 0.15rem 0 0.5rem;
+    font-size: 0.84rem;
+    line-height: 1.4;
+}
+
+.mw-drawer-field {
+    display: contents;
+}
+
+.mw-drawer-field-label {
+    color: var(--mw-text-muted);
+    font-weight: 600;
+}
+
+.mw-drawer-field-value {
+    color: var(--mw-text);
+    word-break: break-word;
+}
+
+.mw-drawer-empty {
+    color: var(--mw-text-muted);
+    font-size: 0.84rem;
+    margin: 0;
+}
+
+.mw-badge-open {
+    background: #ede8f4;
+    color: var(--mw-text-muted);
+}
+
+.mw-badge-done {
+    background: #d4edda;
+    color: #1e5f32;
+}
+
+.mw-badge-wont {
+    background: #f0e8e8;
+    color: #6b4a4a;
+}
+
+.mw-drawer-section-title {
+    margin: 0.85rem 0 0.35rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid var(--mw-border);
+    font-size: 0.95rem;
+    color: var(--mw-text);
+}
+
+.mw-drawer-section-title.mw-drawer-section-title--first {
+    margin-top: 0.35rem;
+    padding-top: 0;
+    border-top: none;
+}
+
+#MainMenu, footer, [data-testid="stToolbar"] {
+    visibility: hidden;
+    height: 0;
+}
+.mw-drawer-task-title {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--mw-text);
+}

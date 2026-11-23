@@ -115,7 +115,7 @@ For selected `(year, month)`:
 
 ## 4. Notion API
 
-- Use Notion API 2025 **data source** pattern (as grocery-wizard `NotionRecipesDB`).
+- Use Notion API 2025 **data source** pattern (as grocery-hub `NotionRecipesDB`).
 - Property read/write for: title, select, status, date, checkbox, relation.
 - Pagination on all queries.
 - Cache in Streamlit `@st.cache_data(ttl=60)` for catalog; invalidate on write.
@@ -195,7 +195,7 @@ python-dotenv>=1.0
 pandas>=2.0   # migration only
 ```
 
-Python `>=3.12,<3.13` to match grocery-wizard.
+Python `>=3.12,<3.13` to match grocery-hub.
 
 ---
 

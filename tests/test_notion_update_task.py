@@ -6,10 +6,10 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from maintenance_wizard.config import Settings, get_settings
-from maintenance_wizard.integrations.notion import client as nc
-from maintenance_wizard.models import TaskLink, Template
-from maintenance_wizard.store.notion import NotionTaskStore
+from home_maintenance_hub.config import Settings, get_settings
+from home_maintenance_hub.integrations.notion import client as nc
+from home_maintenance_hub.models import TaskLink, Template
+from home_maintenance_hub.store.notion import NotionTaskStore
 
 
 def _notion_page_from_template(t: Template) -> dict:
@@ -38,11 +38,11 @@ def _notion_page_from_template(t: Template) -> dict:
 
 @pytest.fixture
 def notion_settings(monkeypatch: pytest.MonkeyPatch) -> Settings:
-    monkeypatch.setenv("MAINTENANCE_WIZARD_STORE", "notion")
+    monkeypatch.setenv("HOME_MAINTENANCE_HUB_STORE", "notion")
     monkeypatch.setenv("NOTION_API_KEY", "secret_test")
-    monkeypatch.setenv("MAINTENANCE_WIZARD_NOTION_TASKS_DS_ID", "tasks-ds")
-    monkeypatch.setenv("MAINTENANCE_WIZARD_NOTION_CONTRACTORS_DS_ID", "ctr-ds")
-    monkeypatch.setenv("MAINTENANCE_WIZARD_NOTION_COMPLETIONS_DS_ID", "cmp-ds")
+    monkeypatch.setenv("HOME_MAINTENANCE_HUB_NOTION_TASKS_DS_ID", "tasks-ds")
+    monkeypatch.setenv("HOME_MAINTENANCE_HUB_NOTION_CONTRACTORS_DS_ID", "ctr-ds")
+    monkeypatch.setenv("HOME_MAINTENANCE_HUB_NOTION_COMPLETIONS_DS_ID", "cmp-ds")
     get_settings.cache_clear()
     yield get_settings()
     get_settings.cache_clear()

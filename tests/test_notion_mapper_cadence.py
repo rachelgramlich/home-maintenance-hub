@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from maintenance_wizard.integrations.notion.mappers import page_to_template
+from home_maintenance_hub.integrations.notion.mappers import page_to_template
 
 
 def _task_page(

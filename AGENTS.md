@@ -1,41 +1,41 @@
-# Agent instructions (maintenance_wizard)
+# Agent instructions (home_maintenance_hub)
 
 ## Issues (slash commands = primary UX)
 
 | You type | Purpose |
 | --- | --- |
 | **`/create-issues`** | One or more notes → auto **bug vs backlog**, merge by **code area**, create GitHub issue(s) via **`gh`** |
-| **`/app-review`** | Hands-on Streamlit UAT → findings → optional grouped **`gh`** issues (`.cursor/commands/maintenance-wizard/app-review.md`) |
-| **`/app-smoke`** | Holistic headless + browser sign-off before UI work is done (`.cursor/commands/maintenance-wizard/app-smoke.md`) |
+| **`/app-review`** | Hands-on Streamlit UAT → findings → optional grouped **`gh`** issues (`.cursor/commands/home-maintenance-hub/app-review.md`) |
+| **`/app-smoke`** | Holistic headless + browser sign-off before UI work is done (`.cursor/commands/home-maintenance-hub/app-smoke.md`) |
 | **`/architecture-review`** | Standards audit + optional **`audit`** issues (shared: `.cursor/commands/shared/architecture-review.md`) |
-| **`/list-enhancements`** | Open backlog (`maintenance-wizard` label) via **`gh`** (`.cursor/commands/maintenance-wizard/list-enhancements.md`) |
+| **`/list-enhancements`** | Open backlog (`home-maintenance-hub` label) via **`gh`** (`.cursor/commands/home-maintenance-hub/list-enhancements.md`) |
 | **`/work-on-issue N`** | Implement one issue — area → files and UAT rules **below** + shared `.cursor/commands/shared/work-on-issue.md` |
 | **`/tidy-project`** | Repo-wide structure-only tidy PR(s) (shared: `.cursor/commands/shared/tidy-project.md`) |
 | **`/create-command`** | Add slash command or skill without name collisions (shared: `.cursor/commands/shared/create-command.md`) |
 | *(automatic)* **`tidy-first` skill** | While implementing work: tidy inline, **S** vs **B** in separate commits |
 
-**Layout:** [rg-ai](https://github.com/rachelgramlich/rg-ai) **git submodule** at **`.cursor/rg-ai`** (private). Shared slash files via **`.cursor/commands/shared/`** → `.cursor/rg-ai/.cursor/commands`. Maintenance-only commands in **`.cursor/commands/maintenance-wizard/`**. After clone or new worktree: **`git submodule update --init --recursive`** once if `/` doesn’t list shared commands — **your Mac only**; GitHub Actions sets **`submodules: false`** (see `.github/workflows/ci.yml`) because `just ci` does not need rg-ai.
+**Layout:** [rg-ai](https://github.com/rachelgramlich/rg-ai) **git submodule** at **`.cursor/rg-ai`** (private). Shared slash files via **`.cursor/commands/shared/`** → `.cursor/rg-ai/.cursor/commands`. Maintenance-only commands in **`.cursor/commands/home-maintenance-hub/`**. After clone or new worktree: **`git submodule update --init --recursive`** once if `/` doesn’t list shared commands — **your Mac only**; GitHub Actions sets **`submodules: false`** (see `.github/workflows/ci.yml`) because `just ci` does not need rg-ai.
 
 ### Labels and areas (for `/create-issues`, `/work-on-issue`)
 
 | Item | Value |
 | --- | --- |
-| **Backlog label** | `maintenance-wizard` |
+| **Backlog label** | `home-maintenance-hub` |
 | **Bug label** | `bug` |
 | **Area labels** | `mw-area-ui`, `mw-area-store`, `mw-area-domain`, `mw-area-notion`, `mw-area-other` |
-| **List backlog** | **`/list-enhancements`** or `gh issue list --label maintenance-wizard --state open` |
+| **List backlog** | **`/list-enhancements`** or `gh issue list --label home-maintenance-hub --state open` |
 | **Verify** | `just check` (includes holistic UI smoke tests) |
 | **Holistic UI smoke** | `just smoke-ui` (headless AppTest; local JSON store in CI) |
 
-**Enhancement create example:** `gh issue create … --label maintenance-wizard --label mw-area-ui` with template sections **Description**, **Expected behavior & manual test hints**, **Area**.
+**Enhancement create example:** `gh issue create … --label home-maintenance-hub --label mw-area-ui` with template sections **Description**, **Expected behavior & manual test hints**, **Area**.
 
 **Area → files (read first):**
 
 | Area | Files |
 | --- | --- |
-| **ui** | `src/maintenance_wizard/ui/app.py`, `styles.py`, `theme.py`, `static/app_theme.css` |
-| **store** | `src/maintenance_wizard/store/` |
-| **domain** | `src/maintenance_wizard/domain/` |
+| **ui** | `src/home_maintenance_hub/ui/app.py`, `styles.py`, `theme.py`, `static/app_theme.css` |
+| **store** | `src/home_maintenance_hub/store/` |
+| **domain** | `src/home_maintenance_hub/domain/` |
 | **notion** | `docs/NOTION_SETUP.md` (integration TBD in code) |
 | **other** | skim issue + grep |
 
@@ -48,7 +48,7 @@ Area from label `mw-area-<name>` or `### Area` in the issue body.
 **Local preflight:**
 
 ```bash
-just init-local-data && PYTHONPATH=src uv run python -c "from maintenance_wizard.config import get_settings; get_settings(); print('config ok')"
+just init-local-data && PYTHONPATH=src uv run python -c "from home_maintenance_hub.config import get_settings; get_settings(); print('config ok')"
 ```
 
 **Browser smoke:** with **notion** store, start **`just ui`** and walk month picker, filters, Done / Won't do against your workspace. Default **local** store: confirm task cards render after `just init-local-data`.

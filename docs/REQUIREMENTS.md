@@ -4,7 +4,7 @@
 
 **Status:** Historical requirements + open product ideas  
 **Product:** Streamlit **monthly maintenance board** on Notion (task catalog, completions, contractors)  
-**Repo:** `maintenance-wizard`
+**Repo:** `home-maintenance-hub`
 
 ---
 
@@ -136,7 +136,7 @@ One row per **(template, period)** when the task is in play for that period.
 |--------|-------------|
 | FR-X1 | Env: `NOTION_API_KEY`, `NOTION_TASK_CATALOG_DATABASE_ID`, `NOTION_PERIOD_RECORDS_DATABASE_ID`. |
 | FR-X2 | Timezone default `America/New_York`. No due-soon days setting. |
-| FR-X3 | Local dev without auth; Cloud deploy with Google allowlist (parity with grocery-wizard). |
+| FR-X3 | Local dev without auth; Cloud deploy with Google allowlist (parity with grocery-hub). |
 
 ### 6.6 Migration
 
@@ -184,7 +184,7 @@ erDiagram
 | NFR1 | Notion API errors shown clearly; no silent data loss. |
 | NFR2 | Idempotent migration (re-run safe on title+area key). |
 | NFR3 | Unit tests for scheduling/carry-over without live Notion. |
-| NFR4 | Python 3.12, `uv`/`just`, ruff/pytest (lightweight vs grocery-wizard). |
+| NFR4 | Python 3.12, `uv`/`just`, ruff/pytest (lightweight vs grocery-hub). |
 | NFR5 | Personal data never committed to git. |
 
 ---
@@ -222,7 +222,7 @@ Streamlit **does not run in the background**. When the browser tab is closed, th
 
 | | |
 |--|--|
-| **Feasibility** | High — same pattern as grocery-wizard’s Notion CI workflows; secrets in GitHub. |
+| **Feasibility** | High — same pattern as grocery-hub’s Notion CI workflows; secrets in GitHub. |
 | **Pros** | One **weekly digest** email (“3 overdue, 2 due this week”); full control of copy and cadence. |
 | **Cons** | Requires email provider account + API key maintenance; GitHub Actions minute usage; not true “push at 9am on due day” unless you tune cron. |
 | **Engineering** | ~1 workflow + `scripts/send_reminders.py` + dedupe state (e.g. “last_reminded_at” on row or KV in repo). |
