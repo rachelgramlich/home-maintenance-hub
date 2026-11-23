@@ -1,5 +1,5 @@
 blank_issues_enabled: true
 contact_links:
   - name: Agent backlog instructions
-    url: https://github.com/rachelgramlich/maintenance-wizard/blob/main/AGENTS.md
-    about: How agents add and ship Maintenance Wizard enhancements (GitHub Issues + PR workflow)
+    url: https://github.com/rachelgramlich/home-maintenance-hub/blob/main/AGENTS.md
+    about: How agents add and ship Home Maintenance Hub enhancements (GitHub Issues + PR workflow)

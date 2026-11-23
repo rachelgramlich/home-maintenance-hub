@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from maintenance_wizard.domain.display import display_task_name
-from maintenance_wizard.migration.names import strip_seasonal_parens
-from maintenance_wizard.scripts.migrate_xlsx import CatalogRow, build_task_props
+from home_maintenance_hub.domain.display import display_task_name
+from home_maintenance_hub.migration.names import strip_seasonal_parens
+from home_maintenance_hub.scripts.migrate_xlsx import CatalogRow, build_task_props
 
 
 def test_strip_seasonal_parens_trailing() -> None:

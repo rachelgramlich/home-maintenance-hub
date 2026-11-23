@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from maintenance_wizard.domain.display import display_task_name
+from home_maintenance_hub.domain.display import display_task_name
 
 
 def test_strips_trailing_season_parentheticals() -> None:

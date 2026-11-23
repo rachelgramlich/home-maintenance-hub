@@ -1,14 +1,14 @@
 from datetime import date
 
-from maintenance_wizard.domain.board import build_month_board
-from maintenance_wizard.domain.schedule import board_period_for_task, task_applies_to_board
-from maintenance_wizard.migration.cadence import (
+from home_maintenance_hub.domain.board import build_month_board
+from home_maintenance_hub.domain.schedule import board_period_for_task, task_applies_to_board
+from home_maintenance_hub.migration.cadence import (
     canonical_group_key,
     infer_cadence_plans,
     monthly_stable_key,
     strip_month_suffix,
 )
-from maintenance_wizard.models import Completion, Template, Urgency
+from home_maintenance_hub.models import Completion, Template, Urgency
 
 
 def test_strip_month_suffix() -> None:

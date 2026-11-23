@@ -6,7 +6,7 @@ import json
 from datetime import date
 from pathlib import Path
 
-from maintenance_wizard.scripts.import_completions import CHECKED, DEFAULT_YEAR, CompletionSpec
+from home_maintenance_hub.scripts.import_completions import CHECKED, DEFAULT_YEAR, CompletionSpec
 
 _FIXTURE = Path(__file__).resolve().parent / "fixtures" / "screenshot_completions.json"
 

@@ -1,4 +1,4 @@
-from maintenance_wizard.migration.keys import map_area, map_type, stable_key
+from home_maintenance_hub.migration.keys import map_area, map_type, stable_key
 
 
 def test_stable_key_normalizes() -> None:

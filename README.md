@@ -1,8 +1,8 @@
-# maintenance-wizard
+# home-maintenance-hub
 
 **B & R Home Maintenance** — monthly checklist (**In progress** / **Done** / **Won't do**), overdue carry-over, contractors, details drawer. Notion-backed.
 
-Repository: https://github.com/rachelgramlich/maintenance-wizard
+Repository: https://github.com/rachelgramlich/home-maintenance-hub
 
 - **v1:** Streamlit + **Notion** (three databases), or **local JSON** for dev/tests
 - **v2:** Google Calendar reminders (not implemented yet)
@@ -27,12 +27,12 @@ Copy `.env.example` → `.env` or `secrets.toml.example` → `secrets.toml`.
 
 | Variable | Default | Meaning |
 |----------|---------|---------|
-| `MAINTENANCE_WIZARD_STORE` | `local` | `local` or `notion` |
+| `HOME_MAINTENANCE_HUB_STORE` | `local` | `local` or `notion` |
 | `NOTION_API_KEY` | — | Notion integration token |
-| `MAINTENANCE_WIZARD_NOTION_*_DS_ID` | — | Data source IDs (tasks, contractors, completions) |
-| `MAINTENANCE_WIZARD_TIMEZONE` | `America/New_York` | Month boundaries |
+| `HOME_MAINTENANCE_HUB_NOTION_*_DS_ID` | — | Data source IDs (tasks, contractors, completions) |
+| `HOME_MAINTENANCE_HUB_TIMEZONE` | `America/New_York` | Month boundaries |
 
-Local data file: `.local/maintenance_wizard/data.json` (gitignored).
+Local data file: `.local/home_maintenance_hub/data.json` (gitignored).
 
 ## Deploy (Streamlit Cloud)
 
@@ -47,7 +47,7 @@ just migrate-xlsx --xlsx /path/to/Ocala.xlsx   # Home Maintenance tab
 just migrate-xlsx --dry-run
 ```
 
-Set `MAINTENANCE_WIZARD_STORE=notion` for production UI. Use **local** for offline dev/CI.
+Set `HOME_MAINTENANCE_HUB_STORE=notion` for production UI. Use **local** for offline dev/CI.
 
 ## Development
 
@@ -66,4 +66,4 @@ just pre-commit # all pre-commit hooks
 
 ### Cursor (optional)
 
-Backlog: GitHub Issues (label `maintenance-wizard`). Follow [AGENTS.md](AGENTS.md). Slash commands under **`.cursor/commands/`** (shared via **rg-ai** submodule). Do not commit `.cursor/mcp.json`.
+Backlog: GitHub Issues (label `home-maintenance-hub`). Follow [AGENTS.md](AGENTS.md). Slash commands under **`.cursor/commands/`** (shared via **rg-ai** submodule). Do not commit `.cursor/mcp.json`.

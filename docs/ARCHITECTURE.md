@@ -1,7 +1,7 @@
-# Maintenance Wizard — architecture
+# Home Maintenance Hub — architecture
 
 **Product:** **B & R Home Maintenance**  
-**Repo:** `maintenance-wizard` · **Package:** `maintenance_wizard`
+**Repo:** `home-maintenance-hub` · **Package:** `home_maintenance_hub`
 
 **Stack (locked):** **Python 3.12** · **Streamlit** (monthly board UX) · **Notion** (source of truth) · develop in **Cursor** with `just` / `uv` / `pytest`.
 
@@ -78,9 +78,9 @@ Streamlit does **not** run background jobs. Reminders are **v2 (GCal)** or optio
 1. Create a Notion **teamspace page** (e.g. “B & R Home Maintenance”).
 2. Create three databases (§3); note each **database ID** and **data source ID** (API).
 3. Create an **internal integration**; share all three databases with it.
-4. Set env vars (§9): `NOTION_API_KEY`, three data source IDs (or database IDs per grocery-wizard pattern).
+4. Set env vars (§9): `NOTION_API_KEY`, three data source IDs (or database IDs per grocery-hub pattern).
 5. Run migration dry-run, then apply.
-6. Smoke-test: `just ui` with `MAINTENANCE_WIZARD_STORE=notion`.
+6. Smoke-test: `just ui` with `HOME_MAINTENANCE_HUB_STORE=notion`.
 
 **Live workspace IDs:** see [NOTION_SETUP.md](./NOTION_SETUP.md) (hub page + three data source IDs created 2026-11-19).
 
@@ -204,7 +204,7 @@ erDiagram
 
 There is **no “due soon” state** and no `due_soon_days` window. Tasks are scheduled by **month**, not by a day inside the month, so urgency does not change as the calendar month runs out.
 
-Month boundaries use `MAINTENANCE_WIZARD_TIMEZONE` (default `America/New_York`).
+Month boundaries use `HOME_MAINTENANCE_HUB_TIMEZONE` (default `America/New_York`).
 
 ### 4.4 Sort order
 
@@ -246,7 +246,7 @@ Month boundaries use `MAINTENANCE_WIZARD_TIMEZONE` (default `America/New_York`).
 Pure Python — **no Notion imports**.
 
 ```
-src/maintenance_wizard/
+src/home_maintenance_hub/
   models.py          # Template, Contractor, Completion, BoardTask, Urgency, …
   domain/
     schedule.py      # month matching, period keys, overdue
@@ -289,14 +289,14 @@ class MaintenanceStore(Protocol):
     def upsert_contractor(self, contractor: Contractor) -> None: ...
 ```
 
-| `MAINTENANCE_WIZARD_STORE` | Use |
+| `HOME_MAINTENANCE_HUB_STORE` | Use |
 |----------------------------|-----|
 | `local` | `.local/.../data.json` — default CI and fast UI dev |
 | `notion` | Production |
 
 Google Sheets backend removed (v1 uses **local JSON** or **Notion** only).
 
-**Notion client:** Follow **Notion API 2025 data source** pattern (same approach as grocery-wizard): resolve data source ID, paginate queries, map select enums strictly, surface API errors in Streamlit (NFR1).
+**Notion client:** Follow **Notion API 2025 data source** pattern (same approach as grocery-hub): resolve data source ID, paginate queries, map select enums strictly, surface API errors in Streamlit (NFR1).
 
 ---
 
@@ -342,16 +342,16 @@ Google Sheets backend removed (v1 uses **local JSON** or **Notion** only).
 
 | Variable | Meaning |
 |----------|---------|
-| `MAINTENANCE_WIZARD_STORE` | `local` \| `notion` |
+| `HOME_MAINTENANCE_HUB_STORE` | `local` \| `notion` |
 | `NOTION_API_KEY` | Integration secret |
-| `MAINTENANCE_WIZARD_NOTION_TASKS_DS_ID` | Tasks data source ID |
-| `MAINTENANCE_WIZARD_NOTION_CONTRACTORS_DS_ID` | Contractors data source ID |
-| `MAINTENANCE_WIZARD_NOTION_COMPLETIONS_DS_ID` | Completions data source ID |
-| `MAINTENANCE_WIZARD_TIMEZONE` | Default `America/New_York` |
+| `HOME_MAINTENANCE_HUB_NOTION_TASKS_DS_ID` | Tasks data source ID |
+| `HOME_MAINTENANCE_HUB_NOTION_CONTRACTORS_DS_ID` | Contractors data source ID |
+| `HOME_MAINTENANCE_HUB_NOTION_COMPLETIONS_DS_ID` | Completions data source ID |
+| `HOME_MAINTENANCE_HUB_TIMEZONE` | Default `America/New_York` |
 
 Never commit secrets or xlsx with credentials (`Account Info` tab). NFR5.
 
-Optional Streamlit Cloud: `secrets.toml` mirroring grocery-wizard.
+Optional Streamlit Cloud: `secrets.toml` mirroring grocery-hub.
 
 ---
 
@@ -395,7 +395,7 @@ Notion is **not** the recurrence engine for phone reminders in v2; **GCal** is. 
 ## 12. Deployment (target)
 
 - **Local:** `just setup` → `just ui` (port **8765**).
-- **Hosted (optional):** Streamlit Community Cloud + Google OAuth allowlist (same ops pattern as grocery-wizard).
+- **Hosted (optional):** Streamlit Community Cloud + Google OAuth allowlist (same ops pattern as grocery-hub).
 - **Notion:** Integration must have access to all three databases in prod and optional `[MW CI]` clones.
 
 ---

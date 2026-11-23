@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from maintenance_wizard.integrations.feedback_github import (
+from home_maintenance_hub.integrations.feedback_github import (
     FEEDBACK_GITHUB_INBOX_LABEL,
     create_feedback_issue,
 )
@@ -20,11 +20,11 @@ def test_create_feedback_issue_posts_inbox_label() -> None:
     mock_response.reason = "Created"
 
     with patch(
-        "maintenance_wizard.integrations.feedback_github.requests.post", return_value=mock_response
+        "home_maintenance_hub.integrations.feedback_github.requests.post", return_value=mock_response
     ) as post:
         result = create_feedback_issue(
             "  Filter chips look great  ",
-            repository="rachelgramlich/maintenance-wizard",
+            repository="rachelgramlich/home-maintenance-hub",
             token="github_pat_test",
             surface="monthly",
             timestamp="2026-11-20T12:00:00+00:00",

@@ -186,13 +186,13 @@ Imports inside function bodies are only acceptable to break true circular import
 ```python
 # Bad — use at top-level instead
 def format_sync_message(summary: SyncSummary) -> str:
-    from src.maintenance_wizard.ingredients.sync import format_sync_summary
+    from src.home_maintenance_hub.ingredients.sync import format_sync_summary
 
     return format_sync_summary(summary)
 
 
 # Good
-from src.maintenance_wizard.ingredients.sync import format_sync_summary
+from src.home_maintenance_hub.ingredients.sync import format_sync_summary
 
 
 def format_sync_message(summary: SyncSummary) -> str:
@@ -207,10 +207,10 @@ Leading-underscore names are private to their module. If another module needs th
 
 ```python
 # Bad
-from src.maintenance_wizard.recipes.scraper import _looks_fragmented
+from src.home_maintenance_hub.recipes.scraper import _looks_fragmented
 
 # Good — after promoting to public in scraper.py
-from src.maintenance_wizard.recipes.scraper import looks_fragmented
+from src.home_maintenance_hub.recipes.scraper import looks_fragmented
 ```
 
 ---
@@ -331,7 +331,7 @@ text = "line one\nline two\nline three"
 ## File Organization
 
 ```
-src/maintenance_wizard/
+src/home_maintenance_hub/
 ├── config.py     # Settings (local / notion store)
 ├── domain/       # Schedule logic + month board assembly
 ├── models.py     # Template, Completion, BoardTask

@@ -1,7 +1,7 @@
 """Task metadata line lives in the details drawer only (not on board cards)."""
 
-from maintenance_wizard.models import Template
-from maintenance_wizard.ui.views.drawer import format_drawer_task_meta, task_context_fields
+from home_maintenance_hub.models import Template
+from home_maintenance_hub.ui.views.drawer import format_drawer_task_meta, task_context_fields
 
 
 def test_task_context_fields_in_drawer() -> None:

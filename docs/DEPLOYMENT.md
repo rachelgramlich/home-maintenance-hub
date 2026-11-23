@@ -8,25 +8,25 @@ Household production target: **Streamlit Community Cloud** with **Notion** as th
 
 1. Notion hub + three databases — [NOTION_SETUP.md](NOTION_SETUP.md).
 2. A Notion **internal integration** connected to the hub page (same token the app uses).
-3. GitHub repo `rachelgramlich/maintenance-wizard` (or your fork) with CI green on `main`.
+3. GitHub repo `rachelgramlich/home-maintenance-hub` (or your fork) with CI green on `main`.
 
 ## Streamlit Cloud app
 
 1. [Share.streamlit.io](https://share.streamlit.io/) → **New app**.
 2. Repository: this repo; branch: `main`.
-3. **Main file path:** `src/maintenance_wizard/ui/app.py`
+3. **Main file path:** `src/home_maintenance_hub/ui/app.py`
 4. **Python version:** 3.12 (match `pyproject.toml`).
 
 Streamlit reads secrets from **Secrets** in the app settings (TOML). Copy from [`secrets.toml.example`](../secrets.toml.example):
 
 ```toml
-MAINTENANCE_WIZARD_STORE = "notion"
-MAINTENANCE_WIZARD_TIMEZONE = "America/New_York"
+HOME_MAINTENANCE_HUB_STORE = "notion"
+HOME_MAINTENANCE_HUB_TIMEZONE = "America/New_York"
 
 NOTION_API_KEY = "secret_…"
-MAINTENANCE_WIZARD_NOTION_TASKS_DS_ID = "collection://…"
-MAINTENANCE_WIZARD_NOTION_CONTRACTORS_DS_ID = "collection://…"
-MAINTENANCE_WIZARD_NOTION_COMPLETIONS_DS_ID = "collection://…"
+HOME_MAINTENANCE_HUB_NOTION_TASKS_DS_ID = "collection://…"
+HOME_MAINTENANCE_HUB_NOTION_CONTRACTORS_DS_ID = "collection://…"
+HOME_MAINTENANCE_HUB_NOTION_COMPLETIONS_DS_ID = "collection://…"
 ```
 
 Data source IDs may use the `collection://` prefix or the bare UUID (the app strips the prefix).
@@ -43,7 +43,7 @@ If Cloud cannot resolve the project file, add a root `requirements.txt` generate
 
 ## Access control (v1)
 
-Streamlit Cloud **private** apps limit viewers to users you invite. Google OAuth allowlist (grocery-wizard parity) is **not** in v1 scope — use private app + shared household logins, or revisit in a follow-up issue.
+Streamlit Cloud **private** apps limit viewers to users you invite. Google OAuth allowlist (grocery-hub parity) is **not** in v1 scope — use private app + shared household logins, or revisit in a follow-up issue.
 
 ## Smoke test after deploy
 
@@ -55,7 +55,7 @@ Streamlit Cloud **private** apps limit viewers to users you invite. Google OAuth
 ## Local production dry-run
 
 ```bash
-export MAINTENANCE_WIZARD_STORE=notion
+export HOME_MAINTENANCE_HUB_STORE=notion
 # NOTION_* from .env
 just ui
 ```

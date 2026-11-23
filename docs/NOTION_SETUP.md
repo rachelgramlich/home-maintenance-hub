@@ -1,10 +1,10 @@
-# Notion setup — Maintenance Wizard
+# Notion setup — Home Maintenance Hub
 
 Created **2026-11-19** in your workspace via Cursor Notion connection.
 
 ## Hub page
 
-**[B & R Home Maintenance (Maintenance Wizard)](https://app.notion.com/p/41deab9e05398149bde2d52d4d86f912)**
+**[B & R Home Maintenance (Home Maintenance Hub)](https://app.notion.com/p/41deab9e05398149bde2d52d4d86f912)**
 
 Child databases live under this page.
 

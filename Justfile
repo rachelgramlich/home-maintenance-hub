@@ -1,4 +1,4 @@
-# Justfile for maintenance-wizard
+# Justfile for home-maintenance-hub
 
 set dotenv-load
 
@@ -33,7 +33,7 @@ smoke-ui:
     uv run pytest -m holistic_ui_smoke
 
 test-cov:
-    uv run pytest --cov=maintenance_wizard --cov-report=html
+    uv run pytest --cov=home_maintenance_hub --cov-report=html
 
 link-secrets:
     #!/usr/bin/env bash
@@ -48,13 +48,13 @@ link-secrets:
     fi
 
 ui *ARGS:
-    uv run streamlit run src/maintenance_wizard/ui/app.py --server.port 8765 {{ARGS}}
+    uv run streamlit run src/home_maintenance_hub/ui/app.py --server.port 8765 {{ARGS}}
 
 maintenance-ui *ARGS:
     @just ui {{ARGS}}
 
 init-local-data:
-    uv run python -m maintenance_wizard.scripts.seed_local_data
+    uv run python -m home_maintenance_hub.scripts.seed_local_data
 
 clean:
     find . -type d -name __pycache__ -exec rm -r {} + 2>/dev/null || true
@@ -78,25 +78,25 @@ dev-setup: setup format lint test
     @echo "Development setup complete!"
 
 migrate-xlsx *ARGS:
-    uv run python -m maintenance_wizard.scripts.migrate_xlsx {{ARGS}}
+    uv run python -m home_maintenance_hub.scripts.migrate_xlsx {{ARGS}}
 
 import-completions *ARGS:
-    uv run python -m maintenance_wizard.scripts.import_completions {{ARGS}}
+    uv run python -m home_maintenance_hub.scripts.import_completions {{ARGS}}
 
 rename-completions *ARGS:
-    uv run python -m maintenance_wizard.scripts.rename_completions {{ARGS}}
+    uv run python -m home_maintenance_hub.scripts.rename_completions {{ARGS}}
 
 normalize-task-titles *ARGS:
-    uv run python -m maintenance_wizard.scripts.normalize_task_titles {{ARGS}}
+    uv run python -m home_maintenance_hub.scripts.normalize_task_titles {{ARGS}}
 
 notion-audit *ARGS:
-    uv run python -m maintenance_wizard.scripts.notion_row_audit {{ARGS}}
+    uv run python -m home_maintenance_hub.scripts.notion_row_audit {{ARGS}}
 
 audit-cadence *ARGS:
-    uv run python -m maintenance_wizard.scripts.audit_task_cadence {{ARGS}}
+    uv run python -m home_maintenance_hub.scripts.audit_task_cadence {{ARGS}}
 
 purge-inactive-duplicates *ARGS:
-    uv run python -m maintenance_wizard.scripts.purge_inactive_duplicates {{ARGS}}
+    uv run python -m home_maintenance_hub.scripts.purge_inactive_duplicates {{ARGS}}
 
 info:
     @echo "Python version:"

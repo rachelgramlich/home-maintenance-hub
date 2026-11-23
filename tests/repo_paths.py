@@ -5,4 +5,4 @@ from __future__ import annotations
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-UI_SRC_ROOT = REPO_ROOT / "src" / "maintenance_wizard" / "ui"
+UI_SRC_ROOT = REPO_ROOT / "src" / "home_maintenance_hub" / "ui"

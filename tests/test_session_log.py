@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from maintenance_wizard.models import BoardTask, Template, Urgency
-from maintenance_wizard.ui.session_log import (
+from home_maintenance_hub.models import BoardTask, Template, Urgency
+from home_maintenance_hub.ui.session_log import (
     BoardSessionTrace,
     build_session_log,
     write_session_log,
