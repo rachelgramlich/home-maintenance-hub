@@ -499,10 +499,33 @@ html {
     top: 0;
     left: 0;
     width: 100vw;
-    height: 100vh;
+    height: 100dvh;
     background: rgba(58, 40, 73, 0.38);
     z-index: 990;
     pointer-events: none;
+}
+
+/* Click dimmed board area to close the drawer */
+.stApp:has(.mw-drawer-backdrop-anchor) div[class*="st-key-mw_drawer_backdrop"] {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 991 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    pointer-events: auto;
+}
+
+.stApp:has(.mw-drawer-backdrop-anchor) div[class*="st-key-mw_drawer_backdrop"] button {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100dvh !important;
+    opacity: 0 !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    cursor: pointer;
 }
 
 .stApp:has(.mw-drawer-overlay-mount)
@@ -510,15 +533,15 @@ html {
     position: fixed;
     top: 0;
     right: 0;
-    bottom: 0;
+    height: 100dvh;
     width: min(32rem, 100vw);
     z-index: 1000;
     overflow-y: auto;
     overflow-x: hidden;
-    background: var(--mw-card-bg);
+    background: var(--mw-card-bg) !important;
     border-left: 1px solid var(--mw-border);
     box-shadow: -4px 0 24px rgba(58, 40, 73, 0.18);
-    padding: 2rem 1.15rem 1.5rem !important;
+    padding: 1rem 1.15rem 1.5rem !important;
     margin: 0 !important;
     box-sizing: border-box;
 }
@@ -541,6 +564,13 @@ html {
 
 [data-testid="column"]:has(.mw-feedback-anchor) [data-testid="stPopover"] {
     margin-top: 0.15rem;
+    width: 100%;
+    max-width: 11.5rem;
+}
+
+[data-testid="column"]:has(.mw-feedback-anchor) [data-testid="stPopover"] button {
+    width: 100% !important;
+    white-space: nowrap;
 }
 
 .stApp:has(.mw-feedback-anchor) [data-testid="stPopoverBody"] {
@@ -550,26 +580,30 @@ html {
     margin-top: 0.35rem;
 }
 
-/* Collapsed left navigation */
+/* Collapsed left navigation — narrow rail with expand control */
 .stApp:has(.mw-layout-sidebar-collapsed) [data-testid="stSidebar"] {
-    width: 0 !important;
-    min-width: 0 !important;
-    visibility: hidden;
+    width: 3.35rem !important;
+    min-width: 3.35rem !important;
+    visibility: visible;
     overflow: hidden;
 }
 
 .stApp:has(.mw-layout-sidebar-collapsed) [data-testid="stSidebar"] > div:first-child {
-    width: 0 !important;
-    min-width: 0 !important;
+    width: 3.35rem !important;
+    min-width: 3.35rem !important;
+    padding-left: 0.35rem !important;
+    padding-right: 0.35rem !important;
 }
 
-.stApp:has(.mw-layout-sidebar-collapsed) section[data-testid="stMain"] {
-    margin-left: 0 !important;
+.stApp:has(.mw-layout-sidebar-collapsed) div[class*="st-key-mw_sidebar_expand"] button {
+    min-width: 2.35rem !important;
+    font-weight: 700 !important;
 }
 
 [data-testid="column"]:has(.mw-sidebar-brand) + [data-testid="column"] .stButton button {
     min-height: 2rem !important;
     padding: 0.2rem 0.45rem !important;
+    font-weight: 700 !important;
 }
 
 .mw-drawer-header {

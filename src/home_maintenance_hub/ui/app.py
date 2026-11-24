@@ -164,19 +164,32 @@ def main() -> None:
     )
 
     with st.sidebar:
-        nav_col, collapse_col = st.columns([4, 1])
-        with nav_col:
-            _render_sidebar_brand()
-        with collapse_col:
+        if collapsed:
+            st.markdown(
+                '<span class="mw-sidebar-rail" aria-hidden="true"></span>',
+                unsafe_allow_html=True,
+            )
             if st.button(
-                "✕",
-                key="mw_sidebar_collapse",
-                help="Collapse navigation",
+                "▶",
+                key="mw_sidebar_expand",
+                help="Expand navigation",
                 type="secondary",
             ):
-                st.session_state.mw_sidebar_collapsed = True
+                st.session_state.mw_sidebar_collapsed = False
                 st.rerun()
-        if not collapsed:
+        else:
+            nav_col, collapse_col = st.columns([4, 1])
+            with nav_col:
+                _render_sidebar_brand()
+            with collapse_col:
+                if st.button(
+                    "◀",
+                    key="mw_sidebar_collapse",
+                    help="Collapse navigation",
+                    type="secondary",
+                ):
+                    st.session_state.mw_sidebar_collapsed = True
+                    st.rerun()
             st.divider()
 
         if not collapsed:
@@ -315,17 +328,12 @@ def main() -> None:
 
     month_label_long = date(year, month, 1).strftime("%B %Y")
 
-    if collapsed and st.button("☰  Show navigation", key="mw_sidebar_expand", type="secondary"):
-        st.session_state.mw_sidebar_collapsed = False
-        st.rerun()
-
-    header_left, header_right = st.columns([6, 1], vertical_alignment="top")
-    with header_left:
-        st.markdown(
-            f'<h2 class="mw-board-month">{month_label_long}</h2>',
-            unsafe_allow_html=True,
-        )
-    with header_right:
+    st.markdown(
+        f'<h2 class="mw-board-month">{month_label_long}</h2>',
+        unsafe_allow_html=True,
+    )
+    _fb_pad, _fb_col = st.columns([3, 2])
+    with _fb_col:
         st.markdown(
             '<span class="mw-feedback-anchor" aria-hidden="true"></span>',
             unsafe_allow_html=True,
@@ -481,12 +489,33 @@ def main() -> None:
                             st.warning(str(err))
 
     if st.session_state.drawer_task:
+        st.markdown(
+            '<span class="mw-drawer-backdrop-anchor" aria-hidden="true"></span>',
+            unsafe_allow_html=True,
+        )
+        if st.button(
+            "Close details overlay",
+            key="mw_drawer_backdrop",
+            type="secondary",
+            help="Click the dimmed board area to close",
+        ):
+            st.session_state.drawer_task = None
+            st.session_state.drawer_edit = False
+            st.rerun()
+
         with st.container():
             st.markdown(
                 '<span class="mw-drawer-overlay-mount" aria-hidden="true"></span>',
                 unsafe_allow_html=True,
             )
-            st.markdown("#### Details")
+            close_col, title_col = st.columns([1, 5], vertical_alignment="center")
+            with close_col:
+                if st.button("←", key="mw_drawer_close", help="Close details", type="secondary"):
+                    st.session_state.drawer_task = None
+                    st.session_state.drawer_edit = False
+                    st.rerun()
+            with title_col:
+                st.markdown("**Details**")
             tid, period = st.session_state.drawer_task
             match = next(
                 (r for r in board if r.template.task_id == tid and r.period == period),
@@ -496,12 +525,9 @@ def main() -> None:
                 edit = st.toggle("Edit mode", value=st.session_state.drawer_edit)
                 st.session_state.drawer_edit = edit
                 render_drawer(match, get_store(), editing=edit)
-                if st.button("Close", key="mw_drawer_close", type="secondary"):
-                    st.session_state.drawer_task = None
-                    st.rerun()
             else:
                 st.caption("Task not found in the current board view.")
-                if st.button("Close", key="mw_drawer_close_empty", type="secondary"):
+                if st.button("← Back", key="mw_drawer_close_empty", type="secondary"):
                     st.session_state.drawer_task = None
                     st.rerun()
 
