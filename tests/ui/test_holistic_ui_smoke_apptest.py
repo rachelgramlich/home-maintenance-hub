@@ -37,7 +37,7 @@ def test_holistic_first_run_renders_board_shell() -> None:
     )
     assert "mw-board-month" in markdown_blob, "Month subheader must render in main hero"
     assert "mw-card-meta-badges" in markdown_blob, (
-        "Open task cards must render priority/overdue badges"
+        "Open task cards must render priority/overdue after Details row"
     )
 
     refresh_buttons = [b for b in at.button if b.label == "Refresh"]
@@ -46,18 +46,18 @@ def test_holistic_first_run_renders_board_shell() -> None:
     done_buttons = [b for b in at.button if b.label == "Done"]
     assert done_buttons, "Expected at least one open task with a Done button"
 
+    assert "mw-task-title" in markdown_blob, "Task cards must expose mw-task-title"
     assert "mw-meta-row" not in markdown_blob, "Board cards must not render subheader meta row"
     assert "Period 20" not in markdown_blob, (
         "Period detail belongs in the drawer, not on card faces"
     )
-    assert "mw-task-title" in markdown_blob, "Task cards must expose mw-task-title"
     assert "HVAC filter" in markdown_blob or "Electrical" in markdown_blob, (
         "Expected seeded task name text on open cards"
     )
     assert "Data source:" not in markdown_blob, "Store mode label must not appear on the board"
 
     details_buttons = [b for b in at.button if b.label == "Details"]
-    assert details_buttons, "Expected Details link on an open task card"
+    assert details_buttons, "Expected Details button on an open task card"
     details_buttons[0].click().run(timeout=120)
     apptest_assert_no_exception(at, context="details drawer open")
 

@@ -72,12 +72,6 @@ def status_glyph(urgency: Urgency) -> str:
     return '<span class="mw-status-icon mw-status-open" aria-hidden="true">◎</span>'
 
 
-def _open_task_drawer(task_id: str, period: str) -> None:
-    st.session_state.drawer_task = (task_id, period)
-    st.session_state.drawer_edit = False
-    st.rerun()
-
-
 def format_last_done_html(row: BoardTask) -> str:
     if not row.last_done_on:
         return ""
@@ -411,11 +405,10 @@ def main() -> None:
             glyph = status_glyph(row.urgency)
             last_html = format_last_done_html(row)
 
-            task_name = display_task_name(t.name)
             title_html = (
                 f'<div class="mw-card-title-block">'
                 f"{glyph}"
-                f'<span class="mw-task-title">{task_name}</span>'
+                f'<span class="mw-task-title">{display_task_name(t.name)}</span>'
                 f"</div>"
                 f"{last_html}"
             )
@@ -436,30 +429,28 @@ def main() -> None:
             with st.container(border=True):
                 uclass = urgency_class(row.urgency)
                 st.markdown(
-                    f'<span class="mw-task-shell {uclass} mw-task--open" aria-hidden="true"></span>',
+                    f'<div class="mw-task-shell {uclass} mw-task--open">{title_html}</div>',
                     unsafe_allow_html=True,
                 )
-                st.markdown(f"{title_html}{last_html}", unsafe_allow_html=True)
-                det_key = f"det_{t.task_id}_{row.period}"
                 with st.container(
                     horizontal=True,
                     gap="small",
                     vertical_alignment="center",
-                    wrap=False,
-                    key=f"det_row_{t.task_id}_{row.period}",
+                    wrap=True,
                 ):
                     st.markdown(
-                        f'<div class="mw-card-meta-row mw-card-meta-row--open">'
-                        f"{meta_badges_html}</div>",
+                        '<span class="mw-card-details-anchor" aria-hidden="true"></span>',
                         unsafe_allow_html=True,
                     )
-                    if st.button(
-                        "Details",
-                        key=det_key,
-                        type="tertiary",
-                        help=f"Open details for {task_name}",
-                    ):
-                        _open_task_drawer(t.task_id, row.period)
+                    det_key = f"det_{t.task_id}_{row.period}"
+                    if st.button("Details", key=det_key, type="secondary"):
+                        st.session_state.drawer_task = (t.task_id, row.period)
+                        st.session_state.drawer_edit = False
+                        st.rerun()
+                    st.markdown(
+                        f'<div class="mw-card-meta-row">{meta_badges_html}</div>',
+                        unsafe_allow_html=True,
+                    )
                 notes_key = f"notes_{t.task_id}_{row.period}"
                 notes = st.text_input(
                     "Completion note",
