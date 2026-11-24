@@ -433,7 +433,7 @@ def main() -> None:
                     unsafe_allow_html=True,
                 )
                 meta_left, meta_right = st.columns(
-                    [5, 2],
+                    [11, 4],
                     gap="small",
                     vertical_alignment="center",
                 )
