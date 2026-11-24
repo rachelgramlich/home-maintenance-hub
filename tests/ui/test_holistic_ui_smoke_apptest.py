@@ -56,11 +56,9 @@ def test_holistic_first_run_renders_board_shell() -> None:
     )
     assert "Data source:" not in markdown_blob, "Store mode label must not appear on the board"
 
-    expand_buttons = [
-        b for b in at.button if (b.help or "").startswith("Open details for")
-    ]
-    assert expand_buttons, "Expected expand control on an open task card"
-    expand_buttons[0].click().run(timeout=120)
+    details_buttons = [b for b in at.button if b.label == "Details"]
+    assert details_buttons, "Expected Details link on an open task card"
+    details_buttons[0].click().run(timeout=120)
     apptest_assert_no_exception(at, context="details drawer open")
 
     drawer_blob = " ".join(m.value or "" for m in at.markdown)

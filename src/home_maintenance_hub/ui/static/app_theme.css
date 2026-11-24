@@ -138,56 +138,63 @@ html {
 }
 
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    [data-testid="stHorizontalBlock"]:has(.mw-card-header-row) {
+    [data-testid="stHorizontalBlock"]:has(.mw-card-details-anchor) {
+    align-items: center !important;
+    justify-content: space-between !important;
     flex-wrap: nowrap !important;
-    align-items: flex-start !important;
     width: 100%;
+    margin-top: 0.35rem;
+    margin-bottom: 0.15rem;
 }
 
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    [data-testid="stHorizontalBlock"]:has(.mw-card-header-row)
+    [data-testid="stHorizontalBlock"]:has(.mw-card-details-anchor)
     > div:first-child {
     flex: 1 1 auto !important;
     min-width: 0 !important;
 }
 
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    [data-testid="stHorizontalBlock"]:has(.mw-card-header-row)
+    [data-testid="stHorizontalBlock"]:has(.mw-card-details-anchor)
+    > div:has(.mw-card-details-anchor)
+    + div,
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
+    [data-testid="stHorizontalBlock"]:has(.mw-card-details-anchor)
     > div:last-child {
     flex: 0 0 auto !important;
-    margin-left: auto !important;
 }
 
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    .mw-card-header-row.mw-card-title-block {
-    margin-bottom: 0;
-}
-
+    [data-testid="stHorizontalBlock"]:has(.mw-card-details-anchor)
+    .stButton
+    button,
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    div[class*="st-key-exp_"]
-    button {
-    background: var(--mw-input-bg) !important;
-    border: 1px solid var(--mw-border) !important;
-    color: var(--mw-text-muted) !important;
-    min-height: 2.15rem !important;
-    min-width: 2.15rem !important;
-    padding: 0.35rem !important;
-    border-radius: 8px !important;
-    flex-shrink: 0;
-}
-
-[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    div[class*="st-key-exp_"]
-    button:hover {
-    border-color: var(--mw-accent) !important;
+    [data-testid="stHorizontalBlock"]:has(.mw-card-details-anchor)
+    .stButton
+    button
+    p {
+    background: transparent !important;
+    border: none !important;
     color: var(--mw-accent) !important;
-    background: var(--mw-card-bg) !important;
+    -webkit-text-fill-color: var(--mw-accent) !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    min-height: auto !important;
+    padding: 0.15rem 0 !important;
+    box-shadow: none !important;
 }
 
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    .mw-card-meta-row {
-    margin-top: 0.5rem;
-    margin-bottom: 0.15rem;
+    [data-testid="stHorizontalBlock"]:has(.mw-card-details-anchor)
+    .stButton
+    button:hover {
+    text-decoration: underline;
+    background: transparent !important;
+}
+
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
+    .mw-card-meta-row--open {
+    margin: 0;
 }
 
 .block-container {
@@ -436,7 +443,7 @@ html {
     align-items: flex-start;
     gap: 0.65rem;
     width: 100%;
-    margin-bottom: 0.15rem;
+    margin-bottom: 0.35rem;
 }
 
 .mw-card-title-block .mw-task-title {

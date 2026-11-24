@@ -439,35 +439,30 @@ def main() -> None:
                     f'<span class="mw-task-shell {uclass} mw-task--open" aria-hidden="true"></span>',
                     unsafe_allow_html=True,
                 )
-                exp_key = f"exp_{t.task_id}_{row.period}"
-                title_block_html = (
-                    f'<div class="mw-card-title-block mw-card-header-row">'
-                    f"{glyph}"
-                    f'<span class="mw-task-title">{task_name}</span>'
-                    f"</div>"
-                )
+                st.markdown(f"{title_html}{last_html}", unsafe_allow_html=True)
                 with st.container(
                     horizontal=True,
                     gap="small",
-                    vertical_alignment="top",
+                    vertical_alignment="center",
                     wrap=False,
-                    key=f"head_{t.task_id}_{row.period}",
                 ):
-                    st.markdown(title_block_html, unsafe_allow_html=True)
+                    st.markdown(
+                        f'<div class="mw-card-meta-row mw-card-meta-row--open">'
+                        f"{meta_badges_html}</div>",
+                        unsafe_allow_html=True,
+                    )
+                    st.markdown(
+                        '<span class="mw-card-details-anchor" aria-hidden="true"></span>',
+                        unsafe_allow_html=True,
+                    )
+                    det_key = f"det_{t.task_id}_{row.period}"
                     if st.button(
-                        "",
-                        key=exp_key,
-                        icon=":material/open_in_full:",
-                        help=f"Open details for {task_name}",
+                        "Details",
+                        key=det_key,
                         type="tertiary",
+                        help=f"Open details for {task_name}",
                     ):
                         _open_task_drawer(t.task_id, row.period)
-                if last_html:
-                    st.markdown(last_html, unsafe_allow_html=True)
-                st.markdown(
-                    f'<div class="mw-card-meta-row">{meta_badges_html}</div>',
-                    unsafe_allow_html=True,
-                )
                 notes_key = f"notes_{t.task_id}_{row.period}"
                 notes = st.text_input(
                     "Completion note",
