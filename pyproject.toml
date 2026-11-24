@@ -17,6 +17,11 @@ dependencies = [
     "streamlit[auth]>=1.42.0",
 ]
 
+[tool.uv]
+# Streamlit Community Cloud runs `uv sync` on uv.lock (no --group dev).
+# Omit default groups so deploy installs runtime deps only; use `just setup` locally.
+default-groups = []
+
 [dependency-groups]
 dev = [
     "mypy>=1.11",
