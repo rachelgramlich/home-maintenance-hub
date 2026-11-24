@@ -138,82 +138,33 @@ html {
 }
 
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    [data-testid="stHorizontalBlock"]:has(.mw-card-title-hit)
-    > div:has(.mw-card-title-hit)
-    + div
-    .stButton
-    button {
-    background: transparent !important;
-    border: none !important;
-    color: var(--mw-text) !important;
-    font-weight: 600 !important;
-    font-size: 1.05rem !important;
-    min-height: auto !important;
-    padding: 0.2rem 0 !important;
-    box-shadow: none !important;
-    justify-content: flex-start !important;
-    text-align: left !important;
-    line-height: 1.35 !important;
-    white-space: normal !important;
-    height: auto !important;
-}
-
-[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    [data-testid="stHorizontalBlock"]:has(.mw-card-title-hit)
-    > div:has(.mw-card-title-hit)
-    + div
-    .stButton
-    button:hover {
-    color: var(--mw-accent) !important;
-    text-decoration: underline;
-    background: transparent !important;
-}
-
-[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    [data-testid="stHorizontalBlock"]:has(.mw-card-title-hit)
-    > div:has(.mw-card-title-hit)
-    + div
-    .stButton
-    button
-    p {
-    color: inherit !important;
-    -webkit-text-fill-color: inherit !important;
-    text-align: left !important;
-    white-space: normal !important;
-}
-
-[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    .mw-card-status-slot
-    .mw-status-icon {
-    margin-top: 0.15rem;
-}
-
-[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    [data-testid="stHorizontalBlock"]:has(.mw-card-header-marker) {
+    [data-testid="stHorizontalBlock"]:has(.mw-card-header-row) {
     flex-wrap: nowrap !important;
     align-items: flex-start !important;
     width: 100%;
 }
 
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    [data-testid="stHorizontalBlock"]:has(.mw-card-title-hit)
-    > div:has(.mw-card-title-hit) {
+    [data-testid="stHorizontalBlock"]:has(.mw-card-header-row)
+    > div:first-child {
     flex: 1 1 auto !important;
     min-width: 0 !important;
 }
 
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    [data-testid="stHorizontalBlock"]:has(.mw-card-title-hit)
-    > div:has(.mw-card-expand-anchor) {
+    [data-testid="stHorizontalBlock"]:has(.mw-card-header-row)
+    > div:last-child {
     flex: 0 0 auto !important;
     margin-left: auto !important;
 }
 
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    [data-testid="stHorizontalBlock"]:has(.mw-card-expand-anchor)
-    > div:has(.mw-card-expand-anchor)
-    + div
-    .stButton
+    .mw-card-header-row.mw-card-title-block {
+    margin-bottom: 0;
+}
+
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
+    div[class*="st-key-exp_"]
     button {
     background: var(--mw-input-bg) !important;
     border: 1px solid var(--mw-border) !important;
@@ -222,13 +173,11 @@ html {
     min-width: 2.15rem !important;
     padding: 0.35rem !important;
     border-radius: 8px !important;
+    flex-shrink: 0;
 }
 
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    [data-testid="stHorizontalBlock"]:has(.mw-card-expand-anchor)
-    > div:has(.mw-card-expand-anchor)
-    + div
-    .stButton
+    div[class*="st-key-exp_"]
     button:hover {
     border-color: var(--mw-accent) !important;
     color: var(--mw-accent) !important;
@@ -237,7 +186,8 @@ html {
 
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
     .mw-card-meta-row {
-    margin-top: 0.35rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.15rem;
 }
 
 .block-container {

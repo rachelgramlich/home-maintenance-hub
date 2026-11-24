@@ -50,16 +50,14 @@ def test_holistic_first_run_renders_board_shell() -> None:
     assert "Period 20" not in markdown_blob, (
         "Period detail belongs in the drawer, not on card faces"
     )
-    button_blob = " ".join(b.label or "" for b in at.button)
-    assert "HVAC filter" in button_blob or "Electrical" in button_blob, (
-        "Expected seeded task name on open card title buttons"
+    assert "mw-task-title" in markdown_blob, "Task cards must expose mw-task-title"
+    assert "HVAC filter" in markdown_blob or "Electrical" in markdown_blob, (
+        "Expected seeded task name text on open cards"
     )
     assert "Data source:" not in markdown_blob, "Store mode label must not appear on the board"
 
     expand_buttons = [
-        b
-        for b in at.button
-        if (b.help or "").startswith("Open details for") or (b.help or "") == "Open task details"
+        b for b in at.button if (b.help or "").startswith("Open details for")
     ]
     assert expand_buttons, "Expected expand control on an open task card"
     expand_buttons[0].click().run(timeout=120)

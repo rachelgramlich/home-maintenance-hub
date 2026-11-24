@@ -439,37 +439,21 @@ def main() -> None:
                     f'<span class="mw-task-shell {uclass} mw-task--open" aria-hidden="true"></span>',
                     unsafe_allow_html=True,
                 )
-                st.markdown(
-                    '<span class="mw-card-header-marker" aria-hidden="true"></span>',
-                    unsafe_allow_html=True,
+                exp_key = f"exp_{t.task_id}_{row.period}"
+                title_block_html = (
+                    f'<div class="mw-card-title-block mw-card-header-row">'
+                    f"{glyph}"
+                    f'<span class="mw-task-title">{task_name}</span>'
+                    f"</div>"
                 )
                 with st.container(
                     horizontal=True,
                     gap="small",
                     vertical_alignment="top",
                     wrap=False,
+                    key=f"head_{t.task_id}_{row.period}",
                 ):
-                    st.markdown(
-                        f'<span class="mw-card-status-slot">{glyph}</span>',
-                        unsafe_allow_html=True,
-                    )
-                    st.markdown(
-                        '<span class="mw-card-title-hit" aria-hidden="true"></span>',
-                        unsafe_allow_html=True,
-                    )
-                    title_key = f"title_{t.task_id}_{row.period}"
-                    if st.button(
-                        task_name,
-                        key=title_key,
-                        type="tertiary",
-                        help="Open task details",
-                    ):
-                        _open_task_drawer(t.task_id, row.period)
-                    st.markdown(
-                        '<span class="mw-card-expand-anchor" aria-hidden="true"></span>',
-                        unsafe_allow_html=True,
-                    )
-                    exp_key = f"exp_{t.task_id}_{row.period}"
+                    st.markdown(title_block_html, unsafe_allow_html=True)
                     if st.button(
                         "",
                         key=exp_key,
