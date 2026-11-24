@@ -37,7 +37,6 @@ def page_to_template(page: dict[str, Any]) -> Template:
         priority=nc.select_name(props.get("Priority")) or "Medium",  # type: ignore[arg-type]
         season=nc.select_name(props.get("Season")),
         instructions=nc.plain_text(props.get("Instructions")),
-        links=(),
         contractor_id=rel[0] if rel else None,
         stable_key=nc.plain_text(props.get("Stable key")),
         notion_url=str(page.get("url") or ""),

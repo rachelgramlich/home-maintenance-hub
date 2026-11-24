@@ -67,7 +67,7 @@ Streamlit does **not** run background jobs. Reminders are **v2 (GCal)** or optio
 | **P0 — Docs & schema** | This document + Notion DB templates (manual create or `init-notion` script) | Property names and select options frozen |
 | **P1 — Store** | `store/notion.py`, config, mocked tests | Read/write three DBs via API 2025 data sources |
 | **P2 — Migration** | `scripts/migrate_xlsx.py` | 61 `Home Maintenance` rows + empty contractors; dry-run |
-| **P3 — Domain** | Extend models: `in_progress`, priority, type, effort, links, contractor | Board matches mockup rules |
+| **P3 — Domain** | Extend models: `in_progress`, priority, type, effort, contractor | Board matches mockup rules |
 | **P4 — UI** | Mockup C: drawer, contractors admin, in progress | Parity with approved mockups |
 | **P5 — Cutover** | Point prod env at Notion; archive xlsx as backup | Sheet optional export only |
 
@@ -107,8 +107,7 @@ One row per **scheduled appearance** (matches your xlsx: e.g. “Replace HVAC fi
 | **Priority** | select | yes | High, Medium, Low |
 | **Season** | select | no | Winter, Spring, … (filter only; not on card) |
 | **Active** | checkbox | yes | default true |
-| **Instructions** | rich text | no | Standing steps; editable in drawer or Notion |
-| **Links** | rich text or multi URL | no | Label + URL pairs; v1: rich text lines or JSON in a text property `Links JSON` if needed |
+| **Instructions** | rich text | no | Standing steps; paste URLs in text; editable in drawer or Notion |
 | **Contractor** | relation → Contractors | no | Single relation |
 | **Cadence** | select | yes | `Annual` (default) or `Monthly` — monthly tasks appear every board month |
 | **Stable key** | rich text | no | Annual: `task\|area\|month`; Monthly: `task_base\|area\|monthly` |
@@ -116,7 +115,6 @@ One row per **scheduled appearance** (matches your xlsx: e.g. “Replace HVAC fi
 
 **Not stored on Tasks:** completion notes, last done date, in-progress state (live on **Completions**).
 
-**Links encoding (v1 implementation):** Prefer a single **`Links`** text property storing JSON array `[{"label":"...","url":"..."}]` for reliable round-trip from Streamlit; optional later migration to Notion URL properties.
 
 ### 3.2 `[MW] Contractors`
 
@@ -225,8 +223,8 @@ Month boundaries use `HOME_MAINTENANCE_HUB_TIMEZONE` (default `America/New_York`
 
 | Mode | Content |
 |------|---------|
-| **View** | Instructions, links (new tab), contractor block (from relation), **Open in Notion** link |
-| **Edit** | Task name, area, type, effort, priority, instructions, links, contractor picker; **Manage contractors** link |
+| **View** | Instructions (URLs in text), contractor block (from relation), **Open in Notion** link |
+| **Edit** | Task name, area, type, effort, priority, instructions, contractor picker; **Manage contractors** link |
 
 ### 4.7 Manage contractors
 

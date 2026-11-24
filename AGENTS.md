@@ -73,6 +73,14 @@ Run **`just ui`** (or **`just maintenance-ui`**) for the monthly maintenance boa
 
 After **`just setup`**, `.cursor/skills/developing-with-streamlit` symlinks from Streamlit skills. **`tidy-first`** is under `.cursor/skills/`. **`/tidy-project`** is shared under `.cursor/commands/shared/`.
 
+## No backward-compatibility shims (default)
+
+When removing a field, API, or Notion property, **delete the code and schema in the same change** — do not keep empty parsers, unused model fields, or “we still read it but ignore it” paths.
+
+- Prefer a **one-shot migration** (script, Notion backfill, or rewrite on next load) over leaving dormant branches.
+- Update **fixtures, seed data, and docs** in the same PR.
+- Ask the owner before keeping a compatibility path only if external consumers still depend on it (this household app usually does not).
+
 ## Structure-only tidy (agents)
 
 - **S vs B:** **`tidy-first`** skill — structure (**S**) and behavior (**B**) in **separate commits**. Repo-wide → **`/tidy-project`**.

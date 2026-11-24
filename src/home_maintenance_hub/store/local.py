@@ -5,15 +5,21 @@ import uuid
 from datetime import date
 from pathlib import Path
 
-from home_maintenance_hub.models import (
-    Completion,
-    CompletionStatus,
-    Contractor,
-    Template,
-    links_to_json,
-    parse_links_json,
-)
+from home_maintenance_hub.models import Completion, CompletionStatus, Contractor, Template
 from home_maintenance_hub.store.base import TaskStore
+
+# Drop on read and rewrite local JSON — no parallel parsers for retired fields.
+_REMOVED_TEMPLATE_KEYS = ("links_json",)
+
+
+def _scrub_retired_template_fields(data: dict) -> bool:
+    changed = False
+    for row in data.get("templates", []):
+        for key in _REMOVED_TEMPLATE_KEYS:
+            if key in row:
+                del row[key]
+                changed = True
+    return changed
 
 
 def _parse_templates(raw: list[dict]) -> list[Template]:
@@ -31,7 +37,6 @@ def _parse_templates(raw: list[dict]) -> list[Template]:
             priority=row.get("priority", "Medium"),  # type: ignore[arg-type]
             season=str(row.get("season", "")),
             instructions=str(row.get("instructions", "")),
-            links=parse_links_json(str(row.get("links_json", ""))),
             contractor_id=row.get("contractor_id"),
             stable_key=str(row.get("stable_key", "")),
         )
@@ -69,7 +74,10 @@ class LocalTaskStore(TaskStore):
     def _load(self) -> dict:
         if not self._path.exists():
             return {"templates": [], "completions": [], "contractors": []}
-        return json.loads(self._path.read_text(encoding="utf-8"))
+        data = json.loads(self._path.read_text(encoding="utf-8"))
+        if _scrub_retired_template_fields(data):
+            self._save(data)
+        return data
 
     def _save(self, data: dict) -> None:
         self._path.parent.mkdir(parents=True, exist_ok=True)
@@ -216,7 +224,6 @@ class LocalTaskStore(TaskStore):
                 "priority": t.priority,
                 "season": t.season,
                 "instructions": t.instructions,
-                "links_json": links_to_json(t.links),
                 "contractor_id": t.contractor_id,
                 "stable_key": t.stable_key,
             }
@@ -227,7 +234,6 @@ class LocalTaskStore(TaskStore):
                     "area": template.area,
                     "priority": template.priority,
                     "instructions": template.instructions,
-                    "links_json": links_to_json(template.links),
                     "contractor_id": template.contractor_id,
                     "task_type": template.task_type,
                     "effort": template.effort,
