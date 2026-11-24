@@ -138,7 +138,8 @@ html {
 }
 
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    [data-testid="stHorizontalBlock"]:has(.mw-card-details-anchor) {
+    div[class*="st-key-det_row_"]
+    [data-testid="stHorizontalBlock"] {
     align-items: center !important;
     justify-content: space-between !important;
     flex-wrap: nowrap !important;
@@ -148,31 +149,35 @@ html {
 }
 
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    [data-testid="stHorizontalBlock"]:has(.mw-card-details-anchor)
+    div[class*="st-key-det_row_"]
+    [data-testid="stHorizontalBlock"]
     > div:first-child {
     flex: 1 1 auto !important;
     min-width: 0 !important;
 }
 
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    [data-testid="stHorizontalBlock"]:has(.mw-card-details-anchor)
-    > div:has(.mw-card-details-anchor)
-    + div,
-[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    [data-testid="stHorizontalBlock"]:has(.mw-card-details-anchor)
+    div[class*="st-key-det_row_"]
+    [data-testid="stHorizontalBlock"]
     > div:last-child {
     flex: 0 0 auto !important;
+    margin-left: auto !important;
 }
 
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    [data-testid="stHorizontalBlock"]:has(.mw-card-details-anchor)
+    div[class*="st-key-det_"]
     .stButton
     button,
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    [data-testid="stHorizontalBlock"]:has(.mw-card-details-anchor)
+    div[class*="st-key-det_"]
     .stButton
     button
-    p {
+    p,
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
+    div[class*="st-key-det_"]
+    .stButton
+    button
+    span {
     background: transparent !important;
     border: none !important;
     color: var(--mw-accent) !important;
@@ -185,11 +190,17 @@ html {
 }
 
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    [data-testid="stHorizontalBlock"]:has(.mw-card-details-anchor)
+    div[class*="st-key-det_"]
     .stButton
-    button:hover {
+    button:hover,
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
+    div[class*="st-key-det_"]
+    .stButton
+    button:hover
+    p {
     text-decoration: underline;
     background: transparent !important;
+    color: var(--mw-accent) !important;
 }
 
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)

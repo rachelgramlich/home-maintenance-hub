@@ -440,22 +440,19 @@ def main() -> None:
                     unsafe_allow_html=True,
                 )
                 st.markdown(f"{title_html}{last_html}", unsafe_allow_html=True)
+                det_key = f"det_{t.task_id}_{row.period}"
                 with st.container(
                     horizontal=True,
                     gap="small",
                     vertical_alignment="center",
                     wrap=False,
+                    key=f"det_row_{t.task_id}_{row.period}",
                 ):
                     st.markdown(
                         f'<div class="mw-card-meta-row mw-card-meta-row--open">'
                         f"{meta_badges_html}</div>",
                         unsafe_allow_html=True,
                     )
-                    st.markdown(
-                        '<span class="mw-card-details-anchor" aria-hidden="true"></span>',
-                        unsafe_allow_html=True,
-                    )
-                    det_key = f"det_{t.task_id}_{row.period}"
                     if st.button(
                         "Details",
                         key=det_key,
