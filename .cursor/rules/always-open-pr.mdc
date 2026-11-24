@@ -7,7 +7,7 @@ alwaysApply: true
 
 When you finish **substantive work** in this repo (features, tooling, docs that ship together, refactors, CI/config), **always**:
 
-1. Run `just check` or `just ci` when relevant.
+1. Run **`just ci`** and confirm exit 0 before push (not only `ruff check` / `pytest`). Use `just check` only if `just ci` already passed on this branch.
 2. **Commit** on a branch (user may still forbid commits in edge cases; default is to commit).
 3. **Push** and **`gh pr create`** ready for review — unless the user explicitly said not to or asked for local-only edits.
 

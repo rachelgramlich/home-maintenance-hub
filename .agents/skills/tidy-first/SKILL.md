@@ -30,7 +30,7 @@ Use this skill during **normal implementation** — features, bugs, refactors th
 | --- | --- |
 | **GitHub Actions** | `just ci` → `ruff check`, `ruff format --check`, `pytest` |
 | **Pre-commit** | `ruff --fix` + `ruff-format` on commit |
-| **You (inline tidy)** | **`just check`** before push; separate **S** commits from **B** |
+| **You (inline tidy)** | **`just ci`** before push (or `just check` only after `just ci` passed this branch); separate **S** commits from **B** |
 
 **Repo patterns (prefer when deduping during tidy):**
 
