@@ -179,6 +179,7 @@ html {
   button {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
+    min-width: 5.25rem !important;
     white-space: nowrap;
 }
 
