@@ -32,7 +32,7 @@ def audit(*, report_path: Path) -> dict:
     if not settings.notion_api_key:
         raise SystemExit("NOTION_API_KEY missing")
     if not settings.notion_tasks_ds_id:
-        raise SystemExit("HOME_MAINTENANCE_NOTION_TASKS_DS_ID missing")
+        raise SystemExit("TASKS_DS_ID missing")
 
     client = nc.make_client(settings.notion_api_key)
     pages = nc.paginate_data_source(client, settings.notion_tasks_ds_id)

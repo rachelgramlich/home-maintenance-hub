@@ -20,13 +20,13 @@ Household production target: **Streamlit Community Cloud** with **Notion** as th
 Streamlit reads secrets from **Secrets** in the app settings (TOML). Copy from [`secrets.toml.example`](../secrets.toml.example):
 
 ```toml
-HOME_MAINTENANCE_STORE = "notion"
-HOME_MAINTENANCE_TIMEZONE = "America/New_York"
+STORE = "notion"
+TIMEZONE = "America/New_York"
 
 NOTION_API_KEY = "secret_…"
-HOME_MAINTENANCE_NOTION_TASKS_DS_ID = "collection://…"
-HOME_MAINTENANCE_NOTION_CONTRACTORS_DS_ID = "collection://…"
-HOME_MAINTENANCE_NOTION_COMPLETIONS_DS_ID = "collection://…"
+TASKS_DS_ID = "collection://…"
+CONTRACTORS_DS_ID = "collection://…"
+COMPLETIONS_DS_ID = "collection://…"
 ```
 
 Data source IDs may use the `collection://` prefix or the bare UUID (the app strips the prefix).
@@ -55,7 +55,7 @@ Streamlit Cloud **private** apps limit viewers to users you invite. Google OAuth
 ## Local production dry-run
 
 ```bash
-export HOME_MAINTENANCE_STORE=notion
+export STORE=notion
 # NOTION_* from .env
 just ui
 ```

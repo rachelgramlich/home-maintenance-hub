@@ -37,11 +37,11 @@ def _notion_page_from_template(t: Template) -> dict:
 
 @pytest.fixture
 def notion_settings(monkeypatch: pytest.MonkeyPatch) -> Settings:
-    monkeypatch.setenv("HOME_MAINTENANCE_STORE", "notion")
+    monkeypatch.setenv("STORE", "notion")
     monkeypatch.setenv("NOTION_API_KEY", "secret_test")
-    monkeypatch.setenv("HOME_MAINTENANCE_NOTION_TASKS_DS_ID", "tasks-ds")
-    monkeypatch.setenv("HOME_MAINTENANCE_NOTION_CONTRACTORS_DS_ID", "ctr-ds")
-    monkeypatch.setenv("HOME_MAINTENANCE_NOTION_COMPLETIONS_DS_ID", "cmp-ds")
+    monkeypatch.setenv("TASKS_DS_ID", "tasks-ds")
+    monkeypatch.setenv("CONTRACTORS_DS_ID", "ctr-ds")
+    monkeypatch.setenv("COMPLETIONS_DS_ID", "cmp-ds")
     get_settings.cache_clear()
     yield get_settings()
     get_settings.cache_clear()

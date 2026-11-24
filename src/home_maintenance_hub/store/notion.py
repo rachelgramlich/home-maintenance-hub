@@ -31,7 +31,7 @@ class NotionTaskStore(TaskStore):
             ("completions", settings.notion_completions_ds_id),
         ):
             if not value:
-                msg = f"Set HOME_MAINTENANCE_NOTION_{name.upper()}_DS_ID"
+                msg = f"Set {name.upper()}_DS_ID"
                 raise RuntimeError(msg)
         self._settings = settings
         self._client = nc.make_client(settings.notion_api_key)
