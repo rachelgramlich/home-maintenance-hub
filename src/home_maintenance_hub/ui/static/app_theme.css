@@ -138,15 +138,14 @@ html {
 }
 
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    [data-testid="column"]:has(.mw-card-details-anchor) {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    justify-content: flex-start;
+    [data-testid="stHorizontalBlock"]:has(.mw-card-details-anchor) {
+    align-items: center !important;
+    flex-wrap: wrap;
+    gap: 0.35rem;
 }
 
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    [data-testid="column"]:has(.mw-card-details-anchor)
+    [data-testid="stHorizontalBlock"]:has(.mw-card-details-anchor)
     .stButton
     button {
     background: transparent !important;
@@ -159,7 +158,7 @@ html {
 }
 
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    [data-testid="column"]:has(.mw-card-details-anchor)
+    [data-testid="stHorizontalBlock"]:has(.mw-card-details-anchor)
     .stButton
     button
     p {
@@ -168,7 +167,7 @@ html {
 }
 
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
-    [data-testid="column"]:has(.mw-card-details-anchor)
+    [data-testid="stHorizontalBlock"]:has(.mw-card-details-anchor)
     .stButton
     button:hover {
     text-decoration: underline;
@@ -225,12 +224,12 @@ html {
 }
 
 .mw-hero-month {
-    margin: 0.35rem 0 0;
-    color: var(--mw-text);
-    font-size: 1.45rem;
+    margin: 0.2rem 0 0;
+    color: var(--mw-text-muted);
+    font-size: 1.05rem;
     font-weight: 600;
     letter-spacing: -0.01em;
-    line-height: 1.25;
+    line-height: 1.35;
 }
 
 /* Marker for Streamlit bordered cards — keep content visible (no display:none). */
@@ -341,11 +340,7 @@ html {
 }
 
 .mw-board-month {
-    font-size: 1.65rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    margin: 0 0 0.35rem;
-    color: var(--mw-text);
+    margin: 0;
 }
 
 .mw-stats-row {
@@ -420,26 +415,46 @@ html {
     border: 1px solid var(--mw-border);
 }
 
-.mw-card-head {
+.mw-card-title-block {
     display: flex;
+    align-items: flex-start;
     gap: 0.65rem;
-    align-items: center;
-    justify-content: space-between;
     width: 100%;
+    margin-bottom: 0.15rem;
 }
 
-.mw-card-head-left {
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
+.mw-card-title-block .mw-task-title {
     flex: 1 1 auto;
     min-width: 0;
+    margin: 0.15rem 0 0;
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+.mw-card-meta-row {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0;
+}
+
+.mw-card-meta-row--closed {
+    margin-top: 0.35rem;
+}
+
+.mw-card-meta-badges {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
 }
 
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
     > [data-testid="stVerticalBlock"]
-    > [data-testid="stHorizontalBlock"]:first-child {
+    > [data-testid="stHorizontalBlock"]:has(.mw-card-details-anchor) {
     align-items: center !important;
+    gap: 0.35rem !important;
 }
 
 .mw-status-icon {
@@ -468,24 +483,6 @@ html {
     background: var(--mw-input-bg);
     color: var(--mw-accent);
     border: 1px solid var(--mw-border);
-}
-
-.mw-card-head-text {
-    flex: 1;
-    min-width: 0;
-}
-
-.mw-title-row {
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.mw-title-row .mw-task-title {
-    margin: 0;
-    flex: 1 1 auto;
-    min-width: 0;
 }
 
 /* Details drawer — slide-over panel (only mounted when a task is selected). */
