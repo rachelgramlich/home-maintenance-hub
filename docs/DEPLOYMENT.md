@@ -33,10 +33,10 @@ Data source IDs may use the `collection://` prefix or the bare UUID (the app str
 
 ## Dependencies
 
-Cloud installs from `pyproject.toml` via the default Streamlit dependency resolver. Local parity:
+Cloud resolves **`uv.lock`** with `uv sync` (runtime only — `tool.uv.default-groups` is empty; no mypy/ruff/pytest on reboot). Local dev with dev tools:
 
 ```bash
-uv sync
+just setup
 ```
 
 If Cloud cannot resolve the project file, add a root `requirements.txt` generated from `uv export` (optional; not required when `pyproject.toml` is at repo root).
