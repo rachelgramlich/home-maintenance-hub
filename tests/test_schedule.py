@@ -3,6 +3,7 @@ from datetime import date
 from home_maintenance_hub.domain.board import build_month_board
 from home_maintenance_hub.domain.schedule import (
     completion_page_title,
+    period_full_month_year_label,
     task_applies_to_board,
     terminal_completion_exists,
 )
@@ -89,3 +90,8 @@ def test_terminal_completion_exists() -> None:
     assert terminal_completion_exists(completions, "x", "2026-01")
     in_prog = [Completion("2", "y", "2026-01", "in_progress", date(2026, 1, 2))]
     assert not terminal_completion_exists(in_prog, "y", "2026-01")
+
+
+def test_period_full_month_year_label() -> None:
+    assert period_full_month_year_label("2026-07") == "July 2026"
+    assert period_full_month_year_label("not-a-period") == "not-a-period"
