@@ -31,11 +31,13 @@ def test_holistic_first_run_renders_board_shell() -> None:
     apptest_assert_no_exception(at, context="board shell")
 
     markdown_blob = " ".join(m.value or "" for m in at.markdown)
+    assert "mw-hero" in markdown_blob, "Main hero must show app name and month"
     assert (
-        "B &amp; R Home Maintenance" in markdown_blob
-        or "B & R Home Maintenance" in markdown_blob
-        or "mw-board-month" in markdown_blob
-        or "mw-sidebar-brand" in markdown_blob
+        "B &amp; R Home Maintenance" in markdown_blob or "B & R Home Maintenance" in markdown_blob
+    )
+    assert "mw-board-month" in markdown_blob, "Month subheader must render in main hero"
+    assert "mw-card-meta-badges" in markdown_blob, (
+        "Open task cards must render priority/overdue after Details row"
     )
 
     refresh_buttons = [b for b in at.button if b.label == "Refresh"]

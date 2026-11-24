@@ -106,11 +106,15 @@ def load_board(year: int, month: int, show_closed: bool) -> list[BoardTask]:
     return board
 
 
-def _render_sidebar_brand() -> None:
+APP_DISPLAY_NAME = "B & R Home Maintenance"
+
+
+def _render_main_hero(month_label_long: str) -> None:
     st.markdown(
-        '<div class="mw-sidebar-brand">'
-        '<span class="mw-brand-icon" aria-hidden="true">🏠</span> '
-        "<span>B &amp; R Home Maintenance</span></div>",
+        '<div class="mw-hero">'
+        f"<h1>{APP_DISPLAY_NAME}</h1>"
+        f'<p class="mw-hero-month mw-board-month">{month_label_long}</p>'
+        "</div>",
         unsafe_allow_html=True,
     )
 
@@ -178,9 +182,7 @@ def main() -> None:
                 st.session_state.mw_sidebar_collapsed = False
                 st.rerun()
         else:
-            nav_col, collapse_col = st.columns([4, 1])
-            with nav_col:
-                _render_sidebar_brand()
+            _, collapse_col = st.columns([5, 1])
             with collapse_col:
                 if st.button(
                     "◀",
@@ -328,10 +330,7 @@ def main() -> None:
 
     month_label_long = date(year, month, 1).strftime("%B %Y")
 
-    st.markdown(
-        f'<h2 class="mw-board-month">{month_label_long}</h2>',
-        unsafe_allow_html=True,
-    )
+    _render_main_hero(month_label_long)
     _fb_pad, _fb_col = st.columns([3, 2])
     with _fb_col:
         st.markdown(
@@ -402,36 +401,39 @@ def main() -> None:
             glyph = status_glyph(row.urgency)
             last_html = format_last_done_html(row)
 
-            head_html = (
-                f'<div class="mw-card-head">'
-                f'<div class="mw-card-head-left">'
+            title_html = (
+                f'<div class="mw-card-title-block">'
                 f"{glyph}"
-                f'<div class="mw-card-head-text">'
-                f'<div class="mw-title-row">'
                 f'<span class="mw-task-title">{display_task_name(t.name)}</span>'
-                f"{prio}</div>"
-                f"{last_html}"
-                f"</div></div>"
-                f"{badge}"
                 f"</div>"
+                f"{last_html}"
             )
+            meta_badges_html = f'<span class="mw-card-meta-badges">{prio}{badge}</span>'
 
             if row.urgency in (Urgency.DONE, Urgency.WONT_DO):
+                closed_html = (
+                    f"{title_html}"
+                    f'<div class="mw-card-meta-row mw-card-meta-row--closed">'
+                    f"{meta_badges_html}</div>"
+                )
                 st.markdown(
-                    f'<div class="mw-task-card {urgency_class(row.urgency)}">{head_html}</div>',
+                    f'<div class="mw-task-card {urgency_class(row.urgency)}">{closed_html}</div>',
                     unsafe_allow_html=True,
                 )
                 continue
 
             with st.container(border=True):
                 uclass = urgency_class(row.urgency)
-                head_col, det_col = st.columns([6, 1], vertical_alignment="center")
-                with head_col:
-                    st.markdown(
-                        f'<div class="mw-task-shell {uclass} mw-task--open">{head_html}</div>',
-                        unsafe_allow_html=True,
-                    )
-                with det_col:
+                st.markdown(
+                    f'<div class="mw-task-shell {uclass} mw-task--open">{title_html}</div>',
+                    unsafe_allow_html=True,
+                )
+                with st.container(
+                    horizontal=True,
+                    gap="small",
+                    vertical_alignment="center",
+                    wrap=True,
+                ):
                     st.markdown(
                         '<span class="mw-card-details-anchor" aria-hidden="true"></span>',
                         unsafe_allow_html=True,
@@ -441,6 +443,10 @@ def main() -> None:
                         st.session_state.drawer_task = (t.task_id, row.period)
                         st.session_state.drawer_edit = False
                         st.rerun()
+                    st.markdown(
+                        f'<div class="mw-card-meta-row">{meta_badges_html}</div>',
+                        unsafe_allow_html=True,
+                    )
                 notes_key = f"notes_{t.task_id}_{row.period}"
                 notes = st.text_input(
                     "Completion note",
