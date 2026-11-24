@@ -188,8 +188,14 @@ html {{ color-scheme: light; }}
     padding-bottom: 3rem;
 }}
 
-#MainMenu, footer, [data-testid="stToolbar"] {{
+#MainMenu,
+footer,
+[data-testid="stToolbar"],
+header[data-testid="stHeader"] {{
     visibility: hidden;
     height: 0;
+    min-height: 0 !important;
+    overflow: hidden;
+    pointer-events: none;
 }}
 </style>"""
