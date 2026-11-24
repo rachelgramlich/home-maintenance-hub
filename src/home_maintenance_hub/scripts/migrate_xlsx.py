@@ -181,7 +181,6 @@ def build_task_props(row: CatalogRow) -> dict[str, Any]:
         "Stable key": nc.rich_text_value(row.migration_key),
         "Cadence": nc.select_value(cadence_label),
         "Active": nc.checkbox_prop(True),
-        "Links JSON": nc.rich_text_value("[]"),
     }
     if row.season:
         props["Season"] = nc.select_value(row.season)

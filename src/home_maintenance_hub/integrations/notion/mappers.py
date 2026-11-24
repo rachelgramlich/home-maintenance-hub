@@ -5,7 +5,7 @@ from typing import Any
 
 from home_maintenance_hub.domain.schedule import MONTH_NAMES
 from home_maintenance_hub.integrations.notion import client as nc
-from home_maintenance_hub.models import Completion, Contractor, Template, parse_links_json
+from home_maintenance_hub.models import Completion, Contractor, Template
 
 
 def page_to_template(page: dict[str, Any]) -> Template:
@@ -15,7 +15,6 @@ def page_to_template(page: dict[str, Any]) -> Template:
     if month_num is None:
         month_name = nc.select_name(props.get("Month"))
         month_num = float(MONTH_NAMES.get(month_name.lower(), 1))
-    links_raw = nc.plain_text(props.get("Links JSON"))
     rel = nc.relation_ids(props.get("Contractor"))
     stable = nc.plain_text(props.get("Stable key"))
     cadence_select = nc.select_name(props.get("Cadence"))
@@ -38,7 +37,7 @@ def page_to_template(page: dict[str, Any]) -> Template:
         priority=nc.select_name(props.get("Priority")) or "Medium",  # type: ignore[arg-type]
         season=nc.select_name(props.get("Season")),
         instructions=nc.plain_text(props.get("Instructions")),
-        links=parse_links_json(links_raw),
+        links=(),
         contractor_id=rel[0] if rel else None,
         stable_key=nc.plain_text(props.get("Stable key")),
         notion_url=str(page.get("url") or ""),
