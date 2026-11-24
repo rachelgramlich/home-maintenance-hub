@@ -84,7 +84,7 @@ When removing a field, API, or Notion property, **delete the code and schema in 
 ## Structure-only tidy (agents)
 
 - **S vs B:** **`tidy-first`** skill — structure (**S**) and behavior (**B**) in **separate commits**. Repo-wide → **`/tidy-project`**.
-- **Verify before push:** `just check` → `ruff check`, `ruff format --check`, `pytest`.
+- **Verify before push:** **`just ci`** (matches CI; includes actionlint). `just check` is OK locally only if you already ran `just ci` this branch.
 - **CI:** GitHub Actions runs `just ci` on every PR.
 - **UI tests:** `tests/ui/ui_source.py` for `APP_PATH` / `ui_source()` — no ad-hoc path literals in tests.
 
@@ -93,3 +93,25 @@ When removing a field, API, or Notion property, **delete the code and schema in 
 ## Agent delivery default
 
 After **substantive** implementation (not Q&A-only): run checks → commit → push → **open a PR** (`gh pr create`). Do not wait for the user to ask for a PR — include the PR link in your final message. See `.cursor/rules/always-open-pr.mdc`.
+
+## Cursor Cloud agents (CI must pass before push)
+
+GitHub Actions runs **`just ci`** (`UV_LOCKED=1` sync → **actionlint** → `ruff check` → **`ruff format --check`** → `pytest`). A green `ruff check` + `pytest` alone is **not** enough — missing **`ruff format --check`** or **workflow-lint** is the usual reason agent PRs fail on the first run.
+
+**Before every push / PR:**
+
+```bash
+just ci
+```
+
+If `just` is not installed, run the same steps explicitly (see `Justfile` recipe `ci`):
+
+```bash
+UV_LOCKED=1 uv sync --group dev
+uvx --from actionlint-py==1.7.12.25 actionlint
+uv run ruff check
+uv run ruff format --check
+uv run pytest
+```
+
+When you change Python, also run **`uv run ruff format`** on touched files (or `just format`) so `format --check` passes. **Do not open or update a PR** until `just ci` exits 0.
