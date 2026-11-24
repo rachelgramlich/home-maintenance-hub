@@ -12,7 +12,7 @@
 - **Sort:** urgency bucket (overdue → in progress → open), then **priority** (High → Low), area, name.
 - **Last done** + last completion note from completions log.
 - Filter by **area** (and optional type / season).
-- **Details drawer:** instructions, links, contractor (relation); view + **edit** template fields.
+- **Details drawer:** instructions (URLs inline), contractor (relation); view + **edit** template fields.
 - **Manage contractors:** CRUD + “used by N tasks”; link from drawer.
 - **Source of truth:** **Notion** (three databases). **Local JSON** for dev/CI only.
 - One-time **migration** from Ocala xlsx `Home Maintenance` tab.

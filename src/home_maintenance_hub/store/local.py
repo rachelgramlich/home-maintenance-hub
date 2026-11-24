@@ -5,14 +5,7 @@ import uuid
 from datetime import date
 from pathlib import Path
 
-from home_maintenance_hub.models import (
-    Completion,
-    CompletionStatus,
-    Contractor,
-    Template,
-    links_to_json,
-    parse_links_json,
-)
+from home_maintenance_hub.models import Completion, CompletionStatus, Contractor, Template
 from home_maintenance_hub.store.base import TaskStore
 
 
@@ -31,7 +24,6 @@ def _parse_templates(raw: list[dict]) -> list[Template]:
             priority=row.get("priority", "Medium"),  # type: ignore[arg-type]
             season=str(row.get("season", "")),
             instructions=str(row.get("instructions", "")),
-            links=parse_links_json(str(row.get("links_json", ""))),
             contractor_id=row.get("contractor_id"),
             stable_key=str(row.get("stable_key", "")),
         )
@@ -216,7 +208,6 @@ class LocalTaskStore(TaskStore):
                 "priority": t.priority,
                 "season": t.season,
                 "instructions": t.instructions,
-                "links_json": links_to_json(t.links),
                 "contractor_id": t.contractor_id,
                 "stable_key": t.stable_key,
             }
@@ -227,7 +218,6 @@ class LocalTaskStore(TaskStore):
                     "area": template.area,
                     "priority": template.priority,
                     "instructions": template.instructions,
-                    "links_json": links_to_json(template.links),
                     "contractor_id": template.contractor_id,
                     "task_type": template.task_type,
                     "effort": template.effort,

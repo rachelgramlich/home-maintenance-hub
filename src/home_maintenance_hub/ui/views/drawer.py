@@ -228,7 +228,6 @@ def _edit_form(template: Template, store: TaskStore) -> None:
             priority=priority,  # type: ignore[arg-type]
             season=season,
             instructions=instructions,
-            links=template.links,
             contractor_id=ctr_id,
             stable_key=template.stable_key,
             notion_url=template.notion_url,
