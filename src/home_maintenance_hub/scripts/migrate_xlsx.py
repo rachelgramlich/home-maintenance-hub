@@ -14,6 +14,7 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 from home_maintenance_hub.config import get_settings
+from home_maintenance_hub.domain.instructions import clean_instruction_text
 from home_maintenance_hub.integrations.notion import client as nc
 from home_maintenance_hub.integrations.notion.mappers import page_to_template
 from home_maintenance_hub.migration.cadence import (
@@ -176,7 +177,7 @@ def build_task_props(row: CatalogRow) -> dict[str, Any]:
         "Type": nc.select_value(map_type(row.task_type)),
         "Priority": nc.select_value(row.priority or "Medium"),
         "Effort": nc.select_value(map_effort(row.effort)),
-        "Instructions": nc.rich_text_value(row.instructions),
+        "Instructions": nc.rich_text_value(clean_instruction_text(row.instructions)),
         "Stable key": nc.rich_text_value(row.migration_key),
         "Cadence": nc.select_value(cadence_label),
         "Active": nc.checkbox_prop(True),
