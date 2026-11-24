@@ -188,14 +188,22 @@ html {{ color-scheme: light; }}
     padding-bottom: 3rem;
 }}
 
-#MainMenu,
-footer,
-[data-testid="stToolbar"],
-header[data-testid="stHeader"] {{
+footer {{
     visibility: hidden;
     height: 0;
     min-height: 0 !important;
     overflow: hidden;
     pointer-events: none;
+}}
+
+#MainMenu {{
+    visibility: hidden;
+}}
+
+[data-testid="stToolbarActions"],
+[data-testid="stMainMenu"],
+[data-testid="stAppDeployButton"],
+[data-testid="stStatusWidget"] {{
+    display: none !important;
 }}
 </style>"""
