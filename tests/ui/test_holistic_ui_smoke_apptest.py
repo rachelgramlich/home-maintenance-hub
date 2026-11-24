@@ -37,7 +37,7 @@ def test_holistic_first_run_renders_board_shell() -> None:
     )
     assert "mw-board-month" in markdown_blob, "Month subheader must render in main hero"
     assert "mw-card-meta-badges" in markdown_blob, (
-        "Open task cards must render priority/overdue after Details row"
+        "Open task cards must render priority/overdue on the meta row"
     )
 
     refresh_buttons = [b for b in at.button if b.label == "Refresh"]
