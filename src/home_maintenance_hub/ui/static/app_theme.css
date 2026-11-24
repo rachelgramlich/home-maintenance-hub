@@ -141,7 +141,7 @@ html {
     [data-testid="stHorizontalBlock"]:has(.mw-card-meta-row--open) {
     align-items: center !important;
     display: grid !important;
-    grid-template-columns: minmax(0, 1fr) minmax(6.5rem, max-content) !important;
+    grid-template-columns: minmax(0, 1fr) minmax(7.25rem, max-content) !important;
     column-gap: 0.5rem !important;
     width: 100% !important;
     flex-direction: row !important;
@@ -160,7 +160,7 @@ html {
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
     [data-testid="stHorizontalBlock"]:has(.mw-card-meta-row--open)
     > [data-testid="column"]:last-child {
-    min-width: 6.5rem !important;
+    min-width: 7.25rem !important;
 }
 
 [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
@@ -185,11 +185,10 @@ html {
   button {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
-    min-width: 6.5rem !important;
+    min-width: 7.25rem !important;
     width: max-content !important;
     max-width: none !important;
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
+    padding: 0.5rem 1.15rem !important;
     white-space: nowrap !important;
 }
 
@@ -225,7 +224,7 @@ html {
     [data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
         [data-testid="stHorizontalBlock"]:has(.mw-card-meta-row--open) {
         display: grid !important;
-        grid-template-columns: minmax(0, 1fr) minmax(6.5rem, max-content) !important;
+        grid-template-columns: minmax(0, 1fr) minmax(7.25rem, max-content) !important;
         flex-direction: row !important;
     }
 
