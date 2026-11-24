@@ -7,13 +7,7 @@ import streamlit as st
 
 from home_maintenance_hub.domain.display import display_task_name
 from home_maintenance_hub.domain.schedule import period_full_month_year_label
-from home_maintenance_hub.models import (
-    BoardTask,
-    Template,
-    Urgency,
-    links_to_json,
-    parse_links_json,
-)
+from home_maintenance_hub.models import BoardTask, Template, Urgency
 from home_maintenance_hub.store.base import TaskStore
 
 
@@ -113,13 +107,6 @@ def render_drawer(row: BoardTask, store: TaskStore, *, editing: bool) -> None:
     else:
         _empty_value()
 
-    _section_title("Links")
-    if t.links:
-        for link in t.links:
-            st.markdown(f"- [{link.label}]({link.url})")
-    else:
-        _empty_value()
-
     contractor = store.get_contractor(t.contractor_id) if t.contractor_id else None
     _section_title("Contractor")
     if contractor:
@@ -152,7 +139,12 @@ def render_drawer(row: BoardTask, store: TaskStore, *, editing: bool) -> None:
 
 def _edit_form(template: Template, store: TaskStore) -> None:
     name = st.text_input("Task name", value=template.name)
-    instructions = st.text_area("Instructions", value=template.instructions, height=120)
+    instructions = st.text_area(
+        "Instructions",
+        value=template.instructions,
+        height=120,
+        help="How to do the task. Paste URLs here if you need reference links.",
+    )
     areas = [
         "HVAC",
         "Plumbing",
@@ -214,12 +206,6 @@ def _edit_form(template: Template, store: TaskStore) -> None:
         index=cadence_options.index(template.cadence),
     )
     active = st.toggle("Active", value=template.active)
-    links_raw = st.text_area(
-        "Links (JSON)",
-        value=links_to_json(template.links),
-        height=80,
-        help='Array of {"label": "...", "url": "..."} objects.',
-    )
     contractors = store.list_contractors()
     ctr_names = ["— none —"] + [c.name for c in contractors]
     ctr_ids = [None] + [c.contractor_id for c in contractors]
@@ -230,7 +216,6 @@ def _edit_form(template: Template, store: TaskStore) -> None:
     ctr_id = ctr_ids[ctr_names.index(ctr_pick)] if ctr_pick != "— none —" else None
 
     if st.button("Save task", type="primary"):
-        parsed_links = parse_links_json(links_raw)
         updated = Template(
             task_id=template.task_id,
             name=name,
@@ -243,7 +228,7 @@ def _edit_form(template: Template, store: TaskStore) -> None:
             priority=priority,  # type: ignore[arg-type]
             season=season,
             instructions=instructions,
-            links=parsed_links,
+            links=template.links,
             contractor_id=ctr_id,
             stable_key=template.stable_key,
             notion_url=template.notion_url,

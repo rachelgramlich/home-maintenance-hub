@@ -16,7 +16,6 @@ from home_maintenance_hub.models import (
     CompletionStatus,
     Contractor,
     Template,
-    links_to_json,
 )
 from home_maintenance_hub.store.base import TaskStore
 
@@ -123,7 +122,6 @@ class NotionTaskStore(TaskStore):
             "Effort": nc.select_value(template.effort),
             "Priority": nc.select_value(template.priority),
             "Instructions": nc.rich_text_value(template.instructions),
-            "Links JSON": nc.rich_text_value(links_to_json(template.links)),
             "Active": nc.checkbox_prop(template.active),
         }
         if template.month_name:

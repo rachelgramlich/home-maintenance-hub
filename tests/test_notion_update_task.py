@@ -8,7 +8,7 @@ import pytest
 
 from home_maintenance_hub.config import Settings, get_settings
 from home_maintenance_hub.integrations.notion import client as nc
-from home_maintenance_hub.models import TaskLink, Template
+from home_maintenance_hub.models import Template
 from home_maintenance_hub.store.notion import NotionTaskStore
 
 
@@ -26,7 +26,6 @@ def _notion_page_from_template(t: Template) -> dict:
                 "type": "rich_text",
                 "rich_text": [{"plain_text": t.instructions}],
             },
-            "Links JSON": {"type": "rich_text", "rich_text": [{"plain_text": "[]"}]},
             "Active": {"type": "checkbox", "checkbox": t.active},
             "Contractor": {
                 "type": "relation",
@@ -60,7 +59,6 @@ def test_update_task_calls_notion_pages_update(notion_settings: Settings, monkey
         effort="Low",
         priority="High",
         instructions="Replace filter",
-        links=(TaskLink(label="Manual", url="https://example.com"),),
         contractor_id="ctr-99",
     )
 
@@ -80,6 +78,7 @@ def test_update_task_calls_notion_pages_update(notion_settings: Settings, monkey
     props = captured["properties"]
     assert props["Task"]["title"][0]["text"]["content"] == "Test filter change"
     assert props["Instructions"]["rich_text"][0]["text"]["content"] == "Replace filter"
+    assert "Links JSON" not in props
     assert props["Contractor"]["relation"] == [{"id": "ctr-99"}]
     assert updated.name == template.name
     assert updated.contractor_id == "ctr-99"
