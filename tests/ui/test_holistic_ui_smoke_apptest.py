@@ -52,6 +52,7 @@ def test_holistic_first_run_renders_board_shell() -> None:
     assert "HVAC filter" in markdown_blob or "Electrical" in markdown_blob, (
         "Expected seeded task name text on open cards"
     )
+    assert "Data source:" not in markdown_blob, "Store mode label must not appear on the board"
 
     details_buttons = [b for b in at.button if b.label == "Details"]
     assert details_buttons, "Expected Details button on an open task card"
