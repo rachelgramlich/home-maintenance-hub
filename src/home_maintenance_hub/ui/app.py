@@ -156,6 +156,9 @@ def main() -> None:
     if "mw_season_filter" not in st.session_state:
         st.session_state.mw_season_filter = []
 
+    if st.session_state.drawer_task and st.session_state.mw_sidebar_collapsed:
+        st.session_state.mw_sidebar_collapsed = False
+
     collapsed = st.session_state.mw_sidebar_collapsed
     layout_marker = "mw-layout-sidebar-collapsed" if collapsed else "mw-layout-sidebar-expanded"
     st.markdown(
