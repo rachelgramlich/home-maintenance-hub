@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=(_REPO_ROOT / ".env", _REPO_ROOT / ".streamlit" / "secrets.toml"),
         env_file_encoding="utf-8",
-        env_prefix="HOME_MAINTENANCE_HUB_",
+        env_prefix="HOME_MAINTENANCE_",
         extra="ignore",
     )
 
@@ -31,13 +31,13 @@ class Settings(BaseSettings):
     )
     notion_api_key: str = Field(default_factory=lambda: os.environ.get("NOTION_API_KEY", ""))
     notion_tasks_ds_id: str = Field(
-        default_factory=lambda: _notion_ds_id("HOME_MAINTENANCE_HUB_NOTION_TASKS_DS_ID")
+        default_factory=lambda: _notion_ds_id("HOME_MAINTENANCE_NOTION_TASKS_DS_ID")
     )
     notion_contractors_ds_id: str = Field(
-        default_factory=lambda: _notion_ds_id("HOME_MAINTENANCE_HUB_NOTION_CONTRACTORS_DS_ID")
+        default_factory=lambda: _notion_ds_id("HOME_MAINTENANCE_NOTION_CONTRACTORS_DS_ID")
     )
     notion_completions_ds_id: str = Field(
-        default_factory=lambda: _notion_ds_id("HOME_MAINTENANCE_HUB_NOTION_COMPLETIONS_DS_ID")
+        default_factory=lambda: _notion_ds_id("HOME_MAINTENANCE_NOTION_COMPLETIONS_DS_ID")
     )
     xlsx_path: Path | None = None
     github_feedback_token: str = Field(
