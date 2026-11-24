@@ -432,25 +432,23 @@ def main() -> None:
                     f'<div class="mw-task-shell {uclass} mw-task--open">{title_html}</div>',
                     unsafe_allow_html=True,
                 )
-                with st.container(
-                    horizontal=True,
+                meta_left, meta_right = st.columns(
+                    [11, 4],
                     gap="small",
                     vertical_alignment="center",
-                    wrap=True,
-                ):
+                )
+                with meta_left:
                     st.markdown(
-                        '<span class="mw-card-details-anchor" aria-hidden="true"></span>',
+                        f'<div class="mw-card-meta-row mw-card-meta-row--open">'
+                        f"{meta_badges_html}</div>",
                         unsafe_allow_html=True,
                     )
+                with meta_right:
                     det_key = f"det_{t.task_id}_{row.period}"
                     if st.button("Details", key=det_key, type="secondary"):
                         st.session_state.drawer_task = (t.task_id, row.period)
                         st.session_state.drawer_edit = False
                         st.rerun()
-                    st.markdown(
-                        f'<div class="mw-card-meta-row">{meta_badges_html}</div>',
-                        unsafe_allow_html=True,
-                    )
                 notes_key = f"notes_{t.task_id}_{row.period}"
                 notes = st.text_input(
                     "Completion note",
