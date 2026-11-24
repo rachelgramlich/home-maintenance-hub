@@ -27,10 +27,10 @@ Copy `.env.example` → `.env` or `secrets.toml.example` → `secrets.toml`.
 
 | Variable | Default | Meaning |
 |----------|---------|---------|
-| `HOME_MAINTENANCE_STORE` | `local` | `local` or `notion` |
+| `STORE` | `local` | `local` or `notion` |
 | `NOTION_API_KEY` | — | Notion integration token |
-| `HOME_MAINTENANCE_NOTION_*_DS_ID` | — | Data source IDs (tasks, contractors, completions) |
-| `HOME_MAINTENANCE_TIMEZONE` | `America/New_York` | Month boundaries |
+| `TASKS_DS_ID, CONTRACTORS_DS_ID, COMPLETIONS_DS_ID` | — | Data source IDs (tasks, contractors, completions) |
+| `TIMEZONE` | `America/New_York` | Month boundaries |
 
 Local data file: `.local/home_maintenance_hub/data.json` (gitignored).
 
@@ -47,7 +47,7 @@ just migrate-xlsx --xlsx /path/to/Ocala.xlsx   # Home Maintenance tab
 just migrate-xlsx --dry-run
 ```
 
-Set `HOME_MAINTENANCE_STORE=notion` for production UI. Use **local** for offline dev/CI.
+Set `STORE=notion` for production UI. Use **local** for offline dev/CI.
 
 ## Development
 

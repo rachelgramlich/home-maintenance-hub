@@ -444,7 +444,7 @@ def main(argv: list[str] | None = None) -> int:
 
     xlsx = args.xlsx or get_settings().xlsx_path
     if xlsx is None:
-        env_path = os.environ.get("HOME_MAINTENANCE_XLSX_PATH")
+        env_path = os.environ.get("XLSX_PATH")
         if env_path:
             xlsx = Path(env_path)
 
