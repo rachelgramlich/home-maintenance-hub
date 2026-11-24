@@ -326,8 +326,8 @@ html {
 }
 
 .mw-task-title {
-    font-size: 1.05rem;
-    font-weight: 600;
+    font-size: 1.3rem;
+    font-weight: 700;
     color: var(--mw-text);
     margin: 0.35rem 0 0.2rem;
 }
@@ -469,9 +469,20 @@ html {
 .mw-card-title-block .mw-task-title {
     flex: 1 1 auto;
     min-width: 0;
-    margin: 0.15rem 0 0;
-    line-height: 1.35;
+    margin: 0.1rem 0 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+    line-height: 1.3;
     word-break: break-word;
+}
+
+/* Keep card controls visually below the task name. */
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell) .stButton button,
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell) .stButton button p,
+[data-testid="stVerticalBlockBorderWrapper"]:has(.mw-task-shell)
+    [data-testid="stTextInput"]
+    input {
+    font-size: 0.9rem !important;
 }
 
 .mw-card-meta-row {
