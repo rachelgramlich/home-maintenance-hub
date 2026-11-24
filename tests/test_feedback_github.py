@@ -20,7 +20,8 @@ def test_create_feedback_issue_posts_inbox_label() -> None:
     mock_response.reason = "Created"
 
     with patch(
-        "home_maintenance_hub.integrations.feedback_github.requests.post", return_value=mock_response
+        "home_maintenance_hub.integrations.feedback_github.requests.post",
+        return_value=mock_response,
     ) as post:
         result = create_feedback_issue(
             "  Filter chips look great  ",

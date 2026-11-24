@@ -6,7 +6,9 @@ import streamlit as st
 
 from home_maintenance_hub.config import Settings
 
-DEPLOYMENT_DOC = "https://github.com/rachelgramlich/home-maintenance-hub/blob/main/docs/DEPLOYMENT.md"
+DEPLOYMENT_DOC = (
+    "https://github.com/rachelgramlich/home-maintenance-hub/blob/main/docs/DEPLOYMENT.md"
+)
 
 
 def render_settings_page(settings: Settings) -> None:
