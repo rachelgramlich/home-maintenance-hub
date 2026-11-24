@@ -5,6 +5,7 @@ import html
 import streamlit as st
 
 from home_maintenance_hub.domain.display import display_task_name
+from home_maintenance_hub.domain.schedule import period_full_month_year_label
 from home_maintenance_hub.models import (
     BoardTask,
     Template,
@@ -37,9 +38,13 @@ def format_drawer_task_meta(template: Template, period: str) -> str:
     return " · ".join(f"{label}: {value}" for label, value in task_context_fields(template, period))
 
 
-def _status_badge_html(urgency: Urgency) -> str:
+def _status_badge_html(urgency: Urgency, *, period: str | None = None) -> str:
     if urgency == Urgency.OVERDUE:
-        return '<span class="mw-badge mw-badge-overdue">Overdue</span>'
+        if period:
+            text = f"Overdue: {period_full_month_year_label(period)}"
+        else:
+            text = "Overdue"
+        return f'<span class="mw-badge mw-badge-overdue">{text}</span>'
     if urgency == Urgency.IN_PROGRESS:
         return '<span class="mw-badge mw-badge-progress">In progress</span>'
     if urgency == Urgency.DONE:
@@ -82,7 +87,7 @@ def _empty_value() -> None:
 def render_drawer(row: BoardTask, store: TaskStore, *, editing: bool) -> None:
     t = row.template
     title = html.escape(display_task_name(t.name))
-    badge = _status_badge_html(row.urgency)
+    badge = _status_badge_html(row.urgency, period=row.period)
     st.markdown(
         f'<div class="mw-drawer-header"><h3 class="mw-drawer-task-title">{title}</h3>{badge}</div>',
         unsafe_allow_html=True,

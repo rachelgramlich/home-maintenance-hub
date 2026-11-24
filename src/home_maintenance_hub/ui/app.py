@@ -10,6 +10,7 @@ import streamlit as st
 from home_maintenance_hub.config import get_settings
 from home_maintenance_hub.domain.board import build_month_board
 from home_maintenance_hub.domain.display import display_task_name
+from home_maintenance_hub.domain.schedule import period_full_month_year_label
 from home_maintenance_hub.models import BoardTask, Priority, Urgency
 from home_maintenance_hub.store.factory import get_store
 from home_maintenance_hub.ui.access_gate import enforce_access_gate
@@ -41,9 +42,14 @@ def urgency_class(urgency: Urgency) -> str:
     }[urgency]
 
 
-def urgency_badge(urgency: Urgency) -> str:
+def urgency_badge(urgency: Urgency, *, period: str | None = None) -> str:
     if urgency == Urgency.OVERDUE:
-        return '<span class="mw-badge mw-badge-overdue">Overdue</span>'
+        if period:
+            month_label = period_full_month_year_label(period)
+            text = f"Overdue: {month_label}"
+        else:
+            text = "Overdue"
+        return f'<span class="mw-badge mw-badge-overdue">{text}</span>'
     if urgency == Urgency.IN_PROGRESS:
         return '<span class="mw-badge mw-badge-progress">In progress</span>'
     return ""
@@ -377,18 +383,13 @@ def main() -> None:
             label_visibility="visible",
         )
 
-    st.markdown(
-        '<p class="mw-sort-caption">Urgency first, then priority, area, and name.</p>',
-        unsafe_allow_html=True,
-    )
-
     if not board:
         st.success("Nothing open for this month — or all tasks are complete.")
     else:
         store = get_store()
         for row in board:
             t = row.template
-            badge = urgency_badge(row.urgency)
+            badge = urgency_badge(row.urgency, period=row.period)
             prio = priority_badge(t.priority)
             glyph = status_glyph(row.urgency)
             last_html = format_last_done_html(row)

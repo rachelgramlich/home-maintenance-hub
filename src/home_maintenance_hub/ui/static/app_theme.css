@@ -310,6 +310,8 @@ html {
 .mw-badge-overdue {
     background: var(--mw-overdue);
     color: #ffffff;
+    white-space: nowrap;
+    font-size: 0.6rem;
 }
 
 .mw-sidebar-brand {
