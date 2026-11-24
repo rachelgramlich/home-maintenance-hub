@@ -37,15 +37,15 @@ Each app needs its own `[auth].redirect_uri` and a **new** `cookie_secret` in Cl
 
 | Secret | Purpose |
 | --- | --- |
-| `NOTION_*`, `HOME_MAINTENANCE_HUB_*` | Notion store (see `docs/NOTION_SETUP.md`) |
-| `HOME_MAINTENANCE_HUB_STORE` | `notion` |
+| `NOTION_*`, `HOME_MAINTENANCE_*` | Notion store (see `docs/NOTION_SETUP.md`) |
+| `HOME_MAINTENANCE_STORE` | `notion` |
 | `[auth]` | Google OIDC (`client_id`, `client_secret`, `redirect_uri`, `cookie_secret`, `server_metadata_url`) |
-| `HOME_MAINTENANCE_HUB_REQUIRE_AUTH` | `true` |
-| `HOME_MAINTENANCE_HUB_AUTH_EMAIL_ALLOWLIST` | Comma-separated household emails |
+| `HOME_MAINTENANCE_REQUIRE_AUTH` | `true` |
+| `HOME_MAINTENANCE_AUTH_EMAIL_ALLOWLIST` | Comma-separated household emails |
 | `GITHUB_FEEDBACK_REPOSITORY` | `rachelgramlich/home-maintenance-hub` |
 | `GITHUB_FEEDBACK_TOKEN` | Fine-grained PAT, **issues:write** on this repo only |
 
-**Local:** copy `secrets.toml.example` → `secrets.toml`, run `just link-secrets`. Default `HOME_MAINTENANCE_HUB_REQUIRE_AUTH = false`.
+**Local:** copy `secrets.toml.example` → `secrets.toml`, run `just link-secrets`. Default `HOME_MAINTENANCE_REQUIRE_AUTH = false`.
 
 **Deps:** `streamlit[auth]` in `pyproject.toml` — run `just setup` / `uv sync` after pull.
 
@@ -68,7 +68,7 @@ Verify: submit **Send feedback** → `gh issue list --label user-feedback-inbox 
 
 | Setting | Local `just ui` | Cloud |
 | --- | --- | --- |
-| `HOME_MAINTENANCE_HUB_REQUIRE_AUTH` | `false` | `true` |
+| `HOME_MAINTENANCE_REQUIRE_AUTH` | `false` | `true` |
 | Store | `local` or `notion` | `notion` |
 | Feedback | GitHub when token set | GitHub |
 
@@ -79,6 +79,6 @@ Verify: submit **Send feedback** → `gh issue list --label user-feedback-inbox 
 | OAuth redirect mismatch | Match `[auth].redirect_uri` to Google Console and Cloud URL |
 | `StreamlitMissingAuthlibError` | `uv sync` / `just setup` for `streamlit[auth]` |
 | Feedback failures | Check `GITHUB_FEEDBACK_TOKEN` in Secrets; reboot app |
-| “Not authorized” after login | Add email to `HOME_MAINTENANCE_HUB_AUTH_EMAIL_ALLOWLIST` |
+| “Not authorized” after login | Add email to `HOME_MAINTENANCE_AUTH_EMAIL_ALLOWLIST` |
 
 See also [docs/DEPLOYMENT.md](../DEPLOYMENT.md).

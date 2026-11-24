@@ -80,7 +80,7 @@ Streamlit does **not** run background jobs. Reminders are **v2 (GCal)** or optio
 3. Create an **internal integration**; share all three databases with it.
 4. Set env vars (§9): `NOTION_API_KEY`, three data source IDs (or database IDs per grocery-hub pattern).
 5. Run migration dry-run, then apply.
-6. Smoke-test: `just ui` with `HOME_MAINTENANCE_HUB_STORE=notion`.
+6. Smoke-test: `just ui` with `HOME_MAINTENANCE_STORE=notion`.
 
 **Live workspace IDs:** see [NOTION_SETUP.md](./NOTION_SETUP.md) (hub page + three data source IDs created 2026-11-19).
 
@@ -202,7 +202,7 @@ erDiagram
 
 There is **no “due soon” state** and no `due_soon_days` window. Tasks are scheduled by **month**, not by a day inside the month, so urgency does not change as the calendar month runs out.
 
-Month boundaries use `HOME_MAINTENANCE_HUB_TIMEZONE` (default `America/New_York`).
+Month boundaries use `HOME_MAINTENANCE_TIMEZONE` (default `America/New_York`).
 
 ### 4.4 Sort order
 
@@ -287,7 +287,7 @@ class MaintenanceStore(Protocol):
     def upsert_contractor(self, contractor: Contractor) -> None: ...
 ```
 
-| `HOME_MAINTENANCE_HUB_STORE` | Use |
+| `HOME_MAINTENANCE_STORE` | Use |
 |----------------------------|-----|
 | `local` | `.local/.../data.json` — default CI and fast UI dev |
 | `notion` | Production |
@@ -340,12 +340,12 @@ Google Sheets backend removed (v1 uses **local JSON** or **Notion** only).
 
 | Variable | Meaning |
 |----------|---------|
-| `HOME_MAINTENANCE_HUB_STORE` | `local` \| `notion` |
+| `HOME_MAINTENANCE_STORE` | `local` \| `notion` |
 | `NOTION_API_KEY` | Integration secret |
-| `HOME_MAINTENANCE_HUB_NOTION_TASKS_DS_ID` | Tasks data source ID |
-| `HOME_MAINTENANCE_HUB_NOTION_CONTRACTORS_DS_ID` | Contractors data source ID |
-| `HOME_MAINTENANCE_HUB_NOTION_COMPLETIONS_DS_ID` | Completions data source ID |
-| `HOME_MAINTENANCE_HUB_TIMEZONE` | Default `America/New_York` |
+| `HOME_MAINTENANCE_NOTION_TASKS_DS_ID` | Tasks data source ID |
+| `HOME_MAINTENANCE_NOTION_CONTRACTORS_DS_ID` | Contractors data source ID |
+| `HOME_MAINTENANCE_NOTION_COMPLETIONS_DS_ID` | Completions data source ID |
+| `HOME_MAINTENANCE_TIMEZONE` | Default `America/New_York` |
 
 Never commit secrets or xlsx with credentials (`Account Info` tab). NFR5.
 

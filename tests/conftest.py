@@ -17,8 +17,8 @@ def _local_store(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     data_path = tmp_path / "home_maintenance_hub" / "data.json"
     data_path.parent.mkdir(parents=True, exist_ok=True)
     data_path.write_text(json.dumps(SAMPLE, indent=2), encoding="utf-8")
-    monkeypatch.setenv("HOME_MAINTENANCE_HUB_STORE", "local")
-    monkeypatch.setenv("HOME_MAINTENANCE_HUB_LOCAL_DATA_PATH", str(data_path))
+    monkeypatch.setenv("HOME_MAINTENANCE_STORE", "local")
+    monkeypatch.setenv("HOME_MAINTENANCE_LOCAL_DATA_PATH", str(data_path))
     get_settings.cache_clear()
     yield
     get_settings.cache_clear()
