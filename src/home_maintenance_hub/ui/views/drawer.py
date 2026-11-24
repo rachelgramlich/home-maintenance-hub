@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import html
+from datetime import date
 
 import streamlit as st
 
@@ -94,20 +95,19 @@ def render_drawer(row: BoardTask, store: TaskStore, *, editing: bool) -> None:
     )
 
     if editing:
-        st.caption(f"{t.area} · {t.month_name or t.due_month} · {row.period}")
-    else:
-        _section_title("Task details", first=True)
-        _render_task_context(t, row.period)
+        _section_title("Edit task", first=True)
+        _edit_form(t, store)
+        if t.notion_url:
+            st.link_button("Open in Notion", t.notion_url)
+        return
+
+    _section_title("Task details", first=True)
+    _render_task_context(t, row.period)
 
     if t.notion_url:
         st.link_button("Open in Notion", t.notion_url)
 
-    if editing:
-        _edit_form(t, store)
-        return
-
-    first_section = False
-    _section_title("Instructions", first=first_section)
+    _section_title("Instructions")
     if t.instructions:
         st.write(t.instructions)
     else:
@@ -152,6 +152,7 @@ def render_drawer(row: BoardTask, store: TaskStore, *, editing: bool) -> None:
 
 def _edit_form(template: Template, store: TaskStore) -> None:
     name = st.text_input("Task name", value=template.name)
+    instructions = st.text_area("Instructions", value=template.instructions, height=120)
     areas = [
         "HVAC",
         "Plumbing",
@@ -180,7 +181,39 @@ def _edit_form(template: Template, store: TaskStore) -> None:
     seasons = ["", "Winter", "Spring", "Summer", "Fall"]
     season_idx = seasons.index(template.season) if template.season in seasons else 0
     season = st.selectbox("Season", seasons, index=season_idx)
-    instructions = st.text_area("Instructions", value=template.instructions, height=120)
+    month_names = [
+        "",
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+    ]
+    due_month = st.selectbox(
+        "Due month",
+        list(range(1, 13)),
+        index=max(0, template.due_month - 1),
+        format_func=lambda m: date(2000, m, 1).strftime("%B"),
+    )
+    month_name = st.selectbox(
+        "Month label",
+        month_names,
+        index=month_names.index(template.month_name) if template.month_name in month_names else 0,
+    )
+    cadence_options = ["annual", "monthly"]
+    cadence = st.selectbox(
+        "Cadence",
+        cadence_options,
+        index=cadence_options.index(template.cadence),
+    )
+    active = st.toggle("Active", value=template.active)
     links_raw = st.text_area(
         "Links (JSON)",
         value=links_to_json(template.links),
@@ -201,10 +234,10 @@ def _edit_form(template: Template, store: TaskStore) -> None:
         updated = Template(
             task_id=template.task_id,
             name=name,
-            due_month=template.due_month,
+            due_month=due_month,
             area=area,
-            active=template.active,
-            month_name=template.month_name,
+            active=active,
+            month_name=month_name,
             task_type=task_type,
             effort=effort,
             priority=priority,  # type: ignore[arg-type]
@@ -214,7 +247,7 @@ def _edit_form(template: Template, store: TaskStore) -> None:
             contractor_id=ctr_id,
             stable_key=template.stable_key,
             notion_url=template.notion_url,
-            cadence=template.cadence,
+            cadence=cadence,  # type: ignore[arg-type]
         )
         try:
             store.update_task(updated)
