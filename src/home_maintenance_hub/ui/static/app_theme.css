@@ -176,9 +176,23 @@ html {
 }
 
 .block-container {
-    max-width: 80rem;
-    padding-top: 1.5rem;
+    max-width: 56rem;
+    padding-top: 2.25rem;
     padding-bottom: 3rem;
+}
+
+@media (min-width: 960px) {
+    .block-container {
+        max-width: 72rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .block-container {
+        max-width: 100%;
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
 }
 
 .mw-badge-progress {
@@ -472,18 +486,88 @@ html {
     min-width: 0;
 }
 
-/* Drawer column — Streamlit widgets cannot nest in a single HTML wrapper div. */
-[data-testid="stHorizontalBlock"]:has(> [data-testid="column"] .mw-drawer-root)
-    > [data-testid="column"]:last-child {
-    background: var(--mw-card-bg);
-    border: 1px solid var(--mw-border);
-    border-radius: 14px;
-    padding: 0.75rem 1rem 1.25rem;
-    box-shadow: 0 1px 4px rgba(58, 40, 73, 0.08);
+/* Details drawer — slide-over panel (only mounted when a task is selected). */
+.mw-drawer-overlay-mount {
+    display: none;
 }
 
-.mw-drawer-root {
-    display: none;
+.stApp:has(.mw-drawer-overlay-mount) [data-testid="stAppViewContainer"]::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(58, 40, 73, 0.38);
+    z-index: 990;
+    pointer-events: none;
+}
+
+.stApp:has(.mw-drawer-overlay-mount)
+    [data-testid="stVerticalBlock"]:has(.mw-drawer-overlay-mount):not(:has(.mw-board-month)) {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(32rem, 100vw);
+    z-index: 1000;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: var(--mw-card-bg);
+    border-left: 1px solid var(--mw-border);
+    box-shadow: -4px 0 24px rgba(58, 40, 73, 0.18);
+    padding: 2rem 1.15rem 1.5rem !important;
+    margin: 0 !important;
+    box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+    .stApp:has(.mw-drawer-overlay-mount)
+        [data-testid="stVerticalBlock"]:has(.mw-drawer-overlay-mount):not(:has(.mw-board-month)) {
+        width: 100vw;
+        border-left: none;
+    }
+}
+
+/* Send feedback — keep control inside the viewport (popover opens downward). */
+[data-testid="column"]:has(.mw-feedback-anchor) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-start;
+}
+
+[data-testid="column"]:has(.mw-feedback-anchor) [data-testid="stPopover"] {
+    margin-top: 0.15rem;
+}
+
+.stApp:has(.mw-feedback-anchor) [data-testid="stPopoverBody"] {
+    transform: translateY(0) !important;
+    bottom: auto !important;
+    top: 100% !important;
+    margin-top: 0.35rem;
+}
+
+/* Collapsed left navigation */
+.stApp:has(.mw-layout-sidebar-collapsed) [data-testid="stSidebar"] {
+    width: 0 !important;
+    min-width: 0 !important;
+    visibility: hidden;
+    overflow: hidden;
+}
+
+.stApp:has(.mw-layout-sidebar-collapsed) [data-testid="stSidebar"] > div:first-child {
+    width: 0 !important;
+    min-width: 0 !important;
+}
+
+.stApp:has(.mw-layout-sidebar-collapsed) section[data-testid="stMain"] {
+    margin-left: 0 !important;
+}
+
+[data-testid="column"]:has(.mw-sidebar-brand) + [data-testid="column"] .stButton button {
+    min-height: 2rem !important;
+    padding: 0.2rem 0.45rem !important;
 }
 
 .mw-drawer-header {
