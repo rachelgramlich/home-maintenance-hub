@@ -675,9 +675,21 @@ html {
     border-top: none;
 }
 
-#MainMenu, footer, [data-testid="stToolbar"] {
+footer {
     visibility: hidden;
     height: 0;
+}
+
+#MainMenu {
+    visibility: hidden;
+}
+
+/* Keep sidebar expand/collapse in the toolbar — do not hide all of stToolbar. */
+[data-testid="stToolbarActions"],
+[data-testid="stMainMenu"],
+[data-testid="stAppDeployButton"],
+[data-testid="stStatusWidget"] {
+    display: none !important;
 }
 .mw-drawer-task-title {
     margin-top: 0;
