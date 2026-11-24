@@ -132,6 +132,7 @@ def main() -> None:
         page_title="B & R Home Maintenance",
         page_icon="🏠",
         layout="wide",
+        initial_sidebar_state="expanded",
     )
     enforce_access_gate()
     inject_app_styles()
