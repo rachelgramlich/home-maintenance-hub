@@ -72,6 +72,12 @@ def status_glyph(urgency: Urgency) -> str:
     return '<span class="mw-status-icon mw-status-open" aria-hidden="true">◎</span>'
 
 
+def _open_task_drawer(task_id: str, period: str) -> None:
+    st.session_state.drawer_task = (task_id, period)
+    st.session_state.drawer_edit = False
+    st.rerun()
+
+
 def format_last_done_html(row: BoardTask) -> str:
     if not row.last_done_on:
         return ""
@@ -405,10 +411,11 @@ def main() -> None:
             glyph = status_glyph(row.urgency)
             last_html = format_last_done_html(row)
 
+            task_name = display_task_name(t.name)
             title_html = (
                 f'<div class="mw-card-title-block">'
                 f"{glyph}"
-                f'<span class="mw-task-title">{display_task_name(t.name)}</span>'
+                f'<span class="mw-task-title">{task_name}</span>'
                 f"</div>"
                 f"{last_html}"
             )
@@ -429,28 +436,54 @@ def main() -> None:
             with st.container(border=True):
                 uclass = urgency_class(row.urgency)
                 st.markdown(
-                    f'<div class="mw-task-shell {uclass} mw-task--open">{title_html}</div>',
+                    f'<span class="mw-task-shell {uclass} mw-task--open" aria-hidden="true"></span>',
+                    unsafe_allow_html=True,
+                )
+                st.markdown(
+                    '<span class="mw-card-header-marker" aria-hidden="true"></span>',
                     unsafe_allow_html=True,
                 )
                 with st.container(
                     horizontal=True,
                     gap="small",
-                    vertical_alignment="center",
-                    wrap=True,
+                    vertical_alignment="top",
+                    wrap=False,
                 ):
                     st.markdown(
-                        '<span class="mw-card-details-anchor" aria-hidden="true"></span>',
+                        f'<span class="mw-card-status-slot">{glyph}</span>',
                         unsafe_allow_html=True,
                     )
-                    det_key = f"det_{t.task_id}_{row.period}"
-                    if st.button("Details", key=det_key, type="secondary"):
-                        st.session_state.drawer_task = (t.task_id, row.period)
-                        st.session_state.drawer_edit = False
-                        st.rerun()
                     st.markdown(
-                        f'<div class="mw-card-meta-row">{meta_badges_html}</div>',
+                        '<span class="mw-card-title-hit" aria-hidden="true"></span>',
                         unsafe_allow_html=True,
                     )
+                    title_key = f"title_{t.task_id}_{row.period}"
+                    if st.button(
+                        task_name,
+                        key=title_key,
+                        type="tertiary",
+                        help="Open task details",
+                    ):
+                        _open_task_drawer(t.task_id, row.period)
+                    st.markdown(
+                        '<span class="mw-card-expand-anchor" aria-hidden="true"></span>',
+                        unsafe_allow_html=True,
+                    )
+                    exp_key = f"exp_{t.task_id}_{row.period}"
+                    if st.button(
+                        "",
+                        key=exp_key,
+                        icon=":material/open_in_full:",
+                        help=f"Open details for {task_name}",
+                        type="tertiary",
+                    ):
+                        _open_task_drawer(t.task_id, row.period)
+                if last_html:
+                    st.markdown(last_html, unsafe_allow_html=True)
+                st.markdown(
+                    f'<div class="mw-card-meta-row">{meta_badges_html}</div>',
+                    unsafe_allow_html=True,
+                )
                 notes_key = f"notes_{t.task_id}_{row.period}"
                 notes = st.text_input(
                     "Completion note",
