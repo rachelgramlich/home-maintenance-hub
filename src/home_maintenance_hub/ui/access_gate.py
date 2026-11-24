@@ -12,7 +12,7 @@ def enforce_access_gate(*, settings: Settings | None = None) -> None:
     if not cfg.require_auth:
         return
     if not st.user.is_logged_in:
-        st.login("google")
+        st.login()
         st.stop()
 
     raw = cfg.auth_email_allowlist or ""
